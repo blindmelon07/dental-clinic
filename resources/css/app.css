@@ -1,0 +1,121 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Noto Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-heading: 'Figtree', ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+    :root {
+        --color-primary: #0891B2;
+        --color-primary-dark: #0e7490;
+        --color-primary-light: #22D3EE;
+        --color-accent: #16A34A;
+        --color-accent-dark: #15803d;
+        --color-bg: #F0FDFA;
+        --color-fg: #134E4A;
+        --color-muted: #E8F1F6;
+        --color-border: #CCFBF1;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    *:focus-visible {
+        outline: 3px solid var(--color-primary);
+        outline-offset: 2px;
+        border-radius: 4px;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: var(--font-heading);
+    }
+}
+
+@layer utilities {
+    .skip-link {
+        position: absolute;
+        top: -100%;
+        left: 1rem;
+        z-index: 9999;
+        padding: 0.5rem 1rem;
+        background: var(--color-primary);
+        color: white;
+        font-weight: 600;
+        border-radius: 0 0 0.5rem 0.5rem;
+        text-decoration: none;
+        transition: top 0.2s;
+    }
+
+    .skip-link:focus {
+        top: 0;
+    }
+
+    .nav-link {
+        @apply px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-cyan-700 hover:bg-cyan-50 transition-all duration-150;
+    }
+
+    .nav-link-active {
+        @apply text-cyan-700 bg-cyan-50 font-semibold;
+    }
+
+    .btn-primary {
+        @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-cyan-600 text-white text-sm font-semibold rounded-xl hover:bg-cyan-700 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 transition-all duration-150 shadow-sm;
+    }
+
+    .btn-secondary {
+        @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-slate-300 text-slate-700 text-sm font-medium rounded-xl hover:bg-slate-50 transition-all duration-150;
+    }
+
+    .btn-accent {
+        @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-green-600 text-white text-sm font-semibold rounded-xl hover:bg-green-700 focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 transition-all duration-150 shadow-sm;
+    }
+
+    .card {
+        @apply bg-white rounded-2xl shadow-sm border border-slate-100;
+    }
+
+    .badge {
+        @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    }
+
+    .input-field {
+        @apply w-full rounded-xl border border-slate-300 bg-white text-slate-900 text-sm px-3 py-2.5 shadow-sm
+               transition-colors duration-150
+               focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20
+               placeholder:text-slate-400;
+    }
+
+    /* Prevent browser autofill from overriding background */
+    .input-field:-webkit-autofill,
+    .input-field:-webkit-autofill:hover,
+    .input-field:-webkit-autofill:focus {
+        -webkit-box-shadow: 0 0 0 1000px white inset;
+        -webkit-text-fill-color: #0f172a;
+        transition: background-color 9999s ease-in-out 0s;
+    }
+
+    .section-label {
+        @apply text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

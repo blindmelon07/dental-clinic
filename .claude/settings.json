@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(composer --version)",
+      "Bash(php --version)",
+      "Bash(composer create-project *)",
+      "Read(//c/Users/bry/AppData/Local/Temp/claude/c--xampp2-htdocs-DentCare/b5a6adf7-3071-4a9c-b4bb-a2fde51acb93/tasks/**)",
+      "Bash(composer require *)",
+      "Bash(grep -rn 'protected static \\\\?string $navigationGroup' /c/xampp2/htdocs/DentCare/app/Filament/ '--include=*.php' -l)",
+      "Bash(grep -rn 'protected static \\\\?string $navigationGroup\\\\|protected static \\\\?string $navigationIcon\\\\|protected static \\\\?int $navigationSort\\\\|protected static \\\\?string $recordTitleAttribute\\\\|protected static \\\\?string $model' /c/xampp2/htdocs/DentCare/vendor/filament/filament/src/Resources/Resource.php)",
+      "Bash(xargs grep *)",
+      "Bash(grep -rn \"namespace Filament\\\\\\\\\\\\\\\\Forms\\\\\\\\\\\\\\\\Components\" /c/xampp2/htdocs/DentCare/vendor/filament/forms/src/Components/TextInput.php)",
+      "Read(//c/xampp2/htdocs/DentCare/use Filament/Schemas/**)",
+      "Bash(python3 -c ' *)",
+      "Read(//c/Users/bry/.claude/plugins/cache/ui-ux-pro-max-skill/ui-ux-pro-max/2.5.0/.claude/skills/ui-ux-pro-max/**)",
+      "Bash(python scripts/search.py \"dental clinic healthcare medical professional patient management\" --design-system -p \"DentCare Management System\" -f markdown)",
+      "Read(//c/Users/bry/.claude/plugins/cache/ui-ux-pro-max-skill/**)",
+      "Bash(python scripts/search.py \"healthcare admin dashboard data-dense professional\" --domain ux)",
+      "Bash(python scripts/search.py \"admin dashboard clinic form table\" --domain style)",
+      "Bash(php -r \"require '/c/xampp2/htdocs/DentCare/vendor/autoload.php'; echo 'ok';\")",
+      "Bash(grep -rn \"Filament\\\\\\\\\\\\\\\\Forms\\\\\\\\\\\\\\\\Get\\\\|Filament\\\\\\\\\\\\\\\\Forms\\\\\\\\\\\\\\\\Set\" /c/xampp2/htdocs/DentCare/app/ --include=\"*.php\")",
+      "Bash(grep -rn \"use Filament\\\\\\\\\\\\\\\\Resources\\\\\\\\\\\\\\\\Pages\\\\\\\\\\\\\\\\ViewRecord\\\\|ViewRecord\" /c/xampp2/htdocs/DentCare/app/Filament --include=\"*.php\" -l)",
+      "Bash(xargs -I{} basename {} .php)",
+      "Bash(php -r ' *)"
+    ]
+  }
+}
