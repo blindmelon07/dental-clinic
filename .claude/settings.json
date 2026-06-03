@@ -21,7 +21,11 @@
       "Bash(grep -rn \"Filament\\\\\\\\\\\\\\\\Forms\\\\\\\\\\\\\\\\Get\\\\|Filament\\\\\\\\\\\\\\\\Forms\\\\\\\\\\\\\\\\Set\" /c/xampp2/htdocs/DentCare/app/ --include=\"*.php\")",
       "Bash(grep -rn \"use Filament\\\\\\\\\\\\\\\\Resources\\\\\\\\\\\\\\\\Pages\\\\\\\\\\\\\\\\ViewRecord\\\\|ViewRecord\" /c/xampp2/htdocs/DentCare/app/Filament --include=\"*.php\" -l)",
       "Bash(xargs -I{} basename {} .php)",
-      "Bash(php -r ' *)"
+      "Bash(php -r ' *)",
+      "Bash(pip show *)",
+      "Bash(python c:\\\\xampp2\\\\htdocs\\\\DentCare\\\\generate_docs.py)",
+      "Bash(python \"c:\\\\xampp2\\\\htdocs\\\\DentCare\\\\generate_docs.py\")",
+      "Bash(del \"c:\\\\xampp2\\\\htdocs\\\\DentCare\\\\generate_docs.py\")"
     ]
   }
 }

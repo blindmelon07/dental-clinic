@@ -43,26 +43,26 @@ class RegisteredUserController extends Controller
 
         $user->assignRole('patient');
 
-        $clinic = Clinic::where('is_active', true)->first();
+        $clinic = Clinic::where('is_active', true)->first() ?? Clinic::first();
 
         if ($clinic) {
             $user->update(['clinic_id' => $clinic->id]);
 
             Patient::create([
-                'user_id'       => $user->id,
-                'clinic_id'     => $clinic->id,
+                'user_id'        => $user->id,
+                'clinic_id'      => $clinic->id,
                 'patient_number' => 'PT-' . date('Ymd') . '-' . str_pad(
-                    Patient::whereDate('created_at', today())->count(),
+                    Patient::whereDate('created_at', today())->count() + 1,
                     4, '0', STR_PAD_LEFT
                 ),
-                'first_name'    => $request->first_name,
-                'last_name'     => $request->last_name,
-                'date_of_birth' => $request->date_of_birth,
-                'gender'        => $request->gender,
-                'phone'         => $request->phone,
-                'email'         => $request->email,
-                'address'       => $request->address,
-                'city'          => $request->city,
+                'first_name'     => $request->first_name,
+                'last_name'      => $request->last_name,
+                'date_of_birth'  => $request->date_of_birth,
+                'gender'         => $request->gender,
+                'phone'          => $request->phone,
+                'email'          => $request->email,
+                'address'        => $request->address,
+                'city'           => $request->city,
             ]);
         }
 
