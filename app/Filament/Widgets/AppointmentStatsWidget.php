@@ -4,7 +4,6 @@ namespace App\Filament\Widgets;
 
 use App\Enums\AppointmentStatus;
 use App\Models\Appointment;
-use App\Models\Invoice;
 use App\Models\Patient;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -12,13 +11,18 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 class AppointmentStatsWidget extends BaseWidget
 {
     protected static ?int $sort = 1;
+    protected ?string $heading = 'Clinic Overview';
+    protected ?string $description = 'Appointments, patients, and reminders at a glance';
 
     protected function getStats(): array
     {
-        $todayAppointments = Appointment::whereDate('appointment_date', today())->count();
+        $todayAppointments   = Appointment::whereDate('appointment_date', today())->count();
         $pendingAppointments = Appointment::where('status', AppointmentStatus::Pending)->count();
-        $totalPatients = Patient::where('is_active', true)->count();
-        $monthRevenue = Invoice::whereMonth('invoice_date', now()->month)->sum('amount_paid');
+        $totalPatients       = Patient::where('is_active', true)->count();
+        $cleaningsDue        = Patient::whereNotNull('next_cleaning_due')
+            ->where('next_cleaning_due', '<=', now()->addDays(30))
+            ->where('is_active', true)
+            ->count();
 
         return [
             Stat::make("Today's Appointments", $todayAppointments)
@@ -36,10 +40,10 @@ class AppointmentStatsWidget extends BaseWidget
                 ->icon('heroicon-o-users')
                 ->color('success'),
 
-            Stat::make('Monthly Revenue', '₱' . number_format($monthRevenue, 2))
-                ->description('Collected this month')
-                ->icon('heroicon-o-banknotes')
-                ->color('info'),
+            Stat::make('Cleaning Reminders', $cleaningsDue)
+                ->description('Due or overdue within 30 days')
+                ->icon('heroicon-o-sparkles')
+                ->color($cleaningsDue > 0 ? 'danger' : 'success'),
         ];
     }
 }

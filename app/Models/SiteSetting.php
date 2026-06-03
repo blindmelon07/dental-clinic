@@ -15,7 +15,7 @@ class SiteSetting extends Model
     public static function instance(): static
     {
         return static::firstOrCreate(['id' => 1], [
-            'clinic_name' => 'DentCare Dental Clinic',
+            'clinic_name' => 'Gonzales Dental Clinic',
             'tagline'     => 'Your Trusted Dental Care Partner',
         ]);
     }
@@ -30,6 +30,6 @@ class SiteSetting extends Model
         if ($this->logo) {
             return asset('storage/' . $this->logo);
         }
-        return asset('images/gghi logo (1).png');
+        return asset('images/logo.png');
     }
 }

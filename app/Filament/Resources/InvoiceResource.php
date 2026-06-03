@@ -13,6 +13,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
@@ -165,11 +166,43 @@ class InvoiceResource extends Resource
                     TextEntry::make('discount_amount')->label('Discount')->money('PHP'),
                     TextEntry::make('tax_amount')->label('Tax')->money('PHP'),
                     TextEntry::make('total')->money('PHP')->weight('bold'),
-                    TextEntry::make('amount_paid')->money('PHP')
-                        ->color('success'),
+                    TextEntry::make('amount_paid')->money('PHP')->color('success'),
                     TextEntry::make('balance_due')->money('PHP')
-                        ->color(fn (Invoice $record) => $record->balance_due > 0 ? 'danger' : 'success'),
+                        ->color(fn (Invoice $record) => $record->balance_due > 0 ? 'danger' : 'success')
+                        ->weight('bold'),
                 ])->columns(3),
+
+            Section::make('Payment History')
+                ->schema([
+                    RepeatableEntry::make('payments')
+                        ->schema([
+                            TextEntry::make('payment_number')
+                                ->label('Payment #')
+                                ->copyable(),
+                            TextEntry::make('paid_at')
+                                ->label('Date')
+                                ->dateTime('M d, Y g:i A'),
+                            TextEntry::make('amount')
+                                ->label('Amount')
+                                ->money('PHP')
+                                ->color('success')
+                                ->weight('bold'),
+                            TextEntry::make('payment_method')
+                                ->label('Method')
+                                ->badge()
+                                ->formatStateUsing(fn ($state) => $state instanceof \App\Enums\PaymentMethod ? $state->label() : $state),
+                            TextEntry::make('reference_number')
+                                ->label('Reference #')
+                                ->placeholder('—'),
+                            TextEntry::make('notes')
+                                ->label('Notes')
+                                ->placeholder('—'),
+                        ])
+                        ->columns(3)
+                        ->columnSpanFull(),
+                ])
+                ->collapsible()
+                ->columnSpanFull(),
         ]);
     }
 

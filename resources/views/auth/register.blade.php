@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Create Account — GSAC General Hospital Inc.</title>
+    <title>Create Account — Gonzales Dental Clinic</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&family=Noto+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -17,7 +17,7 @@
         <div class="text-center mb-8">
             <a href="{{ route('login') }}" class="inline-flex flex-col items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 rounded-2xl p-2">
                 <img src="{{ \App\Models\SiteSetting::instance()->logoUrl() }}"
-                     alt="GSAC General Hospital Inc."
+                     alt="Gonzales Dental Clinic"
                      class="h-16 w-auto object-contain">
                 <p class="text-slate-500 text-sm">Patient Registration</p>
             </a>

@@ -19,14 +19,21 @@ class Patient extends Model
         'email', 'address', 'city', 'emergency_contact_name',
         'emergency_contact_phone', 'emergency_contact_relation',
         'allergies', 'medical_conditions', 'current_medications', 'is_active',
+        'photo', 'next_cleaning_due',
     ];
+
+    public function photoUrl(): ?string
+    {
+        return $this->photo ? asset("storage/{$this->photo}") : null;
+    }
 
     protected function casts(): array
     {
         return [
-            'date_of_birth' => 'date',
-            'gender'        => Gender::class,
-            'is_active'     => 'boolean',
+            'date_of_birth'     => 'date',
+            'gender'            => Gender::class,
+            'is_active'         => 'boolean',
+            'next_cleaning_due' => 'date',
         ];
     }
 

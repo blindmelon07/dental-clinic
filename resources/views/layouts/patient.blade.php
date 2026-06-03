@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>GSAC General Hospital Inc. — Patient Portal</title>
+    <title>Gonzales Dental Clinic — Patient Portal</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,9 +33,9 @@
                             <a href="{{ route('patient.dashboard') }}"
                                class="flex items-center flex-shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 rounded-lg"
                                wire:navigate
-                               aria-label="GSAC General Hospital Inc. home">
+                               aria-label="Gonzales Dental Clinic home">
                                 <img src="{{ \App\Models\SiteSetting::instance()->logoUrl() }}"
-                                     alt="GSAC General Hospital Inc."
+                                     alt="Gonzales Dental Clinic"
                                      class="h-10 w-auto object-contain">
                             </a>
 
@@ -81,6 +81,7 @@
                             </a>
 
                             {{-- User menu --}}
+                            @php $patientPhoto = auth()->user()->patient?->photoUrl(); @endphp
                             <div class="relative" x-data="{ userOpen: false }">
                                 <button @click="userOpen = !userOpen"
                                         @keydown.escape="userOpen = false"
@@ -88,9 +89,14 @@
                                         aria-haspopup="true"
                                         aria-controls="user-menu"
                                         class="flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-slate-100 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500">
-                                    <div class="w-8 h-8 rounded-full bg-cyan-100 flex items-center justify-center text-cyan-700 font-heading font-bold text-sm border border-cyan-200" aria-hidden="true">
-                                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                                    </div>
+                                    @if($patientPhoto)
+                                        <img src="{{ $patientPhoto }}" alt="{{ auth()->user()->name }}"
+                                             class="w-8 h-8 rounded-full object-cover border border-cyan-200" aria-hidden="true">
+                                    @else
+                                        <div class="w-8 h-8 rounded-full bg-cyan-100 flex items-center justify-center text-cyan-700 font-heading font-bold text-sm border border-cyan-200" aria-hidden="true">
+                                            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                        </div>
+                                    @endif
                                     <span class="hidden md:block text-sm font-medium text-slate-700 max-w-[140px] truncate">{{ auth()->user()->name }}</span>
                                     <svg class="w-4 h-4 text-slate-400 transition-transform duration-150" :class="{ 'rotate-180': userOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -111,10 +117,31 @@
                                      aria-label="User menu"
                                      class="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-lg border border-slate-200 py-2 z-50"
                                      style="display: none;">
-                                    <div class="px-4 py-2 border-b border-slate-100 mb-1">
-                                        <p class="text-sm font-semibold text-slate-900 truncate">{{ auth()->user()->name }}</p>
-                                        <p class="text-xs text-slate-500 truncate">{{ auth()->user()->email }}</p>
+                                    {{-- User info header --}}
+                                    <div class="px-4 py-3 border-b border-slate-100 mb-1 flex items-center gap-3">
+                                        @if($patientPhoto)
+                                            <img src="{{ $patientPhoto }}" alt="{{ auth()->user()->name }}"
+                                                 class="w-10 h-10 rounded-full object-cover border border-cyan-200 flex-shrink-0">
+                                        @else
+                                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-400 to-teal-500 flex items-center justify-center text-white font-heading font-bold text-sm flex-shrink-0">
+                                                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                            </div>
+                                        @endif
+                                        <div class="min-w-0">
+                                            <p class="text-sm font-semibold text-slate-900 truncate">{{ auth()->user()->name }}</p>
+                                            <p class="text-xs text-slate-500 truncate">{{ auth()->user()->email }}</p>
+                                        </div>
                                     </div>
+                                    {{-- My Profile link --}}
+                                    <a href="{{ route('patient.profile') }}"
+                                       role="menuitem"
+                                       wire:navigate
+                                       class="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors duration-150">
+                                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                        </svg>
+                                        My Profile
+                                    </a>
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf
                                         <button type="submit"
@@ -238,12 +265,12 @@
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div class="flex items-center gap-3">
                         <img src="{{ \App\Models\SiteSetting::instance()->logoUrl() }}"
-                             alt="GSAC General Hospital Inc."
+                             alt="Gonzales Dental Clinic"
                              class="h-7 w-auto object-contain">
                         <span class="text-slate-300">·</span>
                         <span class="text-sm text-slate-500">Patient Portal</span>
                     </div>
-                    <p class="text-xs text-slate-400">&copy; {{ date('Y') }} GSAC General Hospital Inc. All rights reserved.</p>
+                    <p class="text-xs text-slate-400">&copy; {{ date('Y') }} Gonzales Dental Clinic All rights reserved.</p>
                 </div>
             </div>
         </footer>

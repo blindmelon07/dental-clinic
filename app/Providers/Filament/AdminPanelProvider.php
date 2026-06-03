@@ -4,6 +4,10 @@ namespace App\Providers\Filament;
 
 use App\Filament\Pages\Dashboard;
 use App\Filament\Widgets\AppointmentStatsWidget;
+use App\Filament\Widgets\BillingStatsWidget;
+use App\Filament\Widgets\CleaningRemindersWidget;
+use App\Filament\Widgets\InventoryStatsWidget;
+use App\Filament\Widgets\LowStockMedicinesWidget;
 use App\Filament\Widgets\RecentAppointmentsWidget;
 use App\Filament\Widgets\RevenueChartWidget;
 use Filament\Http\Middleware\Authenticate;
@@ -60,6 +64,9 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make('Billing & Payments')
                     ->icon('heroicon-o-banknotes')
                     ->collapsible(),
+                NavigationGroup::make('Inventory')
+                    ->icon('heroicon-o-archive-box')
+                    ->collapsible(),
                 NavigationGroup::make('Administration')
                     ->icon('heroicon-o-cog-6-tooth')
                     ->collapsible(),
@@ -79,8 +86,12 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 AccountWidget::class,
                 AppointmentStatsWidget::class,
+                BillingStatsWidget::class,
                 RecentAppointmentsWidget::class,
                 RevenueChartWidget::class,
+                InventoryStatsWidget::class,
+                CleaningRemindersWidget::class,
+                LowStockMedicinesWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -98,7 +109,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
-                fn (): string => '<style>.fi-sidebar-nav{scrollbar-width:none;-ms-overflow-style:none;}.fi-sidebar-nav::-webkit-scrollbar{display:none;}</style>',
+                fn (): string => '<style>.fi-sidebar-nav{scrollbar-width:none;-ms-overflow-style:none;}.fi-sidebar-nav::-webkit-scrollbar{display:none;}.fi-logo img{border-radius:9999px;object-fit:cover;}</style>',
             );
     }
 }

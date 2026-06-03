@@ -1,6 +1,20 @@
 <div>
     {{-- Page Header --}}
-    <div class="mb-8">
+    <div class="mb-8 flex items-center gap-5">
+        {{-- Avatar --}}
+        @if($this->patient?->photo)
+            <img src="{{ $this->patient->photoUrl() }}"
+                 alt="{{ $this->patient->first_name }}"
+                 class="w-16 h-16 rounded-full object-cover border-4 border-white shadow-md flex-shrink-0">
+        @else
+            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-cyan-400 to-teal-500 flex items-center justify-center border-4 border-white shadow-md flex-shrink-0">
+                <span class="text-2xl font-bold text-white font-heading">
+                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                </span>
+            </div>
+        @endif
+
+        <div>
         <h1 class="font-heading text-3xl font-bold text-slate-900">
             Welcome back, {{ auth()->user()->name }}
         </h1>
@@ -14,9 +28,53 @@
                 <p class="text-sm text-amber-700 font-medium">Your patient profile is being set up. Please contact the clinic.</p>
             </div>
         @endif
+        </div>
     </div>
 
     @if($this->patient)
+
+    {{-- Cleaning Reminder Banner --}}
+    @if($this->patient->next_cleaning_due)
+        @php
+            $due = $this->patient->next_cleaning_due;
+            $daysUntil = now()->diffInDays($due, false); // negative = overdue
+        @endphp
+        @if($daysUntil <= 30)
+            <div class="mb-6 flex items-start gap-4 p-5 rounded-2xl border
+                {{ $daysUntil < 0
+                    ? 'bg-red-50 border-red-200'
+                    : 'bg-amber-50 border-amber-200' }}">
+                <div class="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center
+                    {{ $daysUntil < 0 ? 'bg-red-100' : 'bg-amber-100' }}">
+                    <svg class="w-5 h-5 {{ $daysUntil < 0 ? 'text-red-600' : 'text-amber-600' }}"
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <p class="font-semibold text-sm {{ $daysUntil < 0 ? 'text-red-800' : 'text-amber-800' }}">
+                        {{ $daysUntil < 0 ? 'Dental Cleaning Overdue!' : 'Dental Cleaning Reminder' }}
+                    </p>
+                    <p class="text-sm mt-0.5 {{ $daysUntil < 0 ? 'text-red-700' : 'text-amber-700' }}">
+                        {{ $daysUntil < 0
+                            ? 'Your 6-month cleaning was due on ' . $due->format('F d, Y') . '. Please book an appointment.'
+                            : 'Your next dental cleaning is due on ' . $due->format('F d, Y') . ' (' . $due->diffForHumans() . ').' }}
+                    </p>
+                </div>
+                <a href="{{ route('patient.book') }}"
+                   wire:navigate
+                   class="flex-shrink-0 px-4 py-2 text-xs font-semibold rounded-xl
+                       {{ $daysUntil < 0
+                           ? 'bg-red-600 hover:bg-red-700 text-white'
+                           : 'bg-amber-500 hover:bg-amber-600 text-white' }}
+                       transition-colors duration-150">
+                    Book Now
+                </a>
+            </div>
+        @endif
+    @endif
+
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         {{-- Upcoming Appointments --}}

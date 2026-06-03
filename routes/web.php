@@ -1,10 +1,12 @@
 <?php
 
+use App\Models\PatientCertificate;
 use App\Livewire\Patient\BookAppointment;
 use App\Livewire\Patient\Dashboard;
 use App\Livewire\Patient\MyAppointments;
 use App\Livewire\Patient\MyInvoices;
 use App\Livewire\Patient\MyRecords;
+use App\Livewire\Patient\Profile;
 use App\Models\Prescription;
 use Illuminate\Support\Facades\Route;
 
@@ -24,6 +26,31 @@ Route::middleware(['auth'])->prefix('patient')->name('patient.')->group(function
     Route::get('/book', BookAppointment::class)->name('book');
     Route::get('/records', MyRecords::class)->name('records');
     Route::get('/invoices', MyInvoices::class)->name('invoices');
+    Route::get('/profile', Profile::class)->name('profile');
+});
+
+// Certificate routes — staff only
+Route::middleware(['auth'])->group(function () {
+    Route::get('/certificates/{certificate}/download', function (PatientCertificate $certificate) {
+        abort_unless(
+            auth()->user()->hasAnyRole(['super_admin', 'admin', 'dentist', 'receptionist']),
+            403
+        );
+        $path = storage_path('app/public/' . $certificate->file_path);
+        abort_unless(file_exists($path), 404);
+        $filename = $certificate->typeLabel() . ' - ' . $certificate->patient->full_name . ' (' . $certificate->certificate_number . ').docx';
+        return response()->download($path, $filename);
+    })->name('certificate.download');
+
+    Route::get('/certificates/{certificate}/print', function (PatientCertificate $certificate) {
+        abort_unless(
+            auth()->user()->hasAnyRole(['super_admin', 'admin', 'dentist', 'receptionist']),
+            403
+        );
+        $clinic  = \App\Models\SiteSetting::instance();
+        $dentist = $certificate->issuedBy;
+        return view('certificates.print', compact('certificate', 'clinic', 'dentist'));
+    })->name('certificate.print');
 });
 
 // Prescription print — admin/staff only

@@ -17,6 +17,14 @@ class MyAppointments extends Component
     public string $statusFilter = '';
     public string $search = '';
 
+    public bool $showCancelModal = false;
+    public ?int $cancellingId = null;
+    public string $cancelAppointmentNumber = '';
+    public string $cancelServiceName = '';
+    public string $cancelDate = '';
+    public string $cancelDentist = '';
+    public string $cancelReason = '';
+
     #[Computed]
     public function patient(): ?Patient
     {
@@ -34,21 +42,56 @@ class MyAppointments extends Component
             ->paginate(10);
     }
 
-    public function cancelAppointment(int $id): void
+    public function openCancelModal(int $id): void
     {
-        $appointment = Appointment::findOrFail($id);
+        $appointment = Appointment::with(['service', 'dentist.user'])->findOrFail($id);
+
+        if ($appointment->patient_id !== $this->patient?->id) {
+            abort(403);
+        }
+
+        $this->cancellingId            = $id;
+        $this->cancelAppointmentNumber = $appointment->appointment_number;
+        $this->cancelServiceName       = $appointment->service->name ?? 'N/A';
+        $this->cancelDate              = $appointment->appointment_date->format('F d, Y') . ' at ' . date('g:i A', strtotime($appointment->start_time));
+        $dentistName = $appointment->dentist->user->name ?? 'N/A';
+        $this->cancelDentist = str_starts_with($dentistName, 'Dr.') ? $dentistName : 'Dr. ' . $dentistName;
+        $this->showCancelModal         = true;
+    }
+
+    public function confirmCancel(): void
+    {
+        if (! $this->cancellingId) {
+            return;
+        }
+
+        $appointment = Appointment::findOrFail($this->cancellingId);
 
         if ($appointment->patient_id !== $this->patient?->id) {
             abort(403);
         }
 
         if (! in_array($appointment->status, [AppointmentStatus::Pending, AppointmentStatus::Confirmed])) {
+            $this->closeCancelModal();
             $this->addError('cancel', 'This appointment cannot be cancelled.');
             return;
         }
 
-        $appointment->cancel('Cancelled by patient');
-        session()->flash('success', 'Appointment cancelled successfully.');
+        $reason = 'Cancelled by patient' . ($this->cancelReason ? ': ' . $this->cancelReason : '');
+        $appointment->cancel($reason);
+        $this->closeCancelModal();
+        session()->flash('success', 'Your appointment has been cancelled successfully.');
+    }
+
+    public function closeCancelModal(): void
+    {
+        $this->showCancelModal         = false;
+        $this->cancellingId            = null;
+        $this->cancelAppointmentNumber = '';
+        $this->cancelServiceName       = '';
+        $this->cancelDate              = '';
+        $this->cancelDentist           = '';
+        $this->cancelReason            = '';
     }
 
     public function updatedStatusFilter(): void

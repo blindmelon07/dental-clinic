@@ -297,7 +297,7 @@
 
     {{-- Header --}}
     <div class="header">
-        <img src="{{ \App\Models\SiteSetting::instance()->logoUrl() }}" alt="GSAC General Hospital Inc.">
+        <img src="{{ \App\Models\SiteSetting::instance()->logoUrl() }}" alt="Gonzales Dental Clinic">
         <div class="header-info">
             <div class="clinic-sub">Dental Department</div>
             @if($clinic)

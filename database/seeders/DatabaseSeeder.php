@@ -21,14 +21,14 @@ class DatabaseSeeder extends Seeder
 
         // Create clinic
         $clinic = Clinic::firstOrCreate(
-            ['slug' => 'dentcare-main'],
+            ['slug' => 'gonzales-dental-main'],
             [
-                'name'         => 'DentCare Dental Clinic',
-                'email'        => 'info@dentcare.local',
-                'phone'        => '+63 912 345 6789',
-                'address'      => '123 Main Street, Brgy. San Antonio',
-                'city'         => 'Quezon City',
-                'state'        => 'Metro Manila',
+                'name'         => 'Gonzales Dental Clinic',
+                'email'        => 'info@gonzalesdentalclinic.com',
+                'phone'        => '(052) 742 1192 / (+63) 917-548-8934 / (+63) 918-633-1795',
+                'address'      => '#28-1 Don Juan Estevez St. Guevara Subd.',
+                'city'         => 'Legaspi City',
+                'state'        => 'Albay',
                 'country'      => 'Philippines',
                 'description'  => 'Your trusted family dental clinic offering comprehensive oral health care.',
                 'is_active'    => true,
@@ -195,7 +195,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        $this->command->info('✅ DentCare seeded successfully!');
+        $this->command->info('✅ Gonzales Dental Clinic seeded successfully!');
         $this->command->table(
             ['Role', 'Email', 'Password'],
             [

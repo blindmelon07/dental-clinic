@@ -124,6 +124,19 @@ class PatientResource extends Resource
                 TextColumn::make('gender')->badge(),
                 TextColumn::make('date_of_birth')->date()->sortable(),
                 TextColumn::make('appointments_count')->counts('appointments')->sortable()->label('Visits'),
+                TextColumn::make('next_cleaning_due')
+                    ->label('Cleaning Due')
+                    ->date('M d, Y')
+                    ->sortable()
+                    ->badge()
+                    ->color(fn (?Patient $record): string => match (true) {
+                        $record?->next_cleaning_due === null           => 'gray',
+                        $record->next_cleaning_due->isPast()          => 'danger',
+                        $record->next_cleaning_due->diffInDays() <= 30 => 'warning',
+                        default                                        => 'success',
+                    })
+                    ->formatStateUsing(fn (?string $state): string => $state ? \Carbon\Carbon::parse($state)->format('M d, Y') : '—')
+                    ->toggleable(),
                 TextColumn::make('created_at')->date()->sortable()->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
