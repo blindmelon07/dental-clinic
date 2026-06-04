@@ -17,6 +17,7 @@ class CertificateGenerator
         }
 
         $processor = new TemplateProcessor($template);
+        $cert->refresh();
         $patient   = $cert->patient;
         $dentist   = $cert->issuedBy;
 

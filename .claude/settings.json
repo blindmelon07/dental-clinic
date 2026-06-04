@@ -30,7 +30,25 @@
       "Bash(xargs php -l)",
       "Bash(grep -c '$certificate' 'c:\\\\xampp2\\\\htdocs\\\\DentCare\\\\resources\\\\views\\\\certificates\\\\print.blade.php')",
       "Bash(grep -c '$cert[^i]' 'c:\\\\xampp2\\\\htdocs\\\\DentCare\\\\resources\\\\views\\\\certificates\\\\print.blade.php')",
-      "Bash(grep -v \"^$\")"
+      "Bash(grep -v \"^$\")",
+      "Bash(powershell -Command \"Get-Process -Name httpd, php -ErrorAction SilentlyContinue | Select-Object Name, Id\")",
+      "Bash(php c:/xampp2/htdocs/DentCare/artisan --version)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost/)",
+      "Bash(php c:/xampp2/htdocs/DentCare/artisan tinker '--execute= *)",
+      "Bash(cp \"c:/xampp2/htdocs/DentCare/storage/app/public/certificates/certification_TEST-VERIFY-001.docx\" \"/tmp/test_cert.zip\")",
+      "Bash(unzip -p /tmp/test_cert.zip word/document.xml)",
+      "Bash(cp \"c:/xampp2/htdocs/DentCare/storage/app/public/certificates/certification_TEST-VERIFY-001.docx\" /tmp/test_cert.zip)",
+      "Bash(unzip -o /tmp/test_cert.zip -d /tmp/test_cert_extracted)",
+      "Read(//tmp/test_cert_extracted/word/**)",
+      "Bash(ls /tmp/test_cert_extracted/word/ 2>&1 || echo \"Dir not found\" *)",
+      "Read(//tmp/test_cert_extracted/**)",
+      "Bash(php c:/xampp2/htdocs/DentCare/fix_templates.php)",
+      "Bash(php c:/xampp2/htdocs/DentCare/check_templates.php)",
+      "Bash(php c:/xampp2/htdocs/DentCare/test_cert.php)",
+      "Bash(php c:/xampp2/htdocs/DentCare/regen_certs.php)",
+      "Bash(php c:/xampp2/htdocs/DentCare/fix_layout.php)",
+      "Bash(php c:/xampp2/htdocs/DentCare/fix_layout2.php)",
+      "Bash(php c:/xampp2/htdocs/DentCare/test_abegael.php)"
     ]
   }
 }
