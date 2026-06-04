@@ -56,7 +56,9 @@
       "Bash(git -C c:/xampp2/htdocs/DentCare add storage/app/templates/ storage/app/.gitignore)",
       "Bash(git -C c:/xampp2/htdocs/DentCare status --short)",
       "Bash(git -C c:/xampp2/htdocs/DentCare log --oneline -3)",
-      "Bash(git -C c:/xampp2/htdocs/DentCare commit -m ' *)"
+      "Bash(git -C c:/xampp2/htdocs/DentCare commit -m ' *)",
+      "Bash(php c:/xampp2/htdocs/DentCare/artisan migrate:fresh --seed --force)",
+      "Bash(git -C c:/xampp2/htdocs/DentCare add database/seeders/DatabaseSeeder.php)"
     ]
   }
 }
