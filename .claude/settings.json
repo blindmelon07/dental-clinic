@@ -48,7 +48,15 @@
       "Bash(php c:/xampp2/htdocs/DentCare/regen_certs.php)",
       "Bash(php c:/xampp2/htdocs/DentCare/fix_layout.php)",
       "Bash(php c:/xampp2/htdocs/DentCare/fix_layout2.php)",
-      "Bash(php c:/xampp2/htdocs/DentCare/test_abegael.php)"
+      "Bash(php c:/xampp2/htdocs/DentCare/test_abegael.php)",
+      "Bash(git -C c:/xampp2/htdocs/DentCare status storage/app/templates/)",
+      "Bash(git -C c:/xampp2/htdocs/DentCare ls-files storage/app/templates/)",
+      "Bash(git -C c:/xampp2/htdocs/DentCare ls-files --error-unmatch storage/app/templates/certification_template.docx)",
+      "Bash(git -C c:/xampp2/htdocs/DentCare check-ignore -v storage/app/templates/certification_template.docx)",
+      "Bash(git -C c:/xampp2/htdocs/DentCare add storage/app/templates/ storage/app/.gitignore)",
+      "Bash(git -C c:/xampp2/htdocs/DentCare status --short)",
+      "Bash(git -C c:/xampp2/htdocs/DentCare log --oneline -3)",
+      "Bash(git -C c:/xampp2/htdocs/DentCare commit -m ' *)"
     ]
   }
 }
