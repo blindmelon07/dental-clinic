@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Patient;
 use App\Models\PatientCertificate;
 use App\Livewire\Patient\BookAppointment;
 use App\Livewire\Patient\Dashboard;
@@ -67,6 +68,18 @@ Route::middleware(['auth'])->group(function () {
 
         return view('prescriptions.print', compact('prescription', 'clinic'));
     })->name('prescription.print');
+});
+
+// Referral form print — staff only
+Route::middleware(['auth'])->group(function () {
+    Route::get('/patients/{patient}/referral/print', function (Patient $patient) {
+        abort_unless(
+            auth()->user()->hasAnyRole(['super_admin', 'admin', 'dentist', 'receptionist']),
+            403
+        );
+        $clinic = \App\Models\SiteSetting::instance();
+        return view('referrals.print', compact('patient', 'clinic'));
+    })->name('patient.referral.print');
 });
 
 require __DIR__ . '/auth.php';
