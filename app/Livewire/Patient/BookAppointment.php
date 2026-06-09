@@ -63,8 +63,12 @@ class BookAppointment extends Component
 
         $bookedSlots = Appointment::where('dentist_id', $this->selectedDentistId)
             ->whereDate('appointment_date', $this->selectedDate)
-            ->whereNotIn('status', ['cancelled', 'no_show'])
+            ->whereNotIn('status', [
+                AppointmentStatus::Cancelled->value,
+                AppointmentStatus::NoShow->value,
+            ])
             ->pluck('start_time')
+            ->map(fn ($t) => substr($t, 0, 5))
             ->toArray();
 
         $slots = [];
