@@ -58,7 +58,30 @@
       "Bash(git -C c:/xampp2/htdocs/DentCare log --oneline -3)",
       "Bash(git -C c:/xampp2/htdocs/DentCare commit -m ' *)",
       "Bash(php c:/xampp2/htdocs/DentCare/artisan migrate:fresh --seed --force)",
-      "Bash(git -C c:/xampp2/htdocs/DentCare add database/seeders/DatabaseSeeder.php)"
+      "Bash(git -C c:/xampp2/htdocs/DentCare add database/seeders/DatabaseSeeder.php)",
+      "Bash(Get-ChildItem -Path \"c:\\\\xampp2\\\\htdocs\\\\DentCare\" -Directory)",
+      "Bash(Select-Object Name)",
+      "Bash(xargs wc -l)",
+      "Bash(pandoc --version)",
+      "Bash(python -c \"import docx\")",
+      "Bash(python \"c:\\\\xampp2\\\\htdocs\\\\DentCare\\\\.docs\\\\generate_docx.py\")",
+      "Bash(Remove-Item \"c:\\\\xampp2\\\\htdocs\\\\DentCare\\\\.docs\\\\generate_docx.py\")",
+      "Bash(python \"c:\\\\xampp2\\\\htdocs\\\\DentCare\\\\.docs\\\\generate_tutorial.py\")",
+      "Bash(python -c \"import pptx; print\\(pptx.__version__\\)\")",
+      "Bash(pip install *)",
+      "Bash(python \"c:\\\\xampp2\\\\htdocs\\\\DentCare\\\\.docs\\\\generate_pptx.py\")",
+      "Bash(python -c \"import edge_tts; print\\('edge-tts ok'\\)\")",
+      "Bash(python -c \"import asyncio, edge_tts; print\\('edge-tts ready'\\)\")",
+      "Bash(ffmpeg -version)",
+      "PowerShell(ffmpeg -version 2>&1)",
+      "Bash(python -c \"import comtypes; print\\('comtypes ok'\\)\")",
+      "Bash(python -c \"import comtypes.client; app=comtypes.client.CreateObject\\('PowerPoint.Application'\\); print\\('PowerPoint COM ready'\\); app.Quit\\(\\)\")",
+      "PowerShell(pip install moviepy pillow mutagen -q)",
+      "PowerShell(python -c \"import moviepy; print\\(moviepy.__version__\\)\")",
+      "Bash(python generate_video.py)",
+      "Bash(Get-Content \"C:\\\\Users\\\\bry\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--xampp2-htdocs-DentCare\\\\a8d6af84-af07-4223-a273-33e855f52228\\\\tasks\\\\b8ps5iuvq.output\" -Raw)",
+      "PowerShell(Get-Content \"C:\\\\Users\\\\bry\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--xampp2-htdocs-DentCare\\\\a8d6af84-af07-4223-a273-33e855f52228\\\\tasks\\\\b8ps5iuvq.output\" -Raw 2>&1; Write-Host \"---\"; if \\(Test-Path \"C:\\\\xampp2\\\\htdocs\\\\DentCare\\\\.docs\\\\system-tutorial.mp4\"\\) { $f = Get-Item \"C:\\\\xampp2\\\\htdocs\\\\DentCare\\\\.docs\\\\system-tutorial.mp4\"; Write-Host \"MP4 EXISTS: $\\([math]::Round\\($f.Length/1MB,1\\)\\) MB\" } else { Write-Host \"MP4 not yet created\" })",
+      "PowerShell(Get-Process python -ErrorAction SilentlyContinue | Select-Object Id, CPU, WorkingSet | Format-Table -AutoSize; Write-Host \"---\"; $f = Get-Item \"C:\\\\xampp2\\\\htdocs\\\\DentCare\\\\.docs\\\\system-tutorial.mp4\" -ErrorAction SilentlyContinue; if \\($f\\) { Write-Host \"MP4 size: $\\([math]::Round\\($f.Length/1MB,2\\)\\) MB  \\(last write: $\\($f.LastWriteTime\\)\\)\" })"
     ]
   }
 }

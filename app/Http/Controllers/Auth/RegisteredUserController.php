@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\WelcomeMail;
 use App\Models\Clinic;
 use App\Models\Patient;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -67,6 +70,14 @@ class RegisteredUserController extends Controller
         }
 
         event(new Registered($user));
+
+        try {
+            $user->load('patient');
+            Mail::to($user->email)->send(new WelcomeMail($user));
+        } catch (\Exception $e) {
+            Log::error('WelcomeMail failed: ' . $e->getMessage(), ['user_id' => $user->id]);
+        }
+
         Auth::login($user);
 
         return redirect()->route('patient.dashboard');

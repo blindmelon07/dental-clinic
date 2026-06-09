@@ -44,6 +44,13 @@ class PermissionSeeder extends Seeder
         'update_invoice',
         'delete_invoice',
 
+        // Service Categories
+        'view_any_service_category',
+        'view_service_category',
+        'create_service_category',
+        'update_service_category',
+        'delete_service_category',
+
         // Services
         'view_any_service',
         'view_service',
@@ -82,6 +89,7 @@ class PermissionSeeder extends Seeder
             'view_any_dental_record', 'view_dental_record', 'create_dental_record', 'update_dental_record', 'delete_dental_record',
             'view_any_prescription', 'view_prescription', 'create_prescription', 'update_prescription', 'delete_prescription',
             'view_any_invoice', 'view_invoice', 'create_invoice', 'update_invoice', 'delete_invoice',
+            'view_any_service_category', 'view_service_category', 'create_service_category', 'update_service_category', 'delete_service_category',
             'view_any_service', 'view_service', 'create_service', 'update_service', 'delete_service',
             'view_any_dentist', 'view_dentist', 'create_dentist', 'update_dentist', 'delete_dentist',
             'view_any_user', 'view_user', 'create_user', 'update_user',
@@ -92,6 +100,7 @@ class PermissionSeeder extends Seeder
             'view_any_appointment', 'view_appointment', 'create_appointment', 'update_appointment', 'delete_appointment',
             'view_any_prescription', 'view_prescription',
             'view_any_invoice', 'view_invoice', 'create_invoice', 'update_invoice',
+            'view_any_service_category', 'view_service_category',
             'view_any_service', 'view_service',
             'view_any_dentist', 'view_dentist',
         ],
@@ -101,6 +110,7 @@ class PermissionSeeder extends Seeder
             'view_any_appointment', 'view_appointment', 'update_appointment',
             'view_any_dental_record', 'view_dental_record', 'create_dental_record', 'update_dental_record',
             'view_any_prescription', 'view_prescription', 'create_prescription', 'update_prescription',
+            'view_any_service_category', 'view_service_category',
             'view_any_service', 'view_service', 'update_service',
             'view_any_dentist', 'view_dentist',
         ],
