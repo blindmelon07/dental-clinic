@@ -24,7 +24,7 @@ class AppointmentObserver
 
         try {
             Mail::to($email)->send(new AppointmentBookedMail($appointment));
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('AppointmentBookedMail failed: ' . $e->getMessage(), [
                 'appointment_id' => $appointment->id,
             ]);
@@ -62,7 +62,7 @@ class AppointmentObserver
             } elseif ($appointment->status === AppointmentStatus::Cancelled) {
                 Mail::to($email)->send(new AppointmentCancelledMail($appointment));
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Appointment status email failed: ' . $e->getMessage(), [
                 'appointment_id' => $appointment->id,
                 'status'         => $appointment->status->value,

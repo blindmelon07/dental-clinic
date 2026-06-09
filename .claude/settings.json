@@ -81,7 +81,13 @@
       "Bash(python generate_video.py)",
       "Bash(Get-Content \"C:\\\\Users\\\\bry\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--xampp2-htdocs-DentCare\\\\a8d6af84-af07-4223-a273-33e855f52228\\\\tasks\\\\b8ps5iuvq.output\" -Raw)",
       "PowerShell(Get-Content \"C:\\\\Users\\\\bry\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--xampp2-htdocs-DentCare\\\\a8d6af84-af07-4223-a273-33e855f52228\\\\tasks\\\\b8ps5iuvq.output\" -Raw 2>&1; Write-Host \"---\"; if \\(Test-Path \"C:\\\\xampp2\\\\htdocs\\\\DentCare\\\\.docs\\\\system-tutorial.mp4\"\\) { $f = Get-Item \"C:\\\\xampp2\\\\htdocs\\\\DentCare\\\\.docs\\\\system-tutorial.mp4\"; Write-Host \"MP4 EXISTS: $\\([math]::Round\\($f.Length/1MB,1\\)\\) MB\" } else { Write-Host \"MP4 not yet created\" })",
-      "PowerShell(Get-Process python -ErrorAction SilentlyContinue | Select-Object Id, CPU, WorkingSet | Format-Table -AutoSize; Write-Host \"---\"; $f = Get-Item \"C:\\\\xampp2\\\\htdocs\\\\DentCare\\\\.docs\\\\system-tutorial.mp4\" -ErrorAction SilentlyContinue; if \\($f\\) { Write-Host \"MP4 size: $\\([math]::Round\\($f.Length/1MB,2\\)\\) MB  \\(last write: $\\($f.LastWriteTime\\)\\)\" })"
+      "PowerShell(Get-Process python -ErrorAction SilentlyContinue | Select-Object Id, CPU, WorkingSet | Format-Table -AutoSize; Write-Host \"---\"; $f = Get-Item \"C:\\\\xampp2\\\\htdocs\\\\DentCare\\\\.docs\\\\system-tutorial.mp4\" -ErrorAction SilentlyContinue; if \\($f\\) { Write-Host \"MP4 size: $\\([math]::Round\\($f.Length/1MB,2\\)\\) MB  \\(last write: $\\($f.LastWriteTime\\)\\)\" })",
+      "Bash(Get-Content \"c:\\\\xampp2\\\\htdocs\\\\DentCare\\\\storage\\\\logs\\\\laravel.log\" -Tail 60)",
+      "Bash(php -l app/Mail/WelcomeMail.php)",
+      "Bash(php -l app/Mail/AppointmentBookedMail.php)",
+      "Bash(php -l app/Mail/AppointmentConfirmedMail.php)",
+      "Bash(php -l app/Mail/AppointmentCancelledMail.php)",
+      "Bash(php -l app/Observers/AppointmentObserver.php)"
     ]
   }
 }

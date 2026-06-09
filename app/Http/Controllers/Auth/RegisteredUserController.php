@@ -69,12 +69,16 @@ class RegisteredUserController extends Controller
             ]);
         }
 
-        event(new Registered($user));
+        try {
+            event(new Registered($user));
+        } catch (\Throwable $e) {
+            Log::error('Registered event failed: ' . $e->getMessage(), ['user_id' => $user->id]);
+        }
 
         try {
             $user->load('patient');
             Mail::to($user->email)->send(new WelcomeMail($user));
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('WelcomeMail failed: ' . $e->getMessage(), ['user_id' => $user->id]);
         }
 
