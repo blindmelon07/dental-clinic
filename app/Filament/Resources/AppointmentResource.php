@@ -135,7 +135,7 @@ class AppointmentResource extends Resource
                     TextEntry::make('patient.full_name')->label('Patient'),
                     TextEntry::make('dentist.user.name')->label('Dentist')
                         ->formatStateUsing(fn ($state) => 'Dr. ' . $state),
-                    TextEntry::make('service.name')->label('Service'),
+                    TextEntry::make('service.display_name')->label('Service'),
                     TextEntry::make('type')->badge(),
                     TextEntry::make('appointment_date')->date(),
                     TextEntry::make('start_time')->time()
@@ -162,7 +162,7 @@ class AppointmentResource extends Resource
                 TextColumn::make('start_time')->time()->sortable(),
                 TextColumn::make('patient.full_name')->searchable(['patient.first_name', 'patient.last_name'])->label('Patient'),
                 TextColumn::make('dentist.user.name')->label('Dentist')->searchable(),
-                TextColumn::make('service.name')->label('Service')->searchable(),
+                TextColumn::make('service.display_name')->label('Service'),
                 TextColumn::make('type')->badge()->sortable(),
                 TextColumn::make('status')->badge()->sortable()
                     ->color(fn (AppointmentStatus $state): string => $state->color()),
@@ -210,6 +210,6 @@ class AppointmentResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->with(['patient', 'dentist.user', 'service']);
+        return parent::getEloquentQuery()->with(['patient', 'dentist.user', 'service.category']);
     }
 }

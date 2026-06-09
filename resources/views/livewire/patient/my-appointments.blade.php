@@ -44,7 +44,7 @@
 
                             {{-- Details --}}
                             <div class="min-w-0">
-                                <h2 class="font-heading font-semibold text-slate-900">{{ $appointment->service->name ?? 'N/A' }}</h2>
+                                <h2 class="font-heading font-semibold text-slate-900">{{ $appointment->service->display_name ?? 'N/A' }}</h2>
                                 <p class="text-sm text-slate-500 mt-0.5">
                                     Dr. {{ $appointment->dentist->user->name ?? 'N/A' }}
                                     <span class="text-slate-300 mx-1" aria-hidden="true">·</span>

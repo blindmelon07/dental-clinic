@@ -35,6 +35,12 @@ class Service extends Model
         return $this->belongsTo(ServiceCategory::class, 'service_category_id');
     }
 
+    public function getDisplayNameAttribute(): string
+    {
+        $categoryName = $this->category?->name;
+        return $categoryName ? "{$categoryName} – {$this->name}" : $this->name;
+    }
+
     public function appointments(): HasMany
     {
         return $this->hasMany(Appointment::class);

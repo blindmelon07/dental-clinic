@@ -34,7 +34,7 @@ class MyAppointments extends Component
     #[Computed]
     public function appointments()
     {
-        return Appointment::with(['dentist.user', 'service'])
+        return Appointment::with(['dentist.user', 'service.category'])
             ->where('patient_id', $this->patient?->id)
             ->when($this->statusFilter, fn ($q) => $q->where('status', $this->statusFilter))
             ->orderBy('appointment_date', 'desc')

@@ -21,7 +21,7 @@ class Dashboard extends Component
     #[Computed]
     public function upcomingAppointments()
     {
-        return Appointment::with(['dentist.user', 'service'])
+        return Appointment::with(['dentist.user', 'service.category'])
             ->where('patient_id', $this->patient?->id)
             ->whereDate('appointment_date', '>=', today())
             ->whereIn('status', [AppointmentStatus::Pending, AppointmentStatus::Confirmed])

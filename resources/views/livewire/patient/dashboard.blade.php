@@ -93,7 +93,7 @@
                         <span class="text-2xl font-bold text-cyan-700 leading-tight">{{ $appointment->appointment_date->format('d') }}</span>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <p class="font-semibold text-slate-900 truncate">{{ $appointment->service->name ?? 'Service' }}</p>
+                        <p class="font-semibold text-slate-900 truncate">{{ $appointment->service->display_name ?? 'Service' }}</p>
                         <p class="text-sm text-slate-500 mt-0.5">
                             Dr. {{ $appointment->dentist->user->name ?? 'N/A' }}
                             <span class="text-slate-300 mx-1" aria-hidden="true">·</span>

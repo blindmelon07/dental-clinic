@@ -17,7 +17,7 @@ class RecentAppointmentsWidget extends BaseWidget
     public function table(Table $table): Table
     {
         return $table
-            ->query(fn () => Appointment::with(['patient', 'dentist.user', 'service'])
+            ->query(fn () => Appointment::with(['patient', 'dentist.user', 'service.category'])
                     ->whereDate('appointment_date', '>=', today()->subDays(7))
                     ->whereDate('appointment_date', '<=', today()->addDays(7))
                     ->orderBy('appointment_date')
@@ -28,7 +28,7 @@ class RecentAppointmentsWidget extends BaseWidget
                 TextColumn::make('start_time')->time(),
                 TextColumn::make('patient.full_name')->label('Patient'),
                 TextColumn::make('dentist.user.name')->label('Dentist'),
-                TextColumn::make('service.name')->label('Service'),
+                TextColumn::make('service.display_name')->label('Service'),
                 TextColumn::make('status')->badge()
                     ->color(fn (AppointmentStatus $state): string => $state->color()),
             ]);

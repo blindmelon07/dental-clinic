@@ -87,7 +87,12 @@
       "Bash(php -l app/Mail/AppointmentBookedMail.php)",
       "Bash(php -l app/Mail/AppointmentConfirmedMail.php)",
       "Bash(php -l app/Mail/AppointmentCancelledMail.php)",
-      "Bash(php -l app/Observers/AppointmentObserver.php)"
+      "Bash(php -l app/Observers/AppointmentObserver.php)",
+      "Bash(php -l app/Models/Service.php)",
+      "Bash(php -l app/Filament/Resources/AppointmentResource.php)",
+      "Bash(php -l app/Filament/Resources/PatientResource/RelationManagers/AppointmentsRelationManager.php)",
+      "Bash(php -l app/Filament/Widgets/RecentAppointmentsWidget.php)",
+      "Bash(php -l app/Livewire/Patient/Dashboard.php)"
     ]
   }
 }
