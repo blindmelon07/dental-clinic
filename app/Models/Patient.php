@@ -24,7 +24,7 @@ class Patient extends Model
 
     public function photoUrl(): ?string
     {
-        return $this->photo ? asset("storage/{$this->photo}") : null;
+        return $this->photo ? \Illuminate\Support\Facades\Storage::disk('public')->url($this->photo) : null;
     }
 
     protected function casts(): array
