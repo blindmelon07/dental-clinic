@@ -92,7 +92,9 @@
       "Bash(php -l app/Filament/Resources/AppointmentResource.php)",
       "Bash(php -l app/Filament/Resources/PatientResource/RelationManagers/AppointmentsRelationManager.php)",
       "Bash(php -l app/Filament/Widgets/RecentAppointmentsWidget.php)",
-      "Bash(php -l app/Livewire/Patient/Dashboard.php)"
+      "Bash(php -l app/Livewire/Patient/Dashboard.php)",
+      "Bash(git stash *)",
+      "Bash(git checkout *)"
     ]
   }
 }

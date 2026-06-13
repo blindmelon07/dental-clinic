@@ -37,6 +37,11 @@ class PatientResource extends Resource
     public static function canDelete(\Illuminate\Database\Eloquent\Model $r): bool { return auth()->user()?->can('delete_patient'); }
     public static function canDeleteAny(): bool { return auth()->user()?->can('delete_patient'); }
 
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['first_name', 'middle_name', 'last_name', 'patient_number', 'phone'];
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
