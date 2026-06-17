@@ -36,7 +36,7 @@
                                aria-label="Gonzales Dental Clinic home">
                                 <img src="{{ \App\Models\SiteSetting::instance()->logoUrl() }}"
                                      alt="Gonzales Dental Clinic"
-                                     class="h-10 w-auto object-contain">
+                                     class="h-10 w-10 object-cover rounded-full ring-2 ring-cyan-100">
                             </a>
 
                             {{-- Desktop nav --}}
@@ -266,7 +266,7 @@
                     <div class="flex items-center gap-3">
                         <img src="{{ \App\Models\SiteSetting::instance()->logoUrl() }}"
                              alt="Gonzales Dental Clinic"
-                             class="h-7 w-auto object-contain">
+                             class="h-7 w-7 object-cover rounded-full ring-1 ring-slate-600">
                         <span class="text-slate-300">·</span>
                         <span class="text-sm text-slate-500">Patient Portal</span>
                     </div>

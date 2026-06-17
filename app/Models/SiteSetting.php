@@ -8,8 +8,19 @@ class SiteSetting extends Model
 {
     protected $fillable = [
         'logo', 'clinic_name', 'tagline',
+        'hero_heading', 'hero_subheading', 'hero_description',
+        'hero_image_1', 'hero_image_2', 'hero_image_3', 'hero_image_4',
+        'stat_years', 'stat_patients', 'stat_satisfaction', 'stat_emergency',
         'address', 'city', 'phone', 'email',
+        'hours_weekday', 'hours_saturday', 'hours_sunday',
         'facebook_url', 'footer_text',
+        'testimonial_quote', 'testimonial_author', 'testimonial_since',
+        'about_story_heading', 'about_story_body',
+        'milestone_1_title', 'milestone_1_body',
+        'milestone_2_title', 'milestone_2_body',
+        'milestone_3_title', 'milestone_3_body',
+        'milestone_4_title', 'milestone_4_body',
+        'about_testimonial_quote', 'about_testimonial_author', 'about_testimonial_since',
     ];
 
     public static function instance(): static

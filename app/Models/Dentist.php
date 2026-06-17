@@ -53,7 +53,8 @@ class Dentist extends Model
 
     public function getFullNameAttribute(): string
     {
-        return "Dr. {$this->user->name}";
+        $name = $this->user->name;
+        return str_starts_with($name, 'Dr.') ? $name : "Dr. {$name}";
     }
 
     public function isAvailableOn(string $date, string $time): bool

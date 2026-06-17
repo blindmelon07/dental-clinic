@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ContactController;
 use App\Models\Patient;
 use App\Models\PatientCertificate;
 use App\Livewire\Patient\BookAppointment;
@@ -18,8 +19,14 @@ Route::get('/', function () {
         }
         return redirect()->route('patient.dashboard');
     }
-    return redirect()->route('login');
-});
+    return view('pages.home');
+})->name('home');
+
+Route::get('/about', fn () => view('pages.about'))->name('about');
+Route::get('/services', fn () => view('pages.services'))->name('services');
+Route::get('/booking', fn () => view('pages.booking'))->name('booking');
+Route::get('/contact', fn () => view('pages.contact'))->name('contact');
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.send');
 
 Route::middleware(['auth'])->prefix('patient')->name('patient.')->group(function () {
     Route::get('/dashboard', Dashboard::class)->name('dashboard');

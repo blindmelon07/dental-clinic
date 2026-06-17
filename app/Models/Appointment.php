@@ -96,7 +96,7 @@ class Appointment extends Model
     public static function generateNumber(): string
     {
         return 'APT-' . date('Ymd') . '-' . str_pad(
-            (static::whereDate('created_at', today())->count() + 1),
+            (static::withTrashed()->whereDate('created_at', today())->count() + 1),
             4,
             '0',
             STR_PAD_LEFT
