@@ -13,15 +13,15 @@
 
 @layer base {
     :root {
-        --color-primary: #0891B2;
-        --color-primary-dark: #0e7490;
-        --color-primary-light: #22D3EE;
+        --color-primary: #1D4ED8;
+        --color-primary-dark: #1E40AF;
+        --color-primary-light: #60A5FA;
         --color-accent: #16A34A;
         --color-accent-dark: #15803d;
-        --color-bg: #F0FDFA;
-        --color-fg: #134E4A;
-        --color-muted: #E8F1F6;
-        --color-border: #CCFBF1;
+        --color-bg: #EFF6FF;
+        --color-fg: #1E3A8A;
+        --color-muted: #DBEAFE;
+        --color-border: #BFDBFE;
     }
 
     html {
@@ -64,15 +64,15 @@
     }
 
     .nav-link {
-        @apply px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-cyan-700 hover:bg-cyan-50 transition-all duration-150;
+        @apply px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-blue-700 hover:bg-blue-50 transition-all duration-150;
     }
 
     .nav-link-active {
-        @apply text-cyan-700 bg-cyan-50 font-semibold;
+        @apply text-blue-700 bg-blue-50 font-semibold;
     }
 
     .btn-primary {
-        @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-cyan-600 text-white text-sm font-semibold rounded-xl hover:bg-cyan-700 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 transition-all duration-150 shadow-sm;
+        @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-700 text-white text-sm font-semibold rounded-xl hover:bg-blue-800 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 transition-all duration-150 shadow-sm;
     }
 
     .btn-secondary {
@@ -94,7 +94,7 @@
     .input-field {
         @apply w-full rounded-xl border border-slate-300 bg-white text-slate-900 text-sm px-3 py-2.5 shadow-sm
                transition-colors duration-150
-               focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20
+               focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20
                placeholder:text-slate-400;
     }
 

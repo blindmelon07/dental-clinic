@@ -1,4 +1,4 @@
-<x-layouts.guest title="About Us">
+﻿<x-layouts.guest title="About Us">
 
     @php
         $settings = \App\Models\SiteSetting::instance();
@@ -9,7 +9,7 @@
     @endphp
 
     {{-- Page Header --}}
-    <section class="bg-gradient-to-br from-teal-50 via-cyan-50 to-white py-14 sm:py-20">
+    <section class="bg-gradient-to-br from-blue-50 via-blue-50 to-white py-14 sm:py-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <span class="section-label">Get To Know Us</span>
             <h1 class="mt-4 font-heading text-4xl sm:text-5xl font-extrabold text-slate-900">About {{ $settings->clinic_name }}</h1>
@@ -42,7 +42,7 @@
     </section>
 
     {{-- Feature Cards --}}
-    <section class="py-16 sm:py-24 bg-teal-50/60">
+    <section class="py-16 sm:py-24 bg-blue-50/60">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="max-w-2xl mx-auto text-center">
                 <span class="section-label">What Sets Us Apart</span>
@@ -51,7 +51,7 @@
 
             <div class="mt-12 grid sm:grid-cols-3 gap-6">
                 <div class="card text-center">
-                    <div class="flex items-center justify-center w-14 h-14 rounded-2xl bg-teal-50 text-teal-600 mx-auto mb-4">
+                    <div class="flex items-center justify-center w-14 h-14 rounded-2xl bg-blue-50 text-blue-700 mx-auto mb-4">
                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-5.13a4 4 0 11-8 0 4 4 0 018 0zm6 3a4 4 0 10-8 0"/>
                         </svg>
@@ -62,7 +62,7 @@
                     </p>
                 </div>
                 <div class="card text-center">
-                    <div class="flex items-center justify-center w-14 h-14 rounded-2xl bg-teal-50 text-teal-600 mx-auto mb-4">
+                    <div class="flex items-center justify-center w-14 h-14 rounded-2xl bg-blue-50 text-blue-700 mx-auto mb-4">
                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                         </svg>
@@ -73,7 +73,7 @@
                     </p>
                 </div>
                 <div class="card text-center">
-                    <div class="flex items-center justify-center w-14 h-14 rounded-2xl bg-teal-50 text-teal-600 mx-auto mb-4">
+                    <div class="flex items-center justify-center w-14 h-14 rounded-2xl bg-blue-50 text-blue-700 mx-auto mb-4">
                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                         </svg>
@@ -98,8 +98,8 @@
             <div class="mt-12 space-y-8">
                 <div class="flex gap-6">
                     <div class="flex flex-col items-center">
-                        <div class="flex items-center justify-center w-12 h-12 rounded-full bg-teal-600 text-white font-heading font-bold text-sm flex-shrink-0">01</div>
-                        <div class="w-px flex-1 bg-teal-100 mt-2"></div>
+                        <div class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-700 text-white font-heading font-bold text-sm flex-shrink-0">01</div>
+                        <div class="w-px flex-1 bg-blue-100 mt-2"></div>
                     </div>
                     <div class="pb-8">
                         <h3 class="font-heading text-lg font-bold text-slate-900">{{ $settings->milestone_1_title ?: 'Our Clinic Opens' }}</h3>
@@ -110,8 +110,8 @@
                 </div>
                 <div class="flex gap-6">
                     <div class="flex flex-col items-center">
-                        <div class="flex items-center justify-center w-12 h-12 rounded-full bg-teal-600 text-white font-heading font-bold text-sm flex-shrink-0">02</div>
-                        <div class="w-px flex-1 bg-teal-100 mt-2"></div>
+                        <div class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-700 text-white font-heading font-bold text-sm flex-shrink-0">02</div>
+                        <div class="w-px flex-1 bg-blue-100 mt-2"></div>
                     </div>
                     <div class="pb-8">
                         <h3 class="font-heading text-lg font-bold text-slate-900">{{ $settings->milestone_2_title ?: 'Expanding Our Services' }}</h3>
@@ -122,8 +122,8 @@
                 </div>
                 <div class="flex gap-6">
                     <div class="flex flex-col items-center">
-                        <div class="flex items-center justify-center w-12 h-12 rounded-full bg-teal-600 text-white font-heading font-bold text-sm flex-shrink-0">03</div>
-                        <div class="w-px flex-1 bg-teal-100 mt-2"></div>
+                        <div class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-700 text-white font-heading font-bold text-sm flex-shrink-0">03</div>
+                        <div class="w-px flex-1 bg-blue-100 mt-2"></div>
                     </div>
                     <div class="pb-8">
                         <h3 class="font-heading text-lg font-bold text-slate-900">{{ $settings->milestone_3_title ?: 'Going Digital' }}</h3>
@@ -134,7 +134,7 @@
                 </div>
                 <div class="flex gap-6">
                     <div class="flex flex-col items-center">
-                        <div class="flex items-center justify-center w-12 h-12 rounded-full bg-teal-600 text-white font-heading font-bold text-sm flex-shrink-0">04</div>
+                        <div class="flex items-center justify-center w-12 h-12 rounded-full bg-blue-700 text-white font-heading font-bold text-sm flex-shrink-0">04</div>
                     </div>
                     <div>
                         <h3 class="font-heading text-lg font-bold text-slate-900">{{ $settings->milestone_4_title ?: 'Serving You Today' }}</h3>
@@ -166,9 +166,9 @@
 
                             // Cycle through a set of teal/cyan gradient combos
                             $gradients = [
-                                'from-teal-500 to-cyan-500',
-                                'from-cyan-500 to-sky-500',
-                                'from-teal-600 to-emerald-500',
+                                'from-blue-600 to-blue-600',
+                                'from-blue-600 to-blue-500',
+                                'from-blue-700 to-blue-500',
                             ];
                             $gradient = $gradients[$loop->index % count($gradients)];
                         @endphp
@@ -176,7 +176,7 @@
                         <div class="group bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col">
 
                             {{-- Avatar header --}}
-                            <div class="bg-gradient-to-br from-teal-50 to-cyan-50 px-8 pt-10 pb-6 flex flex-col items-center">
+                            <div class="bg-gradient-to-br from-blue-50 to-blue-50 px-8 pt-10 pb-6 flex flex-col items-center">
                                 {{-- Avatar circle --}}
                                 @if($dentist->user->avatar)
                                     <div class="w-28 h-28 rounded-full overflow-hidden ring-4 ring-white shadow-lg mb-4">
@@ -192,7 +192,7 @@
 
                                 {{-- Name & specialization --}}
                                 <h3 class="font-heading text-xl font-bold text-slate-900 text-center leading-tight">{{ $dentist->full_name }}</h3>
-                                <p class="mt-1.5 text-sm font-semibold text-teal-600 text-center">{{ $dentist->specialization ?: 'General Dentistry' }}</p>
+                                <p class="mt-1.5 text-sm font-semibold text-blue-700 text-center">{{ $dentist->specialization ?: 'General Dentistry' }}</p>
                             </div>
 
                             {{-- Card body --}}
@@ -216,7 +216,7 @@
                                         <div></div>
                                     @endif
                                     <a href="{{ auth()->check() ? url('/') : route('register') }}"
-                                       class="inline-flex items-center gap-1.5 px-4 py-2 bg-teal-600 text-white text-xs font-semibold rounded-xl hover:bg-teal-700 transition-all duration-150 shadow-sm shadow-teal-600/20"
+                                       class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-700 text-white text-xs font-semibold rounded-xl hover:bg-blue-800 transition-all duration-150 shadow-sm shadow-blue-700/20"
                                        wire:navigate>
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -235,7 +235,7 @@
     {{-- Testimonial --}}
     <section class="py-16 sm:py-20 bg-slate-900">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <svg class="w-10 h-10 text-teal-400 mx-auto" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <svg class="w-10 h-10 text-blue-400 mx-auto" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M9.983 3v7.391c0 5.704-3.731 9.57-8.983 10.609l-.995-2.151c2.432-.917 3.995-3.638 3.995-5.849h-4v-10h9.983zm14.017 0v7.391c0 5.704-3.748 9.571-9 10.609l-.996-2.151c2.433-.917 3.996-3.638 3.996-5.849h-3.983v-10h9.983z"/>
             </svg>
             <p class="mt-6 font-heading text-xl sm:text-2xl font-medium text-white leading-relaxed">
@@ -249,15 +249,15 @@
     </section>
 
     {{-- CTA --}}
-    <section class="py-16 sm:py-20 bg-gradient-to-r from-teal-600 to-cyan-600">
+    <section class="py-16 sm:py-20 bg-gradient-to-r from-blue-700 to-blue-800">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 class="font-heading text-3xl sm:text-4xl font-bold text-white">Come See Us in Person</h2>
-            <p class="mt-4 text-teal-50 text-lg">
+            <p class="mt-4 text-blue-50 text-lg">
                 We'd love to welcome you to {{ $settings->clinic_name }}. Schedule your visit today.
             </p>
             <div class="mt-8 flex flex-wrap justify-center gap-4">
                 <a href="{{ auth()->check() ? url('/') : route('register') }}"
-                   class="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-white text-teal-700 text-sm font-semibold rounded-xl hover:bg-teal-50 shadow-lg transition-all duration-150"
+                   class="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-white text-blue-800 text-sm font-semibold rounded-xl hover:bg-blue-50 shadow-lg transition-all duration-150"
                    wire:navigate>
                     Book Appointment
                 </a>
