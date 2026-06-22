@@ -12,15 +12,7 @@ use App\Livewire\Patient\Profile;
 use App\Models\Prescription;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    if (auth()->check()) {
-        if (auth()->user()->hasRole(['super_admin', 'admin', 'receptionist', 'dentist'])) {
-            return redirect('/admin');
-        }
-        return redirect()->route('patient.dashboard');
-    }
-    return view('pages.home');
-})->name('home');
+Route::get('/', fn () => view('pages.home'))->name('home');
 
 Route::get('/about', fn () => view('pages.about'))->name('about');
 Route::get('/services', fn () => view('pages.services'))->name('services');
