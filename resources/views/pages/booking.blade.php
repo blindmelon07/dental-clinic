@@ -1,4 +1,4 @@
-﻿<x-layouts.guest title="Booking">
+<x-layouts.guest title="Booking">
 
     @php
         $settings  = \App\Models\SiteSetting::instance();
@@ -10,7 +10,6 @@
         $firstService = $services->first();
         $firstDentist = $dentists->first();
 
-        // Generate time slots 8 AM – 5 PM in 30-min increments
         $timeSlots = [];
         for ($h = 8; $h < 17; $h++) {
             foreach ([0, 30] as $m) {
@@ -21,6 +20,53 @@
             }
         }
     @endphp
+
+    <script>
+        function bookingForm() {
+            return {
+                serviceId: '{{ $firstService?->id }}',
+                dentistId: '{{ $firstDentist?->id }}',
+                date: '',
+                time: '',
+                services: @json($services->keyBy('id')->map(fn($s) => ['name' => $s->name, 'price' => (float) $s->price])),
+                dentists: @json($dentists->keyBy('id')->map(fn($d) => ['name' => $d->full_name, 'specialization' => $d->specialization])),
+                timeSlots: @json($timeSlots),
+                get serviceName() {
+                    return this.serviceId && this.services[this.serviceId]
+                        ? this.services[this.serviceId].name
+                        : 'Select a service';
+                },
+                get servicePrice() {
+                    const p = this.serviceId && this.services[this.serviceId]
+                        ? this.services[this.serviceId].price : 0;
+                    return p > 0 ? p : null;
+                },
+                get dentistName() {
+                    return this.dentistId && this.dentists[this.dentistId]
+                        ? this.dentists[this.dentistId].name
+                        : 'Select a doctor';
+                },
+                get dentistSpec() {
+                    return this.dentistId && this.dentists[this.dentistId]
+                        ? this.dentists[this.dentistId].specialization
+                        : null;
+                },
+                get formattedDate() {
+                    if (!this.date) return 'Your preferred date';
+                    const d = new Date(this.date + 'T00:00:00');
+                    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                },
+                get formattedTime() {
+                    return this.time && this.timeSlots[this.time]
+                        ? this.timeSlots[this.time]
+                        : 'Your preferred time';
+                },
+                formatPrice(p) {
+                    return '₱' + Number(p).toLocaleString('en-PH', { minimumFractionDigits: 0 });
+                }
+            };
+        }
+    </script>
 
     {{-- Page Header --}}
     <section class="bg-gradient-to-br from-blue-50 via-blue-50 to-white py-10 sm:py-14 border-b border-slate-100">
@@ -38,7 +84,7 @@
     {{-- Main Booking Layout --}}
     <section class="py-12 sm:py-16 bg-slate-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid lg:grid-cols-3 gap-8 items-start">
+            <div class="grid lg:grid-cols-3 gap-8 items-start" x-data="bookingForm()">
 
                 {{-- Left: Form --}}
                 <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sm:p-8">
@@ -70,7 +116,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                                     </svg>
                                 </div>
-                                <select name="service_id"
+                                <select name="service_id" x-model="serviceId"
                                         class="w-full pl-9 pr-10 py-3 border border-slate-200 rounded-xl bg-slate-50 text-sm text-slate-700 appearance-none focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-colors">
                                     <option value="">— Choose a service —</option>
                                     @foreach($services as $service)
@@ -99,7 +145,7 @@
                         <h2 class="font-heading text-base font-bold text-slate-800 mb-3">2. Choose Doctor</h2>
 
                         @forelse ($dentists as $dentist)
-                            <div class="flex items-center gap-4 px-4 py-3 border border-slate-200 rounded-xl bg-slate-50 hover:border-blue-400 transition-colors cursor-pointer mb-3 last:mb-0">
+                            <label class="flex items-center gap-4 px-4 py-3 border border-slate-200 rounded-xl bg-slate-50 hover:border-blue-400 transition-colors cursor-pointer mb-3 last:mb-0">
                                 {{-- Avatar --}}
                                 <div class="w-12 h-12 rounded-full flex-shrink-0 overflow-hidden bg-blue-50">
                                     @if($dentist->user->avatar)
@@ -130,9 +176,9 @@
 
                                 {{-- Select radio --}}
                                 <input type="radio" name="dentist_id" value="{{ $dentist->id }}"
-                                       class="w-4 h-4 text-blue-700 border-slate-300 focus:ring-blue-600 flex-shrink-0"
-                                       {{ $loop->first ? 'checked' : '' }}>
-                            </div>
+                                       x-model="dentistId"
+                                       class="w-4 h-4 text-blue-700 border-slate-300 focus:ring-blue-600 flex-shrink-0">
+                            </label>
                         @empty
                             <div class="px-4 py-4 border border-slate-200 rounded-xl bg-slate-50 text-sm text-slate-400 italic">
                                 No doctors available at the moment. Please contact us directly.
@@ -150,7 +196,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                     </svg>
                                 </div>
-                                <input type="date" name="appointment_date"
+                                <input type="date" name="appointment_date" x-model="date"
                                        min="{{ now()->addDay()->format('Y-m-d') }}"
                                        class="w-full pl-9 pr-4 py-3 border border-slate-200 rounded-xl bg-slate-50 text-sm text-slate-700 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-colors">
                             </div>
@@ -164,7 +210,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                     </svg>
                                 </div>
-                                <select name="start_time"
+                                <select name="start_time" x-model="time"
                                         class="w-full pl-9 pr-10 py-3 border border-slate-200 rounded-xl bg-slate-50 text-sm text-slate-700 appearance-none focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-colors">
                                     <option value="">— Pick a time —</option>
                                     @foreach($timeSlots as $value => $label)
@@ -238,12 +284,10 @@
                                 </div>
                                 <div>
                                     <p class="text-xs text-slate-400">Service</p>
-                                    <p class="text-sm font-semibold text-slate-800">
-                                        {{ $firstService?->name ?? 'Select a service' }}
-                                    </p>
-                                    @if($firstService?->price > 0)
-                                        <p class="text-xs text-blue-700 font-medium">₱{{ number_format((float)$firstService->price, 0) }}</p>
-                                    @endif
+                                    <p class="text-sm font-semibold text-slate-800" x-text="serviceName"></p>
+                                    <p class="text-xs text-blue-700 font-medium"
+                                       x-show="servicePrice"
+                                       x-text="servicePrice ? formatPrice(servicePrice) : ''"></p>
                                 </div>
                             </div>
 
@@ -256,12 +300,10 @@
                                 </div>
                                 <div>
                                     <p class="text-xs text-slate-400">Doctor</p>
-                                    <p class="text-sm font-semibold text-slate-800">
-                                        {{ $firstDentist?->full_name ?? 'Select a doctor' }}
-                                    </p>
-                                    @if($firstDentist?->specialization)
-                                        <p class="text-xs text-slate-400">{{ $firstDentist->specialization }}</p>
-                                    @endif
+                                    <p class="text-sm font-semibold text-slate-800" x-text="dentistName"></p>
+                                    <p class="text-xs text-slate-400"
+                                       x-show="dentistSpec"
+                                       x-text="dentistSpec || ''"></p>
                                 </div>
                             </div>
 
@@ -274,7 +316,7 @@
                                 </div>
                                 <div>
                                     <p class="text-xs text-slate-400">Date</p>
-                                    <p class="text-sm font-semibold text-slate-800">Your preferred date</p>
+                                    <p class="text-sm font-semibold text-slate-800" x-text="formattedDate"></p>
                                 </div>
                             </div>
 
@@ -287,7 +329,7 @@
                                 </div>
                                 <div>
                                     <p class="text-xs text-slate-400">Time</p>
-                                    <p class="text-sm font-semibold text-slate-800">Your preferred time</p>
+                                    <p class="text-sm font-semibold text-slate-800" x-text="formattedTime"></p>
                                 </div>
                             </div>
 
