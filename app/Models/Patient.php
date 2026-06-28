@@ -15,11 +15,23 @@ class Patient extends Model
 
     protected $fillable = [
         'user_id', 'clinic_id', 'patient_number', 'first_name', 'last_name',
-        'middle_name', 'date_of_birth', 'gender', 'blood_type', 'phone',
-        'email', 'address', 'city', 'emergency_contact_name',
-        'emergency_contact_phone', 'emergency_contact_relation',
-        'allergies', 'medical_conditions', 'current_medications', 'is_active',
-        'photo', 'next_cleaning_due',
+        'middle_name', 'nickname', 'date_of_birth', 'gender', 'blood_type',
+        'religion', 'nationality', 'occupation',
+        'phone', 'home_no', 'office_no', 'email', 'address', 'city',
+        'dental_insurance', 'insurance_effective_date', 'referring_person', 'reason_for_consultation',
+        'emergency_contact_name', 'emergency_contact_phone', 'emergency_contact_relation',
+        'guardian_name', 'guardian_occupation',
+        'previous_dentist', 'last_dental_visit',
+        'physician_name', 'physician_specialty', 'physician_office_address', 'physician_office_number',
+        'in_good_health', 'under_medical_treatment', 'medical_treatment_condition',
+        'serious_illness_or_surgery', 'serious_illness_details',
+        'hospitalized', 'hospitalization_details',
+        'takes_prescription_meds', 'uses_tobacco', 'uses_alcohol_drugs',
+        'drug_allergies', 'drug_allergy_others', 'bleeding_time',
+        'is_pregnant', 'is_nursing', 'taking_birth_control',
+        'blood_pressure', 'medical_conditions_list',
+        'allergies', 'medical_conditions', 'current_medications',
+        'is_active', 'photo', 'next_cleaning_due',
     ];
 
     public function photoUrl(): ?string
@@ -30,10 +42,24 @@ class Patient extends Model
     protected function casts(): array
     {
         return [
-            'date_of_birth'     => 'date',
-            'gender'            => Gender::class,
-            'is_active'         => 'boolean',
-            'next_cleaning_due' => 'date',
+            'date_of_birth'             => 'date',
+            'gender'                    => Gender::class,
+            'is_active'                 => 'boolean',
+            'next_cleaning_due'         => 'date',
+            'insurance_effective_date'  => 'date',
+            'last_dental_visit'         => 'date',
+            'in_good_health'            => 'boolean',
+            'under_medical_treatment'   => 'boolean',
+            'serious_illness_or_surgery'=> 'boolean',
+            'hospitalized'              => 'boolean',
+            'takes_prescription_meds'   => 'boolean',
+            'uses_tobacco'              => 'boolean',
+            'uses_alcohol_drugs'        => 'boolean',
+            'is_pregnant'               => 'boolean',
+            'is_nursing'                => 'boolean',
+            'taking_birth_control'      => 'boolean',
+            'drug_allergies'            => 'array',
+            'medical_conditions_list'   => 'array',
         ];
     }
 
