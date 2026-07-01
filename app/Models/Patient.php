@@ -32,6 +32,11 @@ class Patient extends Model
         'blood_pressure', 'medical_conditions_list',
         'allergies', 'medical_conditions', 'current_medications',
         'is_active', 'photo', 'next_cleaning_due',
+        'consent_treatment_initials', 'consent_drugs_initials', 'consent_treatment_plan_initials',
+        'consent_radiograph_initials', 'consent_removal_of_teeth_initials', 'consent_crowns_initials',
+        'consent_endodontics_initials', 'consent_periodontal_initials', 'consent_fillings_initials',
+        'consent_dentures_initials', 'consent_agreed', 'consent_date', 'consent_dentist_name',
+        'consent_dentist_signature',
     ];
 
     public function photoUrl(): ?string
@@ -60,6 +65,8 @@ class Patient extends Model
             'taking_birth_control'      => 'boolean',
             'drug_allergies'            => 'array',
             'medical_conditions_list'   => 'array',
+            'consent_agreed'            => 'boolean',
+            'consent_date'              => 'date',
         ];
     }
 

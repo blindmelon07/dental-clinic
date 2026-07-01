@@ -26,6 +26,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use App\Forms\Components\SignaturePad;
 use Illuminate\Database\Eloquent\Builder;
 
 class PatientResource extends Resource
@@ -114,7 +115,21 @@ class PatientResource extends Resource
                                     TextInput::make('last_name')->required()->maxLength(100),
                                     TextInput::make('first_name')->required()->maxLength(100),
                                     TextInput::make('middle_name')->maxLength(100),
-                                    DatePicker::make('date_of_birth')->required()->maxDate(now())->label('Birthdate'),
+                                    DatePicker::make('date_of_birth')
+                                        ->required()
+                                        ->maxDate(now())
+                                        ->label('Birthdate')
+                                        ->live()
+                                        ->afterStateUpdated(function ($state, $set) {
+                                            $set('age_display', $state
+                                                ? \Carbon\Carbon::parse($state)->age . ' years old'
+                                                : null);
+                                        }),
+                                    TextInput::make('age_display')
+                                        ->label('Age')
+                                        ->disabled()
+                                        ->dehydrated(false)
+                                        ->placeholder('—'),
                                     Select::make('gender')
                                         ->options(Gender::class)
                                         ->required()
@@ -126,7 +141,7 @@ class PatientResource extends Resource
                                         ->options(['A+' => 'A+', 'A-' => 'A-', 'B+' => 'B+', 'B-' => 'B-', 'AB+' => 'AB+', 'AB-' => 'AB-', 'O+' => 'O+', 'O-' => 'O-'])
                                         ->searchable(),
                                     TextInput::make('occupation')->maxLength(150),
-                                ])->columns(3),
+                                ])->columns(['default' => 1, 'md' => 2, 'lg' => 3]),
 
                             Section::make('Contact & Address')
                                 ->schema([
@@ -136,7 +151,7 @@ class PatientResource extends Resource
                                     TextInput::make('office_no')->tel()->label('Office No.'),
                                     TextInput::make('phone')->required()->tel()->label('Cell / Mobile No.'),
                                     TextInput::make('email')->email()->label('Email Address'),
-                                ])->columns(3),
+                                ])->columns(['default' => 1, 'md' => 2, 'lg' => 3]),
 
                             Section::make('Insurance & Referral')
                                 ->schema([
@@ -147,20 +162,20 @@ class PatientResource extends Resource
                                         ->label('Reason for Dental Consultation')
                                         ->rows(2)
                                         ->columnSpanFull(),
-                                ])->columns(3),
+                                ])->columns(['default' => 1, 'md' => 2, 'lg' => 3]),
 
                             Section::make('For Minors')
                                 ->schema([
                                     TextInput::make('guardian_name')->label("Parent / Guardian's Name")->maxLength(150),
                                     TextInput::make('guardian_occupation')->label("Guardian's Occupation")->maxLength(150),
-                                ])->columns(2)->collapsible()->collapsed(),
+                                ])->columns(['default' => 1, 'sm' => 2])->collapsible()->collapsed(),
 
                             Section::make('Emergency Contact')
                                 ->schema([
                                     TextInput::make('emergency_contact_name')->label('Name'),
                                     TextInput::make('emergency_contact_phone')->tel()->label('Phone'),
                                     TextInput::make('emergency_contact_relation')->label('Relation'),
-                                ])->columns(3),
+                                ])->columns(['default' => 1, 'md' => 2, 'lg' => 3]),
                         ]),
 
                     Tab::make('Dental & Medical History')
@@ -170,15 +185,15 @@ class PatientResource extends Resource
                                 ->schema([
                                     TextInput::make('previous_dentist')->label('Previous Dentist: Dr.')->maxLength(150),
                                     DatePicker::make('last_dental_visit')->label('Last Dental Visit'),
-                                ])->columns(2),
+                                ])->columns(['default' => 1, 'sm' => 2]),
 
                             Section::make('Physician Information')
                                 ->schema([
                                     TextInput::make('physician_name')->label('Name of Physician: Dr.')->maxLength(150),
                                     TextInput::make('physician_specialty')->label('Specialty')->maxLength(150),
                                     TextInput::make('physician_office_number')->label('Office Number')->tel(),
-                                    Textarea::make('physician_office_address')->label('Office Address')->rows(2)->columnSpan(2),
-                                ])->columns(3),
+                                    Textarea::make('physician_office_address')->label('Office Address')->rows(2)->columnSpanFull(),
+                                ])->columns(['default' => 1, 'md' => 2, 'lg' => 3]),
 
                             Section::make('Medical Questionnaire')
                                 ->schema([
@@ -190,28 +205,28 @@ class PatientResource extends Resource
                                             TextInput::make('medical_treatment_condition')
                                                 ->label('If yes, what is the condition being treated?')
                                                 ->columnSpanFull(),
-                                        ])->columns(2)->columnSpanFull(),
+                                        ])->columns(['default' => 1, 'sm' => 2])->columnSpanFull(),
 
                                     Fieldset::make('Q3')
                                         ->label('')
                                         ->schema([
                                             Toggle::make('serious_illness_or_surgery')->label('3. Have you ever had a serious illness or surgical operation?'),
                                             TextInput::make('serious_illness_details')->label('If yes, what illness or operation?'),
-                                        ])->columns(2)->columnSpanFull(),
+                                        ])->columns(['default' => 1, 'sm' => 2])->columnSpanFull(),
 
                                     Fieldset::make('Q4')
                                         ->label('')
                                         ->schema([
                                             Toggle::make('hospitalized')->label('4. Have you ever been hospitalized?'),
                                             TextInput::make('hospitalization_details')->label('If yes, when and why?'),
-                                        ])->columns(2)->columnSpanFull(),
+                                        ])->columns(['default' => 1, 'sm' => 2])->columnSpanFull(),
 
                                     Fieldset::make('Q5')
                                         ->label('')
                                         ->schema([
                                             Toggle::make('takes_prescription_meds')->label('5. Are you taking any prescription / non-prescription medication?'),
                                             Textarea::make('current_medications')->label('If yes, please specify')->rows(2),
-                                        ])->columns(2)->columnSpanFull(),
+                                        ])->columns(['default' => 1, 'sm' => 2])->columnSpanFull(),
 
                                     Toggle::make('uses_tobacco')->label('6. Do you use tobacco products?'),
                                     Toggle::make('uses_alcohol_drugs')->label('7. Do you use alcohol, cocaine or other dangerous drugs?'),
@@ -221,7 +236,7 @@ class PatientResource extends Resource
                                             CheckboxList::make('drug_allergies')
                                                 ->label('8. Are you allergic to any of the following?')
                                                 ->options(self::drugAllergyOptions())
-                                                ->columns(3),
+                                                ->columns(['default' => 1, 'sm' => 2]),
                                             TextInput::make('drug_allergy_others')->label('Others (please specify)'),
                                         ])->columnSpanFull(),
 
@@ -233,22 +248,103 @@ class PatientResource extends Resource
                                             Toggle::make('is_pregnant')->label('Are you pregnant?'),
                                             Toggle::make('is_nursing')->label('Are you nursing?'),
                                             Toggle::make('taking_birth_control')->label('Are you taking birth control pills?'),
-                                        ])->columns(3)->columnSpanFull(),
+                                        ])->columns(['default' => 1, 'sm' => 3])->columnSpanFull(),
 
                                     CheckboxList::make('medical_conditions_list')
                                         ->label('13. Do you have or have you had any of the following?')
                                         ->options(self::medicalConditionOptions())
-                                        ->columns(3)
+                                        ->columns(['default' => 1, 'sm' => 2, 'lg' => 3])
                                         ->columnSpanFull(),
-                                ])->columns(2),
+                                ])->columns(['default' => 1, 'sm' => 2]),
 
                             Section::make('Additional Notes')
                                 ->schema([
                                     Textarea::make('allergies')->label('Other Allergies')->rows(3),
                                     Textarea::make('medical_conditions')->label('Other Medical Conditions')->rows(3),
-                                ])->columns(2)
+                                ])->columns(['default' => 1, 'sm' => 2])
                                 ->description('Free-text notes in addition to the questionnaire above.')
                                 ->collapsible(),
+                        ]),
+
+                    Tab::make('Informed Consent')
+                        ->icon('heroicon-o-document-check')
+                        ->schema([
+                            Section::make('TREATMENT TO BE DONE')
+                                ->description('I understand and consent to have any treatment done by the dentist after the procedure, the risks & benefits & cost have been fully explained. These treatments include, but are not limited to: x rays, cleanings, periodontal treatments, fillings, crowns, bridges, all types of extraction, root canals, &/or dentures, local anesthetics & surgical cases.')
+                                ->schema([
+                                    TextInput::make('consent_treatment_initials')->label('Initial')->maxLength(10),
+                                ])->columns(1),
+
+                            Section::make('DRUGS & MEDICATIONS')
+                                ->description('I understand that antibiotics, analgesics & other medications can cause allergic reactions like redness & swelling of tissues, pain, itching, vomiting, &/or anaphylactic shock.')
+                                ->schema([
+                                    TextInput::make('consent_drugs_initials')->label('Initial')->maxLength(10),
+                                ])->columns(1),
+
+                            Section::make('CHANGES IN TREATMENT PLAN')
+                                ->description('I understand that during treatment it may be necessary to change/add procedures because of conditions found while working on the teeth that was not discovered during examination. For example, root canal therapy may be needed following routine restorative procedures. I give my permission to the dentist to make any/all changes and additions as necessary w/ my responsibility to pay all the costs agreed.')
+                                ->schema([
+                                    TextInput::make('consent_treatment_plan_initials')->label('Initial')->maxLength(10),
+                                ])->columns(1),
+
+                            Section::make('RADIOGRAPH')
+                                ->description('I understand that an x-ray shot or a radiograph maybe necessary as part of diagnostic aid to come up with tentative diagnosis at my dental problem and to make a good treatment plan, but this will not give me a 100% assurance for the accuracy of the treatment since all dental treatments are subject to unpredictable complications that later on may lead to sudden change of treatment plan and subject to new charges.')
+                                ->schema([
+                                    TextInput::make('consent_radiograph_initials')->label('Initial')->maxLength(10),
+                                ])->columns(1),
+
+                            Section::make('REMOVAL OF TEETH')
+                                ->description('I understand that alternatives to tooth removal (root canal therapy, crowns & periodontal surgery, etc.) & I completely understand these alternatives, including their risk & benefits prior to authorizing the dentist to remove teeth & any other structures necessary for reasons above. I understand that removing teeth does not always remove all the infections, if present, & it may be necessary to have further treatment. I understand the risk involved in having teeth removed, such as: pain, swelling, spread of infection, dry socket, fractured jaw, loss of feeling on the teeth, lips, tongue & surrounding tissue that can last for an indefinite period of time. I understand that I may need further treatment under a specialist if complications arise during or following treatment.')
+                                ->schema([
+                                    TextInput::make('consent_removal_of_teeth_initials')->label('Initial')->maxLength(10),
+                                ])->columns(1),
+
+                            Section::make('CROWNS (CAPS) & BRIDGES')
+                                ->description('Preparing a tooth may irritate the nerve tissue in the center of the tooth, leaving the tooth extra sensitive to heat, cold & pressure. Treating such irritation may involve using special toothpastes, mouth rinses or root canal therapy. I understand that sometimes it is not possible to match the color of natural teeth exactly with artificial teeth. I further understand that I may be wearing temporary crowns, which may come off easily & that I must be careful to ensure that they are kept on until the permanent crowns are delivered. It is my responsibility to return for permanent cementation within 20 days from tooth preparation, as excessive days delay may allow for tooth movement, which may necessitate a remake of the crown, bridge/cap. I understand there will be additional charges for remakes due to my delaying of permanent cementation, & I realize that final opportunity to make changes in my new crown, bridges or cap (including shape, fit, size & color) will be before permanent cementation.')
+                                ->schema([
+                                    TextInput::make('consent_crowns_initials')->label('Initial')->maxLength(10),
+                                ])->columns(1),
+
+                            Section::make('ENDODONTICS (ROOT CANAL)')
+                                ->description('I understand there is no guarantee that a root canal treatment will save a tooth & that complications can occur from the treatment & that occasionally root canal filling materials may extend through the tooth which does not necessarily affect the success of the treatment. I understand that endodontic files & drills are very fine instruments & stresses vented in their manufacture & calcifications present in teeth can cause them to break during use. I understand that referral to the endodontist for additional treatments may be necessary following any root canal treatment & I agree that I am responsible for any additional cost for treatment performed by the endodontist. I understand that a tooth may require removal in spite of all efforts to save it.')
+                                ->schema([
+                                    TextInput::make('consent_endodontics_initials')->label('Initial')->maxLength(10),
+                                ])->columns(1),
+
+                            Section::make('PERIODONTAL DISEASE')
+                                ->description('I understand that periodontal disease is a serious condition causing gum & bone inflammation &/or loss & that can lead eventually to the loss of my teeth. I understand the alternative treatment plans to correct periodontal disease, including gum surgery tooth extractions with or without replacement. I understand that undertaking any dental procedures may have future adverse effect on my periodontal conditions.')
+                                ->schema([
+                                    TextInput::make('consent_periodontal_initials')->label('Initial')->maxLength(10),
+                                ])->columns(1),
+
+                            Section::make('FILLINGS')
+                                ->description('I understand that care must be exercised in chewing on fillings, especially during the first 24 hours to avoid breakage. I understand that a more extensive filling or a crown may be required, as additional decay or fracture may become evident after initial excavation. I understand that significant sensitivity is a common, but usually temporary, after-effect of a new placement of filling. I further understand that filling a tooth may irritate the nerve tissue creating sensitivity & treating such sensitivity could require root canal therapy or extractions.')
+                                ->schema([
+                                    TextInput::make('consent_fillings_initials')->label('Initial')->maxLength(10),
+                                ])->columns(1),
+
+                            Section::make('DENTURES')
+                                ->description('I understand that wearing of dentures can be difficult. Sore spots, altered speech & difficulty in eating are common problems. Immediate dentures (placement of denture immediately after extractions) may be painful. Immediate dentures may require considerable adjusting & several relines. I understand that it is my responsibility to return for delivery of dentures. I understand that failure to keep my delivery appointment may result in poorly fitted dentures. If a remake is required due to my delays of more than 30 days, there will be additional charges. A permanent reline will be needed later, which is not included in the initial fee. I understand that all adjustment or alterations of any kind after this initial period is subject to charges.')
+                                ->schema([
+                                    TextInput::make('consent_dentures_initials')->label('Initial')->maxLength(10),
+                                ])->columns(1),
+
+                            Section::make('Authorization & Signature')
+                                ->description('I understand that dentistry is not an exact science and that no dentist can properly guarantee accurate results all the time. I hereby authorize any of the doctors/dental auxiliaries to proceed with & perform the dental restorations & treatments as explained to me. I understand that these are subject to modification depending on undiagnosable circumstances that may arise during the course of treatment. I understand that regarding any dental insurance coverage I may have, I am responsible for payment of dental fees. I agree to pay any attorney\'s fees, collection fee, or court costs that may be incurred to satisfy any obligation to this office. All treatment were properly explained to me & any untoward circumstances that may arise during the procedure, the attending dentist will not be held liable since it is my free will, with full trust & confidence in him/her, to undergo dental treatment under his/her care.')
+                                ->schema([
+                                    Toggle::make('consent_agreed')
+                                        ->label('Patient / Parent / Guardian agrees to the above informed consent')
+                                        ->columnSpanFull(),
+                                    DatePicker::make('consent_date')
+                                        ->label('Date Signed')
+                                        ->maxDate(now()),
+                                    TextInput::make('consent_dentist_name')
+                                        ->label('Dentist Name')
+                                        ->maxLength(150),
+                                    SignaturePad::make('consent_dentist_signature')
+                                        ->label('Dentist E-Signature')
+                                        ->columnSpanFull(),
+                                ])->columns(['default' => 1, 'sm' => 2]),
                         ]),
                 ])
                 ->columnSpanFull(),
@@ -264,12 +360,13 @@ class PatientResource extends Resource
                     TextEntry::make('full_name')->label('Full Name'),
                     TextEntry::make('nickname')->placeholder('—'),
                     TextEntry::make('date_of_birth')->date()->label('Date of Birth'),
+                    TextEntry::make('age')->label('Age')->suffix(' years old'),
                     TextEntry::make('gender')->badge(),
                     TextEntry::make('blood_type')->label('Blood Type')->placeholder('—'),
                     TextEntry::make('religion')->placeholder('—'),
                     TextEntry::make('nationality')->placeholder('—'),
                     TextEntry::make('occupation')->placeholder('—'),
-                ])->columns(3),
+                ])->columns(['default' => 1, 'md' => 2, 'lg' => 3]),
 
             Section::make('Contact Details')
                 ->schema([
@@ -279,7 +376,7 @@ class PatientResource extends Resource
                     TextEntry::make('email')->placeholder('—'),
                     TextEntry::make('address')->placeholder('—'),
                     TextEntry::make('city')->placeholder('—'),
-                ])->columns(3),
+                ])->columns(['default' => 1, 'md' => 2, 'lg' => 3]),
 
             Section::make('Insurance & Referral')
                 ->schema([
@@ -287,26 +384,26 @@ class PatientResource extends Resource
                     TextEntry::make('insurance_effective_date')->label('Effective Date')->date()->placeholder('—'),
                     TextEntry::make('referring_person')->label('Referred By')->placeholder('—'),
                     TextEntry::make('reason_for_consultation')->label('Reason for Consultation')->placeholder('—')->columnSpanFull(),
-                ])->columns(3),
+                ])->columns(['default' => 1, 'md' => 2, 'lg' => 3]),
 
             Section::make('Emergency Contact')
                 ->schema([
                     TextEntry::make('emergency_contact_name')->label('Name')->placeholder('—'),
                     TextEntry::make('emergency_contact_phone')->label('Phone')->placeholder('—'),
                     TextEntry::make('emergency_contact_relation')->label('Relation')->placeholder('—'),
-                ])->columns(3),
+                ])->columns(['default' => 1, 'md' => 2, 'lg' => 3]),
 
             Section::make('For Minors')
                 ->schema([
                     TextEntry::make('guardian_name')->label("Parent / Guardian's Name")->placeholder('—'),
                     TextEntry::make('guardian_occupation')->label("Guardian's Occupation")->placeholder('—'),
-                ])->columns(2),
+                ])->columns(['default' => 1, 'sm' => 2]),
 
             Section::make('Dental History')
                 ->schema([
                     TextEntry::make('previous_dentist')->label('Previous Dentist')->placeholder('—'),
                     TextEntry::make('last_dental_visit')->label('Last Dental Visit')->date()->placeholder('—'),
-                ])->columns(2),
+                ])->columns(['default' => 1, 'sm' => 2]),
 
             Section::make('Physician Information')
                 ->schema([
@@ -314,7 +411,7 @@ class PatientResource extends Resource
                     TextEntry::make('physician_specialty')->label('Specialty')->placeholder('—'),
                     TextEntry::make('physician_office_number')->label('Office Number')->placeholder('—'),
                     TextEntry::make('physician_office_address')->label('Office Address')->placeholder('—'),
-                ])->columns(2),
+                ])->columns(['default' => 1, 'sm' => 2]),
 
             Section::make('Medical Questionnaire')
                 ->schema([
@@ -331,8 +428,9 @@ class PatientResource extends Resource
                     IconEntry::make('uses_alcohol_drugs')->label('Uses alcohol / drugs?')->boolean(),
                     TextEntry::make('drug_allergies')
                         ->label('Drug Allergies')
-                        ->formatStateUsing(function (?array $state): string {
-                            if (empty($state)) return '—';
+                        ->formatStateUsing(function ($state): string {
+                            if (is_string($state)) $state = json_decode($state, true);
+                            if (empty($state) || !is_array($state)) return '—';
                             $map = self::drugAllergyOptions();
                             return implode(', ', array_map(fn ($k) => $map[$k] ?? $k, $state));
                         })
@@ -345,20 +443,37 @@ class PatientResource extends Resource
                     IconEntry::make('taking_birth_control')->label('Birth control pills?')->boolean(),
                     TextEntry::make('medical_conditions_list')
                         ->label('Medical Conditions')
-                        ->formatStateUsing(function (?array $state): string {
-                            if (empty($state)) return '—';
+                        ->formatStateUsing(function ($state): string {
+                            if (is_string($state)) $state = json_decode($state, true);
+                            if (empty($state) || !is_array($state)) return '—';
                             $map = self::medicalConditionOptions();
                             return implode(', ', array_map(fn ($k) => $map[$k] ?? $k, $state));
                         })
                         ->placeholder('—')
                         ->columnSpanFull(),
-                ])->columns(3),
+                ])->columns(['default' => 1, 'md' => 2, 'lg' => 3]),
 
             Section::make('Medical Notes')
                 ->schema([
                     TextEntry::make('allergies')->label('Other Allergies')->placeholder('None recorded'),
                     TextEntry::make('medical_conditions')->label('Other Medical Conditions')->placeholder('None recorded'),
-                ])->columns(2),
+                ])->columns(['default' => 1, 'sm' => 2]),
+
+            Section::make('Informed Consent')
+                ->schema([
+                    \Filament\Infolists\Components\IconEntry::make('consent_agreed')
+                        ->label('Patient Agreed')
+                        ->boolean(),
+                    TextEntry::make('consent_date')->label('Date Signed')->date()->placeholder('—'),
+                    TextEntry::make('consent_dentist_name')->label('Dentist Name')->placeholder('—'),
+                    TextEntry::make('consent_dentist_signature')
+                        ->label('Dentist E-Signature')
+                        ->html()
+                        ->formatStateUsing(fn (?string $state): string => $state
+                            ? '<img src="' . e($state) . '" class="max-h-32 border border-gray-300 rounded-lg bg-white p-1" />'
+                            : '—')
+                        ->columnSpanFull(),
+                ])->columns(3)->collapsible(),
         ]);
     }
 
@@ -371,6 +486,10 @@ class PatientResource extends Resource
                 TextColumn::make('phone')->searchable(),
                 TextColumn::make('gender')->badge(),
                 TextColumn::make('date_of_birth')->date()->sortable(),
+                TextColumn::make('age')
+                    ->label('Age')
+                    ->suffix(' yrs')
+                    ->sortable(false),
                 TextColumn::make('appointments_count')->counts('appointments')->sortable()->label('Visits'),
                 TextColumn::make('next_cleaning_due')
                     ->label('Cleaning Due')
