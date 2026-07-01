@@ -51,6 +51,7 @@ class AdminPanelProvider extends PanelProvider
                 'info'    => Color::Sky,
                 'gray'    => Color::Slate,
             ])
+            ->darkMode()
             ->sidebarCollapsibleOnDesktop()
             ->navigationGroups([
                 NavigationGroup::make('Clinic Operations')
@@ -117,6 +118,10 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
                 fn (): string => '<style>.fi-sidebar-nav{scrollbar-width:none;-ms-overflow-style:none;}.fi-sidebar-nav::-webkit-scrollbar{display:none;}.fi-logo img{border-radius:9999px;object-fit:cover;}</style>',
+            )
+            ->renderHook(
+                PanelsRenderHook::TOPBAR_END,
+                fn (): \Illuminate\Contracts\View\View => view('filament.theme-picker'),
             );
     }
 }
