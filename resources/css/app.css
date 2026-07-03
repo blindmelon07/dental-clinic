@@ -128,3 +128,297 @@
         transition-duration: 0.01ms !important;
     }
 }
+
+/* ==========================================================================
+   Public website dark theme (Black & Dark Blue)
+   Selected via Site Settings → Website Theme. Declared unlayered so it
+   overrides Tailwind's @layer utilities classes regardless of source order.
+   ========================================================================== */
+
+html[data-theme='dark'] body {
+    background-color: #05070d;
+    color: #cbd5e1;
+}
+
+html[data-theme='dark'] .card,
+html[data-theme='dark'] .bg-white {
+    background-color: #0b0f1a !important;
+}
+
+html[data-theme='dark'] .bg-slate-50,
+html[data-theme='dark'] .bg-slate-100 {
+    background-color: #0d1424 !important;
+}
+
+html[data-theme='dark'] .bg-slate-200 {
+    background-color: #16213a !important;
+}
+
+html[data-theme='dark'] .bg-blue-50,
+html[data-theme='dark'] .bg-blue-100 {
+    background-color: #0f1729 !important;
+}
+
+html[data-theme='dark'] .bg-slate-800,
+html[data-theme='dark'] .bg-slate-900 {
+    background-color: #03050a !important;
+}
+
+html[data-theme='dark'] .bg-green-50 {
+    background-color: #06210f !important;
+}
+
+/* Text colors */
+html[data-theme='dark'] .text-slate-900,
+html[data-theme='dark'] .text-slate-800 {
+    color: #f1f5f9 !important;
+}
+
+html[data-theme='dark'] .text-slate-700,
+html[data-theme='dark'] .text-slate-600 {
+    color: #cbd5e1 !important;
+}
+
+html[data-theme='dark'] .text-slate-500,
+html[data-theme='dark'] .text-slate-400,
+html[data-theme='dark'] .text-slate-300 {
+    color: #8a97ac !important;
+}
+
+html[data-theme='dark'] .text-blue-700,
+html[data-theme='dark'] .text-blue-800,
+html[data-theme='dark'] .text-blue-600 {
+    color: #60a5fa !important;
+}
+
+html[data-theme='dark'] .text-blue-400,
+html[data-theme='dark'] .text-blue-100,
+html[data-theme='dark'] .text-blue-50 {
+    color: #93c5fd !important;
+}
+
+/* Buttons / accents */
+html[data-theme='dark'] .btn-primary,
+html[data-theme='dark'] .bg-blue-700 {
+    background-color: #2563eb !important;
+}
+
+html[data-theme='dark'] .btn-primary:hover,
+html[data-theme='dark'] .bg-blue-800,
+html[data-theme='dark'] .hover\:bg-blue-800:hover {
+    background-color: #1d4ed8 !important;
+}
+
+html[data-theme='dark'] .hover\:bg-blue-50:hover,
+html[data-theme='dark'] .hover\:bg-slate-50:hover,
+html[data-theme='dark'] .hover\:bg-slate-100:hover {
+    background-color: #0f1729 !important;
+}
+
+html[data-theme='dark'] .hover\:text-blue-800:hover,
+html[data-theme='dark'] .hover\:text-blue-700:hover {
+    color: #93c5fd !important;
+}
+
+html[data-theme='dark'] .btn-secondary,
+html[data-theme='dark'] .input-field {
+    background-color: #0b0f1a !important;
+    color: #f1f5f9 !important;
+}
+
+/* Borders */
+html[data-theme='dark'] .border-slate-100,
+html[data-theme='dark'] .border-slate-200,
+html[data-theme='dark'] .border-slate-300,
+html[data-theme='dark'] .border-slate-800,
+html[data-theme='dark'] .card,
+html[data-theme='dark'] .btn-secondary,
+html[data-theme='dark'] .input-field {
+    border-color: rgba(148, 163, 184, 0.15) !important;
+}
+
+html[data-theme='dark'] .border-blue-100,
+html[data-theme='dark'] .border-blue-300,
+html[data-theme='dark'] .border-blue-400 {
+    border-color: rgba(96, 165, 250, 0.35) !important;
+}
+
+/* Hero gradients */
+html[data-theme='dark'] .from-blue-50 {
+    --tw-gradient-from: #060a14 !important;
+}
+
+html[data-theme='dark'] .via-blue-50 {
+    --tw-gradient-via: #0a1220 !important;
+}
+
+html[data-theme='dark'] .to-white {
+    --tw-gradient-to: #000000 !important;
+}
+
+html[data-theme='dark'] .from-blue-600 {
+    --tw-gradient-from: #1d4ed8 !important;
+}
+
+html[data-theme='dark'] .from-blue-700 {
+    --tw-gradient-from: #1e3a8a !important;
+}
+
+/* Nav / footer */
+html[data-theme='dark'] header nav.bg-white\/95 {
+    background-color: rgba(5, 7, 13, 0.9) !important;
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+}
+
+html[data-theme='dark'] footer.bg-slate-900 {
+    background-color: #000000 !important;
+    border-top: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+/* ==========================================================================
+   Public website luxury theme (Black & Gold)
+   Same mechanism as the dark theme above, warm near-black surfaces with a
+   brass/gold accent in place of blue.
+   ========================================================================== */
+
+html[data-theme='luxury'] body {
+    background-color: #0b0805;
+    color: #d8c9ac;
+}
+
+html[data-theme='luxury'] .card,
+html[data-theme='luxury'] .bg-white {
+    background-color: #16110b !important;
+}
+
+html[data-theme='luxury'] .bg-slate-50,
+html[data-theme='luxury'] .bg-slate-100 {
+    background-color: #1c150d !important;
+}
+
+html[data-theme='luxury'] .bg-slate-200 {
+    background-color: #241b10 !important;
+}
+
+html[data-theme='luxury'] .bg-blue-50,
+html[data-theme='luxury'] .bg-blue-100 {
+    background-color: #221a10 !important;
+}
+
+html[data-theme='luxury'] .bg-slate-800,
+html[data-theme='luxury'] .bg-slate-900 {
+    background-color: #080604 !important;
+}
+
+html[data-theme='luxury'] .bg-green-50 {
+    background-color: #06210f !important;
+}
+
+/* Text colors */
+html[data-theme='luxury'] .text-slate-900,
+html[data-theme='luxury'] .text-slate-800 {
+    color: #f5ecd9 !important;
+}
+
+html[data-theme='luxury'] .text-slate-700,
+html[data-theme='luxury'] .text-slate-600 {
+    color: #d8c9ac !important;
+}
+
+html[data-theme='luxury'] .text-slate-500,
+html[data-theme='luxury'] .text-slate-400,
+html[data-theme='luxury'] .text-slate-300 {
+    color: #9c8b6f !important;
+}
+
+html[data-theme='luxury'] .text-blue-700,
+html[data-theme='luxury'] .text-blue-800,
+html[data-theme='luxury'] .text-blue-600 {
+    color: #d4af6a !important;
+}
+
+html[data-theme='luxury'] .text-blue-400,
+html[data-theme='luxury'] .text-blue-100,
+html[data-theme='luxury'] .text-blue-50 {
+    color: #e8c98a !important;
+}
+
+/* Buttons / accents */
+html[data-theme='luxury'] .btn-primary,
+html[data-theme='luxury'] .bg-blue-700 {
+    background-color: #8a6a2f !important;
+}
+
+html[data-theme='luxury'] .btn-primary:hover,
+html[data-theme='luxury'] .bg-blue-800,
+html[data-theme='luxury'] .hover\:bg-blue-800:hover {
+    background-color: #6f5424 !important;
+}
+
+html[data-theme='luxury'] .hover\:bg-blue-50:hover,
+html[data-theme='luxury'] .hover\:bg-slate-50:hover,
+html[data-theme='luxury'] .hover\:bg-slate-100:hover {
+    background-color: #221a10 !important;
+}
+
+html[data-theme='luxury'] .hover\:text-blue-800:hover,
+html[data-theme='luxury'] .hover\:text-blue-700:hover {
+    color: #e8c98a !important;
+}
+
+html[data-theme='luxury'] .btn-secondary,
+html[data-theme='luxury'] .input-field {
+    background-color: #16110b !important;
+    color: #f5ecd9 !important;
+}
+
+/* Borders */
+html[data-theme='luxury'] .border-slate-100,
+html[data-theme='luxury'] .border-slate-200,
+html[data-theme='luxury'] .border-slate-300,
+html[data-theme='luxury'] .border-slate-800,
+html[data-theme='luxury'] .card,
+html[data-theme='luxury'] .btn-secondary,
+html[data-theme='luxury'] .input-field {
+    border-color: rgba(212, 175, 106, 0.15) !important;
+}
+
+html[data-theme='luxury'] .border-blue-100,
+html[data-theme='luxury'] .border-blue-300,
+html[data-theme='luxury'] .border-blue-400 {
+    border-color: rgba(212, 175, 106, 0.35) !important;
+}
+
+/* Hero gradients */
+html[data-theme='luxury'] .from-blue-50 {
+    --tw-gradient-from: #0b0805 !important;
+}
+
+html[data-theme='luxury'] .via-blue-50 {
+    --tw-gradient-via: #120d08 !important;
+}
+
+html[data-theme='luxury'] .to-white {
+    --tw-gradient-to: #000000 !important;
+}
+
+html[data-theme='luxury'] .from-blue-600 {
+    --tw-gradient-from: #6f5424 !important;
+}
+
+html[data-theme='luxury'] .from-blue-700 {
+    --tw-gradient-from: #4a3a1a !important;
+}
+
+/* Nav / footer */
+html[data-theme='luxury'] header nav.bg-white\/95 {
+    background-color: rgba(11, 8, 5, 0.9) !important;
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+}
+
+html[data-theme='luxury'] footer.bg-slate-900 {
+    background-color: #000000 !important;
+    border-top: 1px solid rgba(212, 175, 106, 0.12);
+}

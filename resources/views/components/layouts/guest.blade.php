@@ -1,5 +1,8 @@
-﻿<!DOCTYPE html>
-<html lang="en" class="h-full">
+﻿@php
+    $settings = \App\Models\SiteSetting::instance();
+@endphp
+<!DOCTYPE html>
+<html lang="en" class="h-full" data-theme="{{ $settings->site_theme ?? 'light' }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -30,7 +33,6 @@
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
     @php
-        $settings = \App\Models\SiteSetting::instance();
         $navLinks = [
             'home' => ['label' => 'Home', 'route' => 'home'],
             'about' => ['label' => 'About Us', 'route' => 'about'],

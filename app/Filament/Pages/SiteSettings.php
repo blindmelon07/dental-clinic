@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Models\SiteSetting;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -64,6 +65,17 @@ class SiteSettings extends Page implements HasForms
                             ->label('Tagline')
                             ->placeholder('Your Trusted Dental Care Partner')
                             ->maxLength(150),
+                        Select::make('site_theme')
+                            ->label('Website Theme')
+                            ->helperText('Controls the color scheme of the public-facing website (not the admin panel).')
+                            ->options([
+                                'light'   => 'Light',
+                                'dark'    => 'Dark (Black & Dark Blue)',
+                                'luxury'  => 'Luxury (Black & Gold)',
+                            ])
+                            ->default('light')
+                            ->required()
+                            ->native(false),
                     ])->columns(2),
 
                 // ── Contact Information ───────────────────────────────────

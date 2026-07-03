@@ -11,6 +11,7 @@
             rose:    { label:'Rose',    swatch:'oklch(0.645 0.246 16.439)',  vars:{ 50:'oklch(0.969 0.015 12.422)',100:'oklch(0.941 0.03 12.58)',200:'oklch(0.892 0.058 10.001)',300:'oklch(0.81 0.117 11.638)',400:'oklch(0.712 0.194 13.428)',500:'oklch(0.645 0.246 16.439)',600:'oklch(0.586 0.253 17.585)',700:'oklch(0.514 0.222 16.935)',800:'oklch(0.455 0.188 13.697)',900:'oklch(0.41 0.159 10.272)',950:'oklch(0.271 0.105 12.094)' } },
             amber:   { label:'Amber',   swatch:'oklch(0.769 0.188 70.08)',   vars:{ 50:'oklch(0.987 0.022 95.277)',100:'oklch(0.962 0.059 95.617)',200:'oklch(0.924 0.12 95.746)',300:'oklch(0.879 0.169 91.605)',400:'oklch(0.828 0.189 84.429)',500:'oklch(0.769 0.188 70.08)',600:'oklch(0.666 0.179 58.318)',700:'oklch(0.555 0.163 48.998)',800:'oklch(0.473 0.137 46.201)',900:'oklch(0.414 0.112 45.904)',950:'oklch(0.279 0.077 45.635)' } },
             emerald: { label:'Emerald', swatch:'oklch(0.696 0.17 162.48)',   vars:{ 50:'oklch(0.979 0.021 166.113)',100:'oklch(0.95 0.052 163.051)',200:'oklch(0.905 0.093 164.15)',300:'oklch(0.845 0.143 164.978)',400:'oklch(0.765 0.177 163.223)',500:'oklch(0.696 0.17 162.48)',600:'oklch(0.596 0.145 163.225)',700:'oklch(0.508 0.118 165.612)',800:'oklch(0.432 0.095 166.913)',900:'oklch(0.378 0.077 168.94)',950:'oklch(0.262 0.051 172.552)' } },
+            gold:    { label:'Gold',    swatch:'oklch(0.72 0.11 82)',        vars:{ 50:'oklch(0.98 0.02 90)',100:'oklch(0.955 0.035 88)',200:'oklch(0.9 0.06 86)',300:'oklch(0.84 0.085 84)',400:'oklch(0.78 0.10 83)',500:'oklch(0.72 0.11 82)',600:'oklch(0.63 0.105 78)',700:'oklch(0.54 0.095 74)',800:'oklch(0.45 0.08 70)',900:'oklch(0.38 0.065 66)',950:'oklch(0.27 0.045 62)' } },
         },
 
         backgrounds: {
@@ -22,6 +23,20 @@
             lavender: { label:'Lavender',  swatch:'#f5f3ff', css:'body{background:#f5f3ff!important;}' },
             rose:     { label:'Rose',      swatch:'#fff1f2', css:'body{background:#fff1f2!important;}' },
             sand:     { label:'Sand',      swatch:'#fafaf5', css:'body{background:#fafaf5!important;}' },
+            black:    { label:'Black',     swatch:'#000000', css:'body{background:#000000!important;}', dark:true },
+            navy:     { label:'Dark Blue', swatch:'#0a1128', css:'body{background:#0a1128!important;}', dark:true },
+            espresso: { label:'Espresso',  swatch:'#140f0a', css:'body{background:#140f0a!important;}', dark:true },
+        },
+
+        // Filament's own sidebar/topbar/main/card surfaces are painted from
+        // the --gray-50..950 custom properties (same mechanism as --primary-*
+        // above), not from `body`. Repaint them per dark background so the
+        // whole panel — not just the page margins — takes on the chosen tint.
+        grayPalettes: {
+            default:  { 50:'oklch(0.984 0.003 247.858)',100:'oklch(0.968 0.007 247.896)',200:'oklch(0.929 0.013 255.508)',300:'oklch(0.869 0.022 252.894)',400:'oklch(0.704 0.04 256.788)',500:'oklch(0.554 0.046 257.417)',600:'oklch(0.446 0.043 257.281)',700:'oklch(0.372 0.044 257.287)',800:'oklch(0.279 0.041 260.031)',900:'oklch(0.208 0.042 265.755)',950:'oklch(0.129 0.042 264.695)' },
+            black:    { 50:'oklch(0.985 0 0)',100:'oklch(0.96 0 0)',200:'oklch(0.90 0 0)',300:'oklch(0.82 0 0)',400:'oklch(0.64 0 0)',500:'oklch(0.50 0 0)',600:'oklch(0.40 0 0)',700:'oklch(0.30 0 0)',800:'oklch(0.20 0 0)',900:'oklch(0.14 0 0)',950:'oklch(0.07 0 0)' },
+            navy:     { 50:'oklch(0.97 0.01 264)',100:'oklch(0.93 0.016 264)',200:'oklch(0.86 0.026 264)',300:'oklch(0.75 0.04 264)',400:'oklch(0.60 0.05 264)',500:'oklch(0.46 0.055 264)',600:'oklch(0.36 0.055 264)',700:'oklch(0.27 0.05 264)',800:'oklch(0.19 0.045 264)',900:'oklch(0.135 0.04 264)',950:'oklch(0.075 0.035 264)' },
+            espresso: { 50:'oklch(0.97 0.015 60)',100:'oklch(0.93 0.022 58)',200:'oklch(0.86 0.032 55)',300:'oklch(0.75 0.045 52)',400:'oklch(0.60 0.05 48)',500:'oklch(0.46 0.055 45)',600:'oklch(0.36 0.05 42)',700:'oklch(0.27 0.045 40)',800:'oklch(0.19 0.038 38)',900:'oklch(0.13 0.032 36)',950:'oklch(0.07 0.026 34)' },
         },
 
         applyVars(prefix, vars) {
@@ -55,11 +70,30 @@
                 document.head.appendChild(el);
             }
             el.textContent = this.backgrounds[name].css;
+
+            // Dark backgrounds need Filament's own dark mode active too,
+            // otherwise sidebar/headings/cards keep light-mode text colors
+            // and become unreadable against a black/navy/espresso page.
+            if (this.backgrounds[name].dark) {
+                localStorage.setItem('theme', 'dark');
+                document.documentElement.classList.add('dark');
+            } else {
+                localStorage.setItem('theme', 'light');
+                document.documentElement.classList.remove('dark');
+            }
+
+            // Sidebar/topbar/main/cards read --gray-50..950, not `body`, so
+            // repaint that scale too or they stay Filament's default slate.
+            this.applyVars('gray', this.grayPalettes[name] ?? this.grayPalettes.default);
         },
 
         init() {
             this.applyVars('primary', this.colors[this.currentColor].vars);
             this.setBg(this.currentBg);
+        },
+
+        isDark() {
+            return this.backgrounds[this.currentBg]?.dark === true;
         }
     }"
     x-on:click.outside="open = false"
@@ -86,11 +120,18 @@
     <div
         x-show="open"
         x-transition
-        style="position:absolute; top:calc(100% + 8px); right:0; z-index:9999; background:white; border:1px solid #e5e7eb; border-radius:14px; padding:16px; box-shadow:0 10px 30px rgba(0,0,0,0.13); min-width:240px;"
+        :style="`
+            position:absolute; top:calc(100% + 8px); right:0; z-index:9999; border-radius:14px; padding:16px;
+            min-width:240px;
+            background:var(--gray-${isDark() ? '900' : '50'});
+            border:1px solid var(--gray-${isDark() ? '700' : '200'});
+            color:var(--gray-${isDark() ? '100' : '900'});
+            box-shadow:0 10px 30px rgba(0,0,0,${isDark() ? '0.5' : '0.13'});
+        `"
         x-cloak
     >
         {{-- Primary Color --}}
-        <p style="font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:#6b7280; margin:0 0 10px;">Primary Color</p>
+        <p :style="`font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--gray-${isDark() ? '400' : '500'}); margin:0 0 10px;`">Primary Color</p>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-bottom:16px;">
             <template x-for="(c, name) in colors" :key="name">
                 <button
@@ -100,7 +141,7 @@
                         display:flex; align-items:center; gap:8px;
                         padding:7px 10px; border-radius:8px; cursor:pointer;
                         border:2px solid ${currentColor === name ? c.swatch : 'transparent'};
-                        background:${currentColor === name ? 'rgba(0,0,0,0.04)' : 'transparent'};
+                        background:${currentColor === name ? (isDark() ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)') : 'transparent'};
                         font-size:13px; font-weight:500; color:inherit;
                     `"
                 >
@@ -110,10 +151,10 @@
             </template>
         </div>
 
-        <hr style="border:none; border-top:1px solid #f3f4f6; margin:0 0 14px;">
+        <hr :style="`border:none; border-top:1px solid var(--gray-${isDark() ? '700' : '100'}); margin:0 0 14px;`">
 
         {{-- Background --}}
-        <p style="font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:#6b7280; margin:0 0 10px;">Background</p>
+        <p :style="`font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--gray-${isDark() ? '400' : '500'}); margin:0 0 10px;`">Background</p>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px;">
             <template x-for="(bg, name) in backgrounds" :key="name">
                 <button
@@ -123,7 +164,7 @@
                         display:flex; align-items:center; gap:8px;
                         padding:7px 10px; border-radius:8px; cursor:pointer;
                         border:2px solid ${currentBg === name ? bg.swatch : 'transparent'};
-                        background:${currentBg === name ? 'rgba(0,0,0,0.04)' : 'transparent'};
+                        background:${currentBg === name ? (isDark() ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)') : 'transparent'};
                         font-size:13px; font-weight:500; color:inherit;
                     `"
                 >

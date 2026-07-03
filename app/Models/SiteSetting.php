@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class SiteSetting extends Model
 {
     protected $fillable = [
-        'logo', 'clinic_name', 'tagline',
+        'logo', 'clinic_name', 'tagline', 'site_theme',
         'hero_heading', 'hero_subheading', 'hero_description',
         'hero_image_1', 'hero_image_2', 'hero_image_3', 'hero_image_4',
         'stat_years', 'stat_patients', 'stat_satisfaction', 'stat_emergency',
