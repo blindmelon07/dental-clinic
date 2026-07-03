@@ -102,7 +102,7 @@
     {{-- Trigger button --}}
     <button
         type="button"
-        x-on:click="open = !open"
+        x-on:click.stop="open = !open"
         title="Appearance settings"
         style="display:flex; align-items:center; gap:6px; padding:6px 10px; border-radius:8px; border:1px solid rgba(128,128,128,0.2); background:transparent; cursor:pointer; font-size:13px; color:inherit;"
     >
