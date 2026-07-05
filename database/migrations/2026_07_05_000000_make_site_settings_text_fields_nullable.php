@@ -1,28 +1,11 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    private array $columns = [
-        'hero_heading'         => ['type' => 'VARCHAR(255)', 'default' => 'Healthy Smiles'],
-        'hero_subheading'      => ['type' => 'VARCHAR(255)', 'default' => 'Start Here'],
-        'stat_years'           => ['type' => 'VARCHAR(255)', 'default' => '15+'],
-        'stat_patients'        => ['type' => 'VARCHAR(255)', 'default' => '10k+'],
-        'stat_satisfaction'    => ['type' => 'VARCHAR(255)', 'default' => '98%'],
-        'stat_emergency'       => ['type' => 'VARCHAR(255)', 'default' => '24/7'],
-        'hours_weekday'        => ['type' => 'VARCHAR(255)', 'default' => '9:00 AM – 6:00 PM'],
-        'hours_saturday'       => ['type' => 'VARCHAR(255)', 'default' => '9:00 AM – 2:00 PM'],
-        'hours_sunday'         => ['type' => 'VARCHAR(255)', 'default' => 'Closed'],
-        'about_story_heading'  => ['type' => 'VARCHAR(255)', 'default' => 'Care With Compassion'],
-        'milestone_1_title'    => ['type' => 'VARCHAR(255)', 'default' => 'Our Clinic Opens'],
-        'milestone_2_title'    => ['type' => 'VARCHAR(255)', 'default' => 'Expanding Our Services'],
-        'milestone_3_title'    => ['type' => 'VARCHAR(255)', 'default' => 'Going Digital'],
-        'milestone_4_title'    => ['type' => 'VARCHAR(255)', 'default' => 'Serving You Today'],
-    ];
-
     /**
      * These columns are optional in the Site Settings form and every page
      * template already falls back with `?:` when they're empty, but the
@@ -31,15 +14,41 @@ return new class extends Migration
      */
     public function up(): void
     {
-        foreach ($this->columns as $name => $def) {
-            DB::statement("ALTER TABLE site_settings MODIFY `{$name}` {$def['type']} NULL DEFAULT " . DB::getPdo()->quote($def['default']));
-        }
+        Schema::table('site_settings', function (Blueprint $table) {
+            $table->string('hero_heading')->nullable()->default('Healthy Smiles')->change();
+            $table->string('hero_subheading')->nullable()->default('Start Here')->change();
+            $table->string('stat_years')->nullable()->default('15+')->change();
+            $table->string('stat_patients')->nullable()->default('10k+')->change();
+            $table->string('stat_satisfaction')->nullable()->default('98%')->change();
+            $table->string('stat_emergency')->nullable()->default('24/7')->change();
+            $table->string('hours_weekday')->nullable()->default('9:00 AM – 6:00 PM')->change();
+            $table->string('hours_saturday')->nullable()->default('9:00 AM – 2:00 PM')->change();
+            $table->string('hours_sunday')->nullable()->default('Closed')->change();
+            $table->string('about_story_heading')->nullable()->default('Care With Compassion')->change();
+            $table->string('milestone_1_title')->nullable()->default('Our Clinic Opens')->change();
+            $table->string('milestone_2_title')->nullable()->default('Expanding Our Services')->change();
+            $table->string('milestone_3_title')->nullable()->default('Going Digital')->change();
+            $table->string('milestone_4_title')->nullable()->default('Serving You Today')->change();
+        });
     }
 
     public function down(): void
     {
-        foreach ($this->columns as $name => $def) {
-            DB::statement("ALTER TABLE site_settings MODIFY `{$name}` {$def['type']} NOT NULL DEFAULT " . DB::getPdo()->quote($def['default']));
-        }
+        Schema::table('site_settings', function (Blueprint $table) {
+            $table->string('hero_heading')->default('Healthy Smiles')->change();
+            $table->string('hero_subheading')->default('Start Here')->change();
+            $table->string('stat_years')->default('15+')->change();
+            $table->string('stat_patients')->default('10k+')->change();
+            $table->string('stat_satisfaction')->default('98%')->change();
+            $table->string('stat_emergency')->default('24/7')->change();
+            $table->string('hours_weekday')->default('9:00 AM – 6:00 PM')->change();
+            $table->string('hours_saturday')->default('9:00 AM – 2:00 PM')->change();
+            $table->string('hours_sunday')->default('Closed')->change();
+            $table->string('about_story_heading')->default('Care With Compassion')->change();
+            $table->string('milestone_1_title')->default('Our Clinic Opens')->change();
+            $table->string('milestone_2_title')->default('Expanding Our Services')->change();
+            $table->string('milestone_3_title')->default('Going Digital')->change();
+            $table->string('milestone_4_title')->default('Serving You Today')->change();
+        });
     }
 };
