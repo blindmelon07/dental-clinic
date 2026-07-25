@@ -225,7 +225,7 @@
             <div class="grid lg:grid-cols-2 gap-12 items-center">
                 <div class="relative order-2 lg:order-1">
                     <div class="aspect-[4/3] rounded-3xl overflow-hidden shadow-xl">
-                        <img src="https://picsum.photos/seed/dental-team/800/600" alt="Dental team in our clinic" class="w-full h-full object-cover" loading="lazy">
+                        <img src="{{ $settings->home_about_image ? asset('storage/' . $settings->home_about_image) : 'https://picsum.photos/seed/dental-team/800/600' }}" alt="Dental team in our clinic" class="w-full h-full object-cover" loading="lazy">
                     </div>
                 </div>
                 <div class="order-1 lg:order-2">

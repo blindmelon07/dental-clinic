@@ -15,6 +15,7 @@ class SiteSetting extends Model
         'hours_weekday', 'hours_saturday', 'hours_sunday',
         'facebook_url', 'footer_text',
         'testimonial_quote', 'testimonial_author', 'testimonial_since',
+        'home_about_image',
         'about_story_heading', 'about_story_body', 'about_story_image',
         'milestone_1_title', 'milestone_1_body',
         'milestone_2_title', 'milestone_2_body',

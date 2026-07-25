@@ -200,6 +200,23 @@ class SiteSettings extends Page implements HasForms
                             ->maxLength(20),
                     ])->columns(4),
 
+                // ── Homepage – Why Choose Us ──────────────────────────────
+                Section::make('Homepage – Why Choose Us')
+                    ->description('The "Comfortable Care, Confident You" teaser section on the home page.')
+                    ->schema([
+                        FileUpload::make('home_about_image')
+                            ->label('Section Image')
+                            ->image()
+                            ->directory('home')
+                            ->disk('public')
+                            ->visibility('public')
+                            ->imagePreviewHeight('120')
+                            ->maxSize(3072)
+                            ->acceptedFileTypes(['image/png', 'image/jpeg', 'image/webp'])
+                            ->helperText('Shown beside the "Why Choose Us" text on the home page. Recommended: 4:3 ratio, at least 800×600px.')
+                            ->columnSpanFull(),
+                    ]),
+
                 // ── Homepage – Testimonial ────────────────────────────────
                 Section::make('Homepage – Testimonial')
                     ->description('The patient quote shown in the dark banner on the home page.')
