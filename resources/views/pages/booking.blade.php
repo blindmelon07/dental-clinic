@@ -11,8 +11,11 @@
         $firstDentist = $dentists->first();
 
         $timeSlots = [];
-        for ($h = 7; $h < 17; $h++) {
+        for ($h = 7; $h <= 19; $h++) {
             foreach ([0, 30] as $m) {
+                if ($h === 19 && $m === 30) {
+                    continue;
+                }
                 $time24 = sprintf('%02d:%02d', $h, $m);
                 $period = $h < 12 ? 'AM' : 'PM';
                 $h12    = $h > 12 ? $h - 12 : ($h === 0 ? 12 : $h);
