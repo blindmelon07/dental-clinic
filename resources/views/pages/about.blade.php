@@ -25,7 +25,7 @@
             <div class="grid lg:grid-cols-2 gap-12 items-center">
                 <div class="relative">
                     <div class="aspect-[4/3] rounded-3xl overflow-hidden shadow-xl">
-                        <img src="https://picsum.photos/seed/dental-clinic-interior/800/600" alt="Inside our dental clinic" class="w-full h-full object-cover" loading="lazy">
+                        <img src="{{ $settings->about_story_image ? asset('storage/' . $settings->about_story_image) : 'https://picsum.photos/seed/dental-clinic-interior/800/600' }}" alt="Inside our dental clinic" class="w-full h-full object-cover" loading="lazy">
                     </div>
                 </div>
                 <div>

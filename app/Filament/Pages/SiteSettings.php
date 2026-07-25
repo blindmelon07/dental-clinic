@@ -234,6 +234,17 @@ class SiteSettings extends Page implements HasForms
                             ->rows(4)
                             ->maxLength(800)
                             ->columnSpanFull(),
+                        FileUpload::make('about_story_image')
+                            ->label('Story Image')
+                            ->image()
+                            ->directory('about')
+                            ->disk('public')
+                            ->visibility('public')
+                            ->imagePreviewHeight('120')
+                            ->maxSize(3072)
+                            ->acceptedFileTypes(['image/png', 'image/jpeg', 'image/webp'])
+                            ->helperText('Shown beside the story text on the About page. Recommended: 4:3 ratio, at least 800×600px.')
+                            ->columnSpanFull(),
                     ]),
 
                 // ── About – Milestones ────────────────────────────────────
