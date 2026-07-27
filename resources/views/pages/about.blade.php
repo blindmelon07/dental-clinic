@@ -160,9 +160,10 @@
                 <div class="mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     @foreach ($dentists as $dentist)
                         @php
-                            // Build initials from name (strip "Dr." prefix for initials)
-                            $nameParts = explode(' ', preg_replace('/^Dr\.\s*/i', '', $dentist->full_name));
-                            $initials   = collect($nameParts)->filter()->take(2)->map(fn($p) => strtoupper($p[0]))->implode('');
+                            // Strip "Dr." prefix for display and initials
+                            $displayName = preg_replace('/^Dr\.\s*/i', '', $dentist->full_name);
+                            $nameParts   = explode(' ', $displayName);
+                            $initials    = collect($nameParts)->filter()->take(2)->map(fn($p) => strtoupper($p[0]))->implode('');
 
                             // Cycle through a set of teal/cyan gradient combos
                             $gradients = [
@@ -181,7 +182,7 @@
                                 @if($dentist->user->avatar)
                                     <div class="w-28 h-28 rounded-full overflow-hidden ring-4 ring-white shadow-lg mb-4">
                                         <img src="{{ asset('storage/' . $dentist->user->avatar) }}"
-                                             alt="Photo of {{ $dentist->full_name }}"
+                                             alt="Photo of {{ $displayName }}"
                                              class="w-full h-full object-cover">
                                     </div>
                                 @else
@@ -191,7 +192,7 @@
                                 @endif
 
                                 {{-- Name & specialization --}}
-                                <h3 class="font-heading text-xl font-bold text-slate-900 text-center leading-tight">{{ $dentist->full_name }}</h3>
+                                <h3 class="font-heading text-xl font-bold text-slate-900 text-center leading-tight">{{ $displayName }}</h3>
                                 <p class="mt-1.5 text-sm font-semibold text-blue-700 text-center">{{ $dentist->specialization ?: 'General Dentistry' }}</p>
                             </div>
 
