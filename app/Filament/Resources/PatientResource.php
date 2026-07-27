@@ -472,11 +472,12 @@ class PatientResource extends Resource
                                             $set('consent_dentist_signature', $dentist?->signature);
                                         }),
                                     Hidden::make('consent_dentist_name')->dehydrated(),
+                                    SignaturePad::make('consent_patient_signature')
+                                        ->label('Patient / Parent / Guardian Signature'),
                                     SignaturePad::make('consent_dentist_signature')
                                         ->label('Dentist E-Signature')
                                         ->disabled()
-                                        ->dehydrated()
-                                        ->columnSpanFull(),
+                                        ->dehydrated(),
                                 ])->columns(['default' => 1, 'sm' => 2]),
                         ]),
                 ])
@@ -599,13 +600,18 @@ class PatientResource extends Resource
                         ->boolean(),
                     TextEntry::make('consent_date')->label('Date Signed')->date()->placeholder('—'),
                     TextEntry::make('consent_dentist_name')->label('Dentist Name')->placeholder('—'),
+                    TextEntry::make('consent_patient_signature')
+                        ->label('Patient / Parent / Guardian Signature')
+                        ->html()
+                        ->formatStateUsing(fn (?string $state): string => $state
+                            ? '<img src="' . e($state) . '" class="max-h-32 border border-gray-300 rounded-lg bg-white p-1" />'
+                            : '—'),
                     TextEntry::make('consent_dentist_signature')
                         ->label('Dentist E-Signature')
                         ->html()
                         ->formatStateUsing(fn (?string $state): string => $state
                             ? '<img src="' . e($state) . '" class="max-h-32 border border-gray-300 rounded-lg bg-white p-1" />'
-                            : '—')
-                        ->columnSpanFull(),
+                            : '—'),
                 ])->columns(3)->collapsible(),
         ]);
     }
