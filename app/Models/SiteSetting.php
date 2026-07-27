@@ -13,7 +13,7 @@ class SiteSetting extends Model
         'stat_years', 'stat_patients', 'stat_satisfaction', 'stat_emergency',
         'address', 'city', 'phone', 'email',
         'hours_weekday', 'hours_saturday', 'hours_sunday',
-        'facebook_url', 'footer_text',
+        'facebook_url', 'footer_text', 'contact_location_image',
         'testimonial_quote', 'testimonial_author', 'testimonial_since',
         'home_about_image',
         'about_story_heading', 'about_story_body', 'about_story_image',

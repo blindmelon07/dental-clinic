@@ -163,7 +163,9 @@
       "Bash(node -e ' *)",
       "Read(//c/Users/bry/AppData/Local/ms-playwright/**)",
       "Bash(npx playwright *)",
-      "Bash(php -l app/Livewire/Patient/BookAppointment.php)"
+      "Bash(php -l app/Livewire/Patient/BookAppointment.php)",
+      "Bash(php -l app/Filament/Pages/SiteSettings.php)",
+      "Bash(php -l app/Models/SiteSetting.php)"
     ]
   }
 }

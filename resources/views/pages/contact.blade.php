@@ -137,7 +137,7 @@
                 {{-- Location / Map --}}
                 <div class="space-y-6">
                     <div class="aspect-[4/3] rounded-3xl overflow-hidden shadow-xl">
-                        <img src="https://picsum.photos/seed/dental-clinic-location/800/600" alt="Map of our clinic location" class="w-full h-full object-cover" loading="lazy">
+                        <img src="{{ $settings->contact_location_image ? asset('storage/' . $settings->contact_location_image) : 'https://picsum.photos/seed/dental-clinic-location/800/600' }}" alt="Our clinic location" class="w-full h-full object-cover" loading="lazy">
                     </div>
                     <div class="card">
                         <h3 class="font-heading font-bold text-slate-900 mb-3">Visit Our Clinic</h3>

@@ -95,6 +95,17 @@ class SiteSettings extends Page implements HasForms
                             ->label('Footer Text')
                             ->placeholder('© 2026 DentCare. All rights reserved.')
                             ->maxLength(255),
+                        FileUpload::make('contact_location_image')
+                            ->label('Contact Page — Location Image')
+                            ->image()
+                            ->directory('contact')
+                            ->disk('public')
+                            ->visibility('public')
+                            ->imagePreviewHeight('120')
+                            ->maxSize(3072)
+                            ->acceptedFileTypes(['image/png', 'image/jpeg', 'image/webp'])
+                            ->helperText('Shown beside the contact form on the Contact page. Recommended: 4:3 ratio, at least 800×600px.')
+                            ->columnSpanFull(),
                     ])->columns(2),
 
                 // ── Clinic Hours ──────────────────────────────────────────
