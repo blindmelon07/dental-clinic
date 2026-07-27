@@ -8,6 +8,7 @@ use App\Models\Clinic;
 use App\Models\Patient;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -152,11 +153,8 @@ class RegisteredUserController extends Controller
             Log::error('Registered event failed: ' . $e->getMessage(), ['user_id' => $user->id]);
         }
 
-        return redirect()->route('registration.pending');
-    }
+        Auth::login($user);
 
-    public function pending(): View
-    {
-        return view('auth.registration-pending');
+        return redirect()->route('patient.dashboard');
     }
 }

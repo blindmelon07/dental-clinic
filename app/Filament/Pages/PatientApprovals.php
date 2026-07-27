@@ -60,7 +60,7 @@ class PatientApprovals extends Page implements Tables\Contracts\HasTable
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->requiresConfirmation()
-                    ->modalDescription('This patient will be able to log in and book appointments immediately.')
+                    ->modalDescription('This patient will be able to book appointments immediately.')
                     ->action(function (User $record) {
                         $record->update(['is_active' => true]);
 
@@ -73,7 +73,7 @@ class PatientApprovals extends Page implements Tables\Contracts\HasTable
 
                         Notification::make()
                             ->title('Patient approved')
-                            ->body($record->name . ' can now log in and was emailed a welcome message.')
+                            ->body($record->name . ' can now book appointments and was emailed a welcome message.')
                             ->success()
                             ->send();
                     }),

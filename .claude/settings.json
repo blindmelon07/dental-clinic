@@ -162,7 +162,8 @@
       "Bash(node test-create-patient-wizard.js)",
       "Bash(node -e ' *)",
       "Read(//c/Users/bry/AppData/Local/ms-playwright/**)",
-      "Bash(npx playwright *)"
+      "Bash(npx playwright *)",
+      "Bash(php -l app/Livewire/Patient/BookAppointment.php)"
     ]
   }
 }

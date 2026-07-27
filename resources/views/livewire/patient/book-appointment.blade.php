@@ -4,7 +4,20 @@
         <p class="text-slate-500 mt-1.5">Schedule your dental visit in a few easy steps</p>
     </div>
 
-    @if($bookingComplete)
+    @if(! auth()->user()->is_active)
+        {{-- Pending Approval State --}}
+        <div class="text-center py-16 card p-8">
+            <div class="mx-auto w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mb-5">
+                <svg class="w-10 h-10 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <h2 class="font-heading text-2xl font-bold text-slate-900">Account pending approval</h2>
+            <p class="text-slate-600 mt-2 max-w-md mx-auto">
+                Your registration is still being reviewed by our staff. Once your account is approved, you'll be able to book appointments here — we'll email you when that happens.
+            </p>
+        </div>
+    @elseif($bookingComplete)
         {{-- Success State --}}
         <div class="text-center py-16 card p-8">
             <div class="mx-auto w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-5">

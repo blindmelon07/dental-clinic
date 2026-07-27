@@ -111,6 +111,12 @@ class BookAppointment extends Component
 
     public function confirm(): void
     {
+        if (! Auth::user()->is_active) {
+            $this->addError('booking', 'Your account is pending approval by our staff before you can book appointments.');
+
+            return;
+        }
+
         $this->validate([
             'selectedServiceId'  => 'required|exists:services,id',
             'selectedDentistId'  => 'required|exists:dentists,id',
