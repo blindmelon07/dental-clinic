@@ -10,7 +10,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
 </head>
-<body class="min-h-dvh font-sans antialiased bg-gradient-to-br from-teal-50 via-cyan-50 to-sky-100 py-8 px-4">
+<body class="min-h-dvh font-sans antialiased bg-black py-8 px-4">
 
     <div class="w-full max-w-4xl mx-auto">
 
@@ -20,7 +20,7 @@
                 <img src="{{ \App\Models\SiteSetting::instance()->logoUrl() }}"
                      alt="Gonzales Dental Clinic"
                      class="h-16 w-auto object-contain">
-                <p class="text-slate-500 text-sm">Patient Registration</p>
+                <p class="text-slate-300 text-sm">Patient Registration</p>
             </a>
         </div>
 
