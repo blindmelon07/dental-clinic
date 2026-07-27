@@ -206,14 +206,9 @@ class PatientResource extends Resource
         ];
     }
 
-    public static function form(Schema $schema): Schema
+    public static function patientInformationSchema(): array
     {
-        return $schema->components([
-            Tabs::make()
-                ->tabs([
-                    Tab::make('Patient Information')
-                        ->icon('heroicon-o-user')
-                        ->schema([
+        return [
                             Section::make('Personal Information')
                                 ->schema([
                                     TextInput::make('last_name')->required()->maxLength(100),
@@ -295,11 +290,12 @@ class PatientResource extends Resource
                                     TextInput::make('emergency_contact_phone')->tel()->label('Phone'),
                                     TextInput::make('emergency_contact_relation')->label('Relation'),
                                 ])->columns(['default' => 1, 'md' => 2, 'lg' => 3]),
-                        ]),
+        ];
+    }
 
-                    Tab::make('Dental & Medical History')
-                        ->icon('heroicon-o-clipboard-document-list')
-                        ->schema([
+    public static function dentalMedicalHistorySchema(): array
+    {
+        return [
                             Section::make('Dental History')
                                 ->schema([
                                     TextInput::make('previous_dentist')->label('Previous Dentist: Dr.')->maxLength(150),
@@ -383,11 +379,12 @@ class PatientResource extends Resource
                                 ])->columns(['default' => 1, 'sm' => 2])
                                 ->description('Free-text notes in addition to the questionnaire above.')
                                 ->collapsible(),
-                        ]),
+        ];
+    }
 
-                    Tab::make('Informed Consent')
-                        ->icon('heroicon-o-document-check')
-                        ->schema([
+    public static function informedConsentSchema(): array
+    {
+        return [
                             Section::make('TREATMENT TO BE DONE')
                                 ->description('I understand and consent to have any treatment done by the dentist after the procedure, the risks & benefits & cost have been fully explained. These treatments include, but are not limited to: x rays, cleanings, periodontal treatments, fillings, crowns, bridges, all types of extraction, root canals, &/or dentures, local anesthetics & surgical cases.')
                                 ->schema([
@@ -479,7 +476,23 @@ class PatientResource extends Resource
                                         ->disabled()
                                         ->dehydrated(),
                                 ])->columns(['default' => 1, 'sm' => 2]),
-                        ]),
+        ];
+    }
+
+    public static function form(Schema $schema): Schema
+    {
+        return $schema->components([
+            Tabs::make()
+                ->tabs([
+                    Tab::make('Patient Information')
+                        ->icon('heroicon-o-user')
+                        ->schema(self::patientInformationSchema()),
+                    Tab::make('Dental & Medical History')
+                        ->icon('heroicon-o-clipboard-document-list')
+                        ->schema(self::dentalMedicalHistorySchema()),
+                    Tab::make('Informed Consent')
+                        ->icon('heroicon-o-document-check')
+                        ->schema(self::informedConsentSchema()),
                 ])
                 ->columnSpanFull(),
         ]);

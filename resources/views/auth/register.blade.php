@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&family=Noto+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
 </head>
 <body class="min-h-dvh font-sans antialiased bg-gradient-to-br from-teal-50 via-cyan-50 to-sky-100 py-8 px-4">
 
@@ -458,6 +459,63 @@
                         </fieldset>
                     </section>
 
+                    {{-- Step 6 --}}
+                    <section class="wizard-step" data-step-title="Informed Consent">
+                        <fieldset class="mb-8">
+                            <legend class="font-heading text-base font-semibold text-slate-900 mb-4 pb-2 border-b border-slate-100 w-full">
+                                Informed Consent
+                            </legend>
+                            <p class="text-sm text-slate-500 mb-4">Please read each statement below and write your initials to confirm you understand it.</p>
+
+                            <div class="space-y-4">
+                                <x-consent-clause name="consent_treatment_initials" title="TREATMENT TO BE DONE"
+                                    description="I understand and consent to have any treatment done by the dentist after the procedure, the risks & benefits & cost have been fully explained. These treatments include, but are not limited to: x rays, cleanings, periodontal treatments, fillings, crowns, bridges, all types of extraction, root canals, &/or dentures, local anesthetics & surgical cases." />
+
+                                <x-consent-clause name="consent_drugs_initials" title="DRUGS & MEDICATIONS"
+                                    description="I understand that antibiotics, analgesics & other medications can cause allergic reactions like redness & swelling of tissues, pain, itching, vomiting, &/or anaphylactic shock." />
+
+                                <x-consent-clause name="consent_treatment_plan_initials" title="CHANGES IN TREATMENT PLAN"
+                                    description="I understand that during treatment it may be necessary to change/add procedures because of conditions found while working on the teeth that was not discovered during examination. For example, root canal therapy may be needed following routine restorative procedures. I give my permission to the dentist to make any/all changes and additions as necessary w/ my responsibility to pay all the costs agreed." />
+
+                                <x-consent-clause name="consent_radiograph_initials" title="RADIOGRAPH"
+                                    description="I understand that an x-ray shot or a radiograph maybe necessary as part of diagnostic aid to come up with tentative diagnosis at my dental problem and to make a good treatment plan, but this will not give me a 100% assurance for the accuracy of the treatment since all dental treatments are subject to unpredictable complications that later on may lead to sudden change of treatment plan and subject to new charges." />
+
+                                <x-consent-clause name="consent_removal_of_teeth_initials" title="REMOVAL OF TEETH"
+                                    description="I understand that alternatives to tooth removal (root canal therapy, crowns & periodontal surgery, etc.) & I completely understand these alternatives, including their risk & benefits prior to authorizing the dentist to remove teeth & any other structures necessary for reasons above. I understand that removing teeth does not always remove all the infections, if present, & it may be necessary to have further treatment. I understand the risk involved in having teeth removed, such as: pain, swelling, spread of infection, dry socket, fractured jaw, loss of feeling on the teeth, lips, tongue & surrounding tissue that can last for an indefinite period of time. I understand that I may need further treatment under a specialist if complications arise during or following treatment." />
+
+                                <x-consent-clause name="consent_crowns_initials" title="CROWNS (CAPS) & BRIDGES"
+                                    description="Preparing a tooth may irritate the nerve tissue in the center of the tooth, leaving the tooth extra sensitive to heat, cold & pressure. Treating such irritation may involve using special toothpastes, mouth rinses or root canal therapy. I understand that sometimes it is not possible to match the color of natural teeth exactly with artificial teeth. I further understand that I may be wearing temporary crowns, which may come off easily & that I must be careful to ensure that they are kept on until the permanent crowns are delivered. It is my responsibility to return for permanent cementation within 20 days from tooth preparation, as excessive days delay may allow for tooth movement, which may necessitate a remake of the crown, bridge/cap. I understand there will be additional charges for remakes due to my delaying of permanent cementation, & I realize that final opportunity to make changes in my new crown, bridges or cap (including shape, fit, size & color) will be before permanent cementation." />
+
+                                <x-consent-clause name="consent_endodontics_initials" title="ENDODONTICS (ROOT CANAL)"
+                                    description="I understand there is no guarantee that a root canal treatment will save a tooth & that complications can occur from the treatment & that occasionally root canal filling materials may extend through the tooth which does not necessarily affect the success of the treatment. I understand that endodontic files & drills are very fine instruments & stresses vented in their manufacture & calcifications present in teeth can cause them to break during use. I understand that referral to the endodontist for additional treatments may be necessary following any root canal treatment & I agree that I am responsible for any additional cost for treatment performed by the endodontist. I understand that a tooth may require removal in spite of all efforts to save it." />
+
+                                <x-consent-clause name="consent_periodontal_initials" title="PERIODONTAL DISEASE"
+                                    description="I understand that periodontal disease is a serious condition causing gum & bone inflammation &/or loss & that can lead eventually to the loss of my teeth. I understand the alternative treatment plans to correct periodontal disease, including gum surgery tooth extractions with or without replacement. I understand that undertaking any dental procedures may have future adverse effect on my periodontal conditions." />
+
+                                <x-consent-clause name="consent_fillings_initials" title="FILLINGS"
+                                    description="I understand that care must be exercised in chewing on fillings, especially during the first 24 hours to avoid breakage. I understand that a more extensive filling or a crown may be required, as additional decay or fracture may become evident after initial excavation. I understand that significant sensitivity is a common, but usually temporary, after-effect of a new placement of filling. I further understand that filling a tooth may irritate the nerve tissue creating sensitivity & treating such sensitivity could require root canal therapy or extractions." />
+
+                                <x-consent-clause name="consent_dentures_initials" title="DENTURES"
+                                    description="I understand that wearing of dentures can be difficult. Sore spots, altered speech & difficulty in eating are common problems. Immediate dentures (placement of denture immediately after extractions) may be painful. Immediate dentures may require considerable adjusting & several relines. I understand that it is my responsibility to return for delivery of dentures. I understand that failure to keep my delivery appointment may result in poorly fitted dentures. If a remake is required due to my delays of more than 30 days, there will be additional charges. A permanent reline will be needed later, which is not included in the initial fee. I understand that all adjustment or alterations of any kind after this initial period is subject to charges." />
+                            </div>
+                        </fieldset>
+
+                        <fieldset class="mb-8">
+                            <legend class="font-heading text-base font-semibold text-slate-900 mb-4 pb-2 border-b border-slate-100 w-full">
+                                Authorization & Signature
+                            </legend>
+                            <p class="text-sm text-slate-500 leading-relaxed mb-4">
+                                I understand that dentistry is not an exact science and that no dentist can properly guarantee accurate results all the time. I hereby authorize any of the doctors/dental auxiliaries to proceed with & perform the dental restorations & treatments as explained to me. I understand that these are subject to modification depending on undiagnosable circumstances that may arise during the course of treatment. I understand that regarding any dental insurance coverage I may have, I am responsible for payment of dental fees. I agree to pay any attorney's fees, collection fee, or court costs that may be incurred to satisfy any obligation to this office. All treatment were properly explained to me & any untoward circumstances that may arise during the procedure, the attending dentist will not be held liable since it is my free will, with full trust & confidence in him/her, to undergo dental treatment under his/her care.
+                            </p>
+
+                            <x-bool-field name="consent_agreed" label="Patient / Parent / Guardian agrees to the above informed consent" :required="true" />
+
+                            <div class="mt-4">
+                                <x-signature-field name="consent_patient_signature" label="Patient / Parent / Guardian Signature" :required="true" />
+                            </div>
+                        </fieldset>
+                    </section>
+
                     {{-- Wizard navigation --}}
                     <div class="flex items-center justify-between mt-2 pt-4 border-t border-slate-100">
                         <button type="button" id="wizard-back"
@@ -512,6 +570,8 @@
                 nextBtn.classList.toggle('hidden', current === total - 1);
                 submitBtn.classList.toggle('hidden', current !== total - 1);
 
+                window.dispatchEvent(new CustomEvent('wizard:step-shown', { detail: { step: steps[current] } }));
+
                 if (scroll) {
                     wizard.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
@@ -525,6 +585,22 @@
                         return false;
                     }
                 }
+
+                var requiredSignatures = steps[current].querySelectorAll('.signature-field[data-required="1"]');
+                for (var j = 0; j < requiredSignatures.length; j++) {
+                    var sigField = requiredSignatures[j];
+                    var hiddenInput = sigField.querySelector('[data-hidden-input]');
+                    var sigError = sigField.querySelector('[data-sig-error]');
+                    var isEmpty = !hiddenInput || !hiddenInput.value;
+                    if (sigError) {
+                        sigError.classList.toggle('hidden', !isEmpty);
+                    }
+                    if (isEmpty) {
+                        sigField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        return false;
+                    }
+                }
+
                 return true;
             }
 
@@ -560,6 +636,114 @@
                 }
 
                 phone.value = formatted;
+            });
+        })();
+
+        (function () {
+            function setupField(field) {
+                var canvas = field.querySelector('.sig-canvas');
+                var hiddenInput = field.querySelector('[data-hidden-input]');
+                var sigError = field.querySelector('[data-sig-error]');
+                var preview = field.querySelector('[data-preview]');
+                var previewImg = field.querySelector('[data-preview-img]');
+                var tabButtons = field.querySelectorAll('[data-tab-btn]');
+                var tabs = field.querySelectorAll('[data-tab]');
+                var fileInput = field.querySelector('[data-action="upload"]');
+                var clearBtn = field.querySelector('[data-action="clear"]');
+                var removeBtn = field.querySelector('[data-action="remove"]');
+                var pad = null;
+
+                function setValue(value) {
+                    hiddenInput.value = value || '';
+                    if (value) {
+                        previewImg.src = value;
+                        preview.classList.remove('hidden');
+                        if (sigError) sigError.classList.add('hidden');
+                    } else {
+                        preview.classList.add('hidden');
+                    }
+                }
+
+                function showTab(name) {
+                    tabs.forEach(function (t) {
+                        t.classList.toggle('hidden', t.dataset.tab !== name);
+                    });
+                    tabButtons.forEach(function (b) {
+                        var active = b.dataset.tabBtn === name;
+                        b.classList.toggle('bg-white', active);
+                        b.classList.toggle('shadow-sm', active);
+                        b.classList.toggle('text-cyan-600', active);
+                        b.classList.toggle('font-medium', active);
+                        b.classList.toggle('text-slate-500', !active);
+                    });
+                }
+
+                field._initPad = function () {
+                    if (pad) return;
+                    if (typeof SignaturePad === 'undefined') {
+                        setTimeout(field._initPad, 150);
+                        return;
+                    }
+                    var width = canvas.parentElement.offsetWidth;
+                    if (!width) return;
+                    canvas.width = width;
+                    canvas.height = 160;
+                    pad = new SignaturePad(canvas, { backgroundColor: 'rgb(255,255,255)' });
+                    pad.addEventListener('endStroke', function () {
+                        setValue(pad.toDataURL());
+                    });
+                };
+
+                tabButtons.forEach(function (btn) {
+                    btn.addEventListener('click', function () {
+                        showTab(btn.dataset.tabBtn);
+                    });
+                });
+
+                clearBtn.addEventListener('click', function () {
+                    if (pad) pad.clear();
+                    setValue(null);
+                });
+
+                fileInput.addEventListener('change', function (e) {
+                    var file = e.target.files[0];
+                    if (!file) return;
+                    if (file.size > 2 * 1024 * 1024) {
+                        alert('File is too large. Maximum size is 2MB.');
+                        e.target.value = '';
+                        return;
+                    }
+                    var reader = new FileReader();
+                    reader.onload = function (ev) {
+                        setValue(ev.target.result);
+                    };
+                    reader.readAsDataURL(file);
+                });
+
+                removeBtn.addEventListener('click', function () {
+                    setValue(null);
+                    if (pad) pad.clear();
+                    fileInput.value = '';
+                });
+
+                showTab('draw');
+
+                if (hiddenInput.value) {
+                    setValue(hiddenInput.value);
+                }
+            }
+
+            var fields = Array.prototype.slice.call(document.querySelectorAll('.signature-field'));
+            fields.forEach(setupField);
+
+            fields.forEach(function (field) {
+                if (field.offsetParent !== null) field._initPad();
+            });
+
+            window.addEventListener('wizard:step-shown', function (e) {
+                e.detail.step.querySelectorAll('.signature-field').forEach(function (field) {
+                    if (field._initPad) field._initPad();
+                });
             });
         })();
     </script>

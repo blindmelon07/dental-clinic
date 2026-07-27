@@ -103,6 +103,20 @@ class RegisteredUserController extends Controller
             'medical_conditions_list.*'   => 'string',
             'allergies'                   => 'nullable|string',
             'medical_conditions'          => 'nullable|string',
+
+            // Informed consent
+            'consent_treatment_initials'        => 'nullable|string|max:10',
+            'consent_drugs_initials'            => 'nullable|string|max:10',
+            'consent_treatment_plan_initials'   => 'nullable|string|max:10',
+            'consent_radiograph_initials'       => 'nullable|string|max:10',
+            'consent_removal_of_teeth_initials' => 'nullable|string|max:10',
+            'consent_crowns_initials'           => 'nullable|string|max:10',
+            'consent_endodontics_initials'      => 'nullable|string|max:10',
+            'consent_periodontal_initials'      => 'nullable|string|max:10',
+            'consent_fillings_initials'         => 'nullable|string|max:10',
+            'consent_dentures_initials'         => 'nullable|string|max:10',
+            'consent_agreed'                    => 'required|accepted',
+            'consent_patient_signature'          => 'required|string',
         ]);
 
         $user = User::create([
@@ -128,6 +142,7 @@ class RegisteredUserController extends Controller
                     Patient::whereDate('created_at', today())->count() + 1,
                     4, '0', STR_PAD_LEFT
                 ),
+                'consent_date' => today(),
             ]);
         }
 

@@ -155,7 +155,14 @@
       "Bash(php -l app/Http/Controllers/Auth/AuthenticatedSessionController.php)",
       "Bash(php -l app/Filament/Pages/PatientApprovals.php)",
       "Bash(php -l routes/auth.php)",
-      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost/DentCare/public/admin/patient-approvals --max-time 8)"
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost/DentCare/public/admin/patient-approvals --max-time 8)",
+      "Bash(mkdir -p screenshots)",
+      "Bash(npx --yes -p playwright node test-patient-signature.js)",
+      "Bash(php -l app/Filament/Resources/PatientResource/Pages/CreatePatient.php)",
+      "Bash(node test-create-patient-wizard.js)",
+      "Bash(node -e ' *)",
+      "Read(//c/Users/bry/AppData/Local/ms-playwright/**)",
+      "Bash(npx playwright *)"
     ]
   }
 }
