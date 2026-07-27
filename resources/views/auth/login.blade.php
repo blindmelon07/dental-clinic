@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&family=Noto+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-dvh font-sans antialiased bg-gradient-to-br from-teal-50 via-cyan-50 to-sky-100 flex items-center justify-center p-4">
+<body class="min-h-dvh font-sans antialiased bg-black flex items-center justify-center p-4">
 
     <div class="w-full max-w-md">
 
@@ -19,7 +19,7 @@
                 <img src="{{ \App\Models\SiteSetting::instance()->logoUrl() }}"
                      alt="Gonzales Dental Clinic"
                      class="h-16 w-auto object-contain">
-                <p class="text-slate-500 text-sm">Patient Portal</p>
+                <p class="text-slate-300 text-sm">Patient Portal</p>
             </a>
         </div>
 
