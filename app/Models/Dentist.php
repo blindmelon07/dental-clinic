@@ -14,7 +14,7 @@ class Dentist extends Model
 
     protected $fillable = [
         'user_id', 'clinic_id', 'license_number', 'specialization',
-        'bio', 'consultation_fee', 'consultation_duration', 'is_active',
+        'bio', 'consultation_fee', 'consultation_duration', 'is_active', 'signature',
     ];
 
     protected function casts(): array

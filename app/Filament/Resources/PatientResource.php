@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Enums\Gender;
 use App\Filament\Resources\PatientResource\Pages;
+use App\Models\Dentist;
 use App\Models\Patient;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -11,6 +12,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -22,6 +24,8 @@ use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -49,7 +53,107 @@ class PatientResource extends Resource
         return ['first_name', 'middle_name', 'last_name', 'patient_number', 'phone'];
     }
 
-    private static function medicalConditionOptions(): array
+    public static function religionOptions(): array
+    {
+        return [
+            'Roman Catholic'  => 'Roman Catholic',
+            'Christian'       => 'Christian',
+            'Protestant'      => 'Protestant',
+            'Baptist'         => 'Baptist',
+            'Iglesia ni Cristo' => 'Iglesia ni Cristo',
+            'Born Again Christian' => 'Born Again Christian',
+            'Seventh-day Adventist' => 'Seventh-day Adventist',
+            'Jehovah\'s Witness' => 'Jehovah\'s Witness',
+            'Mormon (LDS)'    => 'Mormon (LDS)',
+            'Orthodox Christian' => 'Orthodox Christian',
+            'Islam'           => 'Islam',
+            'Buddhism'        => 'Buddhism',
+            'Hinduism'        => 'Hinduism',
+            'Judaism'         => 'Judaism',
+            'Sikhism'         => 'Sikhism',
+            'Taoism'          => 'Taoism',
+            'Atheist'         => 'Atheist',
+            'Agnostic'        => 'Agnostic',
+            'None'            => 'None',
+            'Other'           => 'Other',
+        ];
+    }
+
+    public static function bloodTypeOptions(): array
+    {
+        return ['A+' => 'A+', 'A-' => 'A-', 'B+' => 'B+', 'B-' => 'B-', 'AB+' => 'AB+', 'AB-' => 'AB-', 'O+' => 'O+', 'O-' => 'O-'];
+    }
+
+    public static function nationalityOptions(): array
+    {
+        $nationalities = [
+            'Afghan', 'Albanian', 'Algerian', 'American', 'Andorran', 'Angolan', 'Antiguan', 'Argentine',
+            'Armenian', 'Australian', 'Austrian', 'Azerbaijani', 'Bahamian', 'Bahraini', 'Bangladeshi',
+            'Barbadian', 'Belarusian', 'Belgian', 'Belizean', 'Beninese', 'Bhutanese', 'Bolivian',
+            'Bosnian', 'Motswana', 'Brazilian', 'British', 'Bruneian', 'Bulgarian', 'Burkinabe', 'Burmese',
+            'Burundian', 'Cambodian', 'Cameroonian', 'Canadian', 'Cape Verdean', 'Central African', 'Chadian',
+            'Chilean', 'Chinese', 'Colombian', 'Comoran', 'Congolese', 'Costa Rican', 'Croatian', 'Cuban',
+            'Cypriot', 'Czech', 'Danish', 'Djiboutian', 'Dominican', 'Dutch', 'East Timorese', 'Ecuadorian',
+            'Egyptian', 'Emirati', 'English', 'Equatorial Guinean', 'Eritrean', 'Estonian', 'Eswatini',
+            'Ethiopian', 'Fijian', 'Filipino', 'Finnish', 'French', 'Gabonese', 'Gambian', 'Georgian',
+            'German', 'Ghanaian', 'Greek', 'Grenadian', 'Guatemalan', 'Guinean', 'Guyanese', 'Haitian',
+            'Honduran', 'Hungarian', 'Icelandic', 'Indian', 'Indonesian', 'Iranian', 'Iraqi', 'Irish',
+            'Israeli', 'Italian', 'Ivorian', 'Jamaican', 'Japanese', 'Jordanian', 'Kazakhstani', 'Kenyan',
+            'Kittitian', 'Kiribati', 'Korean (North)', 'Korean (South)', 'Kosovar', 'Kuwaiti', 'Kyrgyz',
+            'Lao', 'Latvian', 'Lebanese', 'Liberian', 'Libyan', 'Liechtensteiner', 'Lithuanian',
+            'Luxembourgish', 'Macedonian', 'Malagasy', 'Malawian', 'Malaysian', 'Maldivian', 'Malian',
+            'Maltese', 'Marshallese', 'Mauritanian', 'Mauritian', 'Mexican', 'Micronesian', 'Moldovan',
+            'Monacan', 'Mongolian', 'Montenegrin', 'Moroccan', 'Mozambican', 'Namibian', 'Nauruan',
+            'Nepalese', 'New Zealander', 'Nicaraguan', 'Nigerian', 'Nigerien', 'Norwegian', 'Omani',
+            'Pakistani', 'Palauan', 'Palestinian', 'Panamanian', 'Papua New Guinean', 'Paraguayan',
+            'Peruvian', 'Polish', 'Portuguese', 'Qatari', 'Romanian', 'Russian', 'Rwandan', 'Salvadoran',
+            'Samoan', 'San Marinese', 'Sao Tomean', 'Saudi Arabian', 'Scottish', 'Senegalese', 'Serbian',
+            'Seychellois', 'Sierra Leonean', 'Singaporean', 'Slovak', 'Slovenian', 'Solomon Islander',
+            'Somali', 'South African', 'South Sudanese', 'Spanish', 'Sri Lankan', 'Sudanese', 'Surinamese',
+            'Swedish', 'Swiss', 'Syrian', 'Taiwanese', 'Tajik', 'Tanzanian', 'Thai', 'Togolese', 'Tongan',
+            'Trinidadian', 'Tunisian', 'Turkish', 'Turkmen', 'Tuvaluan', 'Ugandan', 'Ukrainian', 'Uruguayan',
+            'Uzbekistani', 'Vanuatuan', 'Vatican', 'Venezuelan', 'Vietnamese', 'Welsh', 'Yemeni', 'Zambian',
+            'Zimbabwean', 'Other',
+        ];
+
+        sort($nationalities);
+
+        // Pin Filipino at the top for a Philippine clinic, followed by the rest alphabetically.
+        $nationalities = array_values(array_unique(array_merge(['Filipino'], $nationalities)));
+
+        return array_combine($nationalities, $nationalities);
+    }
+
+    public static function cityOptions(): array
+    {
+        $cities = [
+            'Alaminos', 'Angeles', 'Antipolo', 'Bacolod', 'Bacoor', 'Bago', 'Baguio', 'Bais', 'Balanga',
+            'Batac', 'Batangas City', 'Bayawan', 'Baybay', 'Bayugan', 'Biñan', 'Bislig', 'Bogo', 'Borongan',
+            'Butuan', 'Cabadbaran', 'Cabanatuan', 'Cabuyao', 'Cadiz', 'Cagayan de Oro', 'Calamba', 'Calapan',
+            'Calbayog', 'Caloocan', 'Candon', 'Canlaon', 'Carcar', 'Carmona', 'Catbalogan', 'Cauayan',
+            'Cavite City', 'Cebu City', 'Cotabato City', 'Dagupan', 'Danao', 'Dapitan', 'Dasmariñas',
+            'Davao City', 'Digos', 'Dipolog', 'Dumaguete', 'El Salvador', 'Escalante', 'Gapan',
+            'General Santos', 'General Trias', 'Gingoog', 'Guihulngan', 'Himamaylan', 'Ilagan', 'Iligan',
+            'Iloilo City', 'Imus', 'Iriga', 'Isabela City', 'Kabankalan', 'Kidapawan', 'Koronadal',
+            'La Carlota', 'Lamitan', 'Laoag', 'Lapu-Lapu', 'Las Piñas', 'Legazpi', 'Ligao', 'Lipa',
+            'Lucena', 'Maasin', 'Mabalacat', 'Makati', 'Malabon', 'Malaybalay', 'Malolos', 'Mandaluyong',
+            'Mandaue', 'Manila', 'Marawi', 'Marikina', 'Masbate City', 'Mati', 'Meycauayan', 'Muntinlupa',
+            'Muñoz', 'Naga (Camarines Sur)', 'Naga (Cebu)', 'Navotas', 'Olongapo', 'Ormoc', 'Oroquieta',
+            'Ozamiz', 'Pagadian', 'Palayan', 'Panabo', 'Parañaque', 'Pasay', 'Pasig', 'Passi', 'Pateros',
+            'Puerto Princesa', 'Quezon City', 'Sagay', 'Samal', 'San Carlos (Negros Occidental)',
+            'San Carlos (Pangasinan)', 'San Fernando (La Union)', 'San Fernando (Pampanga)',
+            'San Jose (Nueva Ecija)', 'San Jose del Monte', 'San Juan', 'San Pablo', 'San Pedro',
+            'Santa Rosa', 'Santiago', 'Silay', 'Sipalay', 'Sorsogon City', 'Surigao', 'Tabaco', 'Tabuk',
+            'Tacloban', 'Tacurong', 'Tagaytay', 'Tagbilaran', 'Taguig', 'Tagum', 'Talisay (Cebu)',
+            'Talisay (Negros Occidental)', 'Tanauan', 'Tandag', 'Tangub', 'Tanjay', 'Tarlac City',
+            'Tayabas', 'Toledo', 'Trece Martires', 'Tuguegarao', 'Urdaneta', 'Valencia', 'Valenzuela',
+            'Victorias', 'Vigan', 'Zamboanga City', 'Other',
+        ];
+
+        return array_combine($cities, $cities);
+    }
+
+    public static function medicalConditionOptions(): array
     {
         return [
             'high_blood_pressure'        => 'High Blood Pressure',
@@ -90,7 +194,7 @@ class PatientResource extends Resource
         ];
     }
 
-    private static function drugAllergyOptions(): array
+    public static function drugAllergyOptions(): array
     {
         return [
             'local_anesthetic' => 'Local Anesthetic (e.g. Lidocaine)',
@@ -135,10 +239,16 @@ class PatientResource extends Resource
                                         ->required()
                                         ->label('Sex'),
                                     TextInput::make('nickname')->maxLength(100),
-                                    TextInput::make('religion')->maxLength(100),
-                                    TextInput::make('nationality')->maxLength(100),
+                                    Select::make('religion')
+                                        ->options(self::religionOptions())
+                                        ->searchable()
+                                        ->native(false),
+                                    Select::make('nationality')
+                                        ->options(self::nationalityOptions())
+                                        ->searchable()
+                                        ->native(false),
                                     Select::make('blood_type')
-                                        ->options(['A+' => 'A+', 'A-' => 'A-', 'B+' => 'B+', 'B-' => 'B-', 'AB+' => 'AB+', 'AB-' => 'AB-', 'O+' => 'O+', 'O-' => 'O-'])
+                                        ->options(self::bloodTypeOptions())
                                         ->searchable(),
                                     TextInput::make('occupation')->maxLength(150),
                                 ])->columns(['default' => 1, 'md' => 2, 'lg' => 3]),
@@ -146,10 +256,19 @@ class PatientResource extends Resource
                             Section::make('Contact & Address')
                                 ->schema([
                                     Textarea::make('address')->required()->rows(2)->label('Home Address')->columnSpanFull(),
-                                    TextInput::make('city')->required(),
+                                    Select::make('city')
+                                        ->options(self::cityOptions())
+                                        ->searchable()
+                                        ->native(false)
+                                        ->required(),
                                     TextInput::make('home_no')->tel()->label('Home No.'),
                                     TextInput::make('office_no')->tel()->label('Office No.'),
-                                    TextInput::make('phone')->required()->tel()->label('Cell / Mobile No.'),
+                                    TextInput::make('phone')
+                                        ->required()
+                                        ->tel()
+                                        ->label('Cell / Mobile No.')
+                                        ->mask('9999 999 9999')
+                                        ->placeholder('0917 123 4567'),
                                     TextInput::make('email')->email()->label('Email Address'),
                                 ])->columns(['default' => 1, 'md' => 2, 'lg' => 3]),
 
@@ -334,15 +453,29 @@ class PatientResource extends Resource
                                 ->schema([
                                     Toggle::make('consent_agreed')
                                         ->label('Patient / Parent / Guardian agrees to the above informed consent')
+                                        ->required()
+                                        ->accepted()
                                         ->columnSpanFull(),
                                     DatePicker::make('consent_date')
                                         ->label('Date Signed')
                                         ->maxDate(now()),
-                                    TextInput::make('consent_dentist_name')
+                                    Select::make('consent_dentist_id')
                                         ->label('Dentist Name')
-                                        ->maxLength(150),
+                                        ->relationship('dentist', 'id')
+                                        ->getOptionLabelFromRecordUsing(fn (Dentist $record) => $record->full_name)
+                                        ->searchable()
+                                        ->preload()
+                                        ->live()
+                                        ->afterStateUpdated(function (Set $set, ?string $state) {
+                                            $dentist = $state ? Dentist::find($state) : null;
+                                            $set('consent_dentist_name', $dentist?->full_name);
+                                            $set('consent_dentist_signature', $dentist?->signature);
+                                        }),
+                                    Hidden::make('consent_dentist_name')->dehydrated(),
                                     SignaturePad::make('consent_dentist_signature')
                                         ->label('Dentist E-Signature')
+                                        ->disabled()
+                                        ->dehydrated()
                                         ->columnSpanFull(),
                                 ])->columns(['default' => 1, 'sm' => 2]),
                         ]),

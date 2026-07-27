@@ -2,46 +2,115 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Filament\Resources\PatientResource;
 use App\Http\Controllers\Controller;
-use App\Mail\WelcomeMail;
 use App\Models\Clinic;
 use App\Models\Patient;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
     public function create(): View
     {
-        return view('auth.register');
+        return view('auth.register', [
+            'religionOptions'         => PatientResource::religionOptions(),
+            'bloodTypeOptions'        => PatientResource::bloodTypeOptions(),
+            'nationalityOptions'      => PatientResource::nationalityOptions(),
+            'cityOptions'             => PatientResource::cityOptions(),
+            'drugAllergyOptions'      => PatientResource::drugAllergyOptions(),
+            'medicalConditionOptions' => PatientResource::medicalConditionOptions(),
+        ]);
     }
 
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
+        $validated = $request->validate([
+            // Account
             'name'       => 'required|string|max:255',
             'email'      => 'required|string|email|max:255|unique:users',
             'password'   => 'required|string|min:8|confirmed',
             'phone'      => 'required|string|max:20',
-            'first_name' => 'required|string|max:100',
-            'last_name'  => 'required|string|max:100',
-            'date_of_birth' => 'required|date|before:today',
-            'gender'     => 'required|in:male,female,other',
-            'address'    => 'required|string',
-            'city'       => 'required|string|max:100',
+
+            // Personal information
+            'first_name'      => 'required|string|max:100',
+            'last_name'       => 'required|string|max:100',
+            'middle_name'     => 'nullable|string|max:100',
+            'nickname'        => 'nullable|string|max:100',
+            'date_of_birth'   => 'required|date|before:today',
+            'gender'          => 'required|in:male,female,other',
+            'religion'        => 'nullable|string|max:100',
+            'nationality'     => 'nullable|string|max:100',
+            'blood_type'      => 'nullable|string|max:5',
+            'occupation'      => 'nullable|string|max:150',
+
+            // Contact & address
+            'address'   => 'required|string',
+            'city'      => 'required|string|max:100',
+            'home_no'   => 'nullable|string|max:30',
+            'office_no' => 'nullable|string|max:30',
+
+            // Insurance & referral
+            'dental_insurance'         => 'nullable|string|max:150',
+            'insurance_effective_date' => 'nullable|date',
+            'referring_person'         => 'nullable|string|max:150',
+            'reason_for_consultation'  => 'nullable|string',
+
+            // For minors
+            'guardian_name'       => 'nullable|string|max:150',
+            'guardian_occupation' => 'nullable|string|max:150',
+
+            // Emergency contact
+            'emergency_contact_name'     => 'nullable|string|max:150',
+            'emergency_contact_phone'    => 'nullable|string|max:30',
+            'emergency_contact_relation' => 'nullable|string|max:100',
+
+            // Dental history
+            'previous_dentist'  => 'nullable|string|max:150',
+            'last_dental_visit' => 'nullable|date',
+
+            // Physician information
+            'physician_name'           => 'nullable|string|max:150',
+            'physician_specialty'      => 'nullable|string|max:150',
+            'physician_office_number'  => 'nullable|string|max:30',
+            'physician_office_address' => 'nullable|string',
+
+            // Medical questionnaire
+            'in_good_health'              => 'nullable|boolean',
+            'under_medical_treatment'     => 'nullable|boolean',
+            'medical_treatment_condition' => 'nullable|string',
+            'serious_illness_or_surgery'  => 'nullable|boolean',
+            'serious_illness_details'     => 'nullable|string',
+            'hospitalized'                => 'nullable|boolean',
+            'hospitalization_details'     => 'nullable|string',
+            'takes_prescription_meds'     => 'nullable|boolean',
+            'current_medications'         => 'nullable|string',
+            'uses_tobacco'                => 'nullable|boolean',
+            'uses_alcohol_drugs'          => 'nullable|boolean',
+            'drug_allergies'              => 'nullable|array',
+            'drug_allergies.*'            => 'string',
+            'drug_allergy_others'         => 'nullable|string|max:150',
+            'bleeding_time'               => 'nullable|string|max:100',
+            'is_pregnant'                 => 'nullable|boolean',
+            'is_nursing'                  => 'nullable|boolean',
+            'taking_birth_control'        => 'nullable|boolean',
+            'blood_pressure'              => 'nullable|string|max:50',
+            'medical_conditions_list'     => 'nullable|array',
+            'medical_conditions_list.*'   => 'string',
+            'allergies'                   => 'nullable|string',
+            'medical_conditions'          => 'nullable|string',
         ]);
 
         $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => $request->password,
-            'phone'    => $request->phone,
+            'name'      => $validated['name'],
+            'email'     => $validated['email'],
+            'password'  => $validated['password'],
+            'phone'     => $validated['phone'],
+            'is_active' => false,
         ]);
 
         $user->assignRole('patient');
@@ -52,20 +121,13 @@ class RegisteredUserController extends Controller
             $user->update(['clinic_id' => $clinic->id]);
 
             Patient::create([
+                ...array_diff_key($validated, array_flip(['name', 'password'])),
                 'user_id'        => $user->id,
                 'clinic_id'      => $clinic->id,
                 'patient_number' => 'PT-' . date('Ymd') . '-' . str_pad(
                     Patient::whereDate('created_at', today())->count() + 1,
                     4, '0', STR_PAD_LEFT
                 ),
-                'first_name'     => $request->first_name,
-                'last_name'      => $request->last_name,
-                'date_of_birth'  => $request->date_of_birth,
-                'gender'         => $request->gender,
-                'phone'          => $request->phone,
-                'email'          => $request->email,
-                'address'        => $request->address,
-                'city'           => $request->city,
             ]);
         }
 
@@ -75,15 +137,11 @@ class RegisteredUserController extends Controller
             Log::error('Registered event failed: ' . $e->getMessage(), ['user_id' => $user->id]);
         }
 
-        try {
-            $user->load('patient');
-            Mail::to($user->email)->send(new WelcomeMail($user));
-        } catch (\Throwable $e) {
-            Log::error('WelcomeMail failed: ' . $e->getMessage(), ['user_id' => $user->id]);
-        }
+        return redirect()->route('registration.pending');
+    }
 
-        Auth::login($user);
-
-        return redirect()->route('patient.dashboard');
+    public function pending(): View
+    {
+        return view('auth.registration-pending');
     }
 }

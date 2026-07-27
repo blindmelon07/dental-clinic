@@ -35,7 +35,7 @@ class Patient extends Model
         'consent_treatment_initials', 'consent_drugs_initials', 'consent_treatment_plan_initials',
         'consent_radiograph_initials', 'consent_removal_of_teeth_initials', 'consent_crowns_initials',
         'consent_endodontics_initials', 'consent_periodontal_initials', 'consent_fillings_initials',
-        'consent_dentures_initials', 'consent_agreed', 'consent_date', 'consent_dentist_name',
+        'consent_dentures_initials', 'consent_agreed', 'consent_date', 'consent_dentist_id', 'consent_dentist_name',
         'consent_dentist_signature',
     ];
 
@@ -78,6 +78,11 @@ class Patient extends Model
     public function clinic(): BelongsTo
     {
         return $this->belongsTo(Clinic::class);
+    }
+
+    public function dentist(): BelongsTo
+    {
+        return $this->belongsTo(Dentist::class, 'consent_dentist_id');
     }
 
     public function appointments(): HasMany

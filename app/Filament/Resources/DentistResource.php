@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\DentistResource\Pages;
+use App\Forms\Components\SignaturePad;
 use App\Models\Dentist;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -51,6 +52,14 @@ class DentistResource extends Resource
                     Textarea::make('bio')->rows(4),
                     Toggle::make('is_active')->default(true),
                 ])->columns(2),
+
+            Section::make('E-Signature')
+                ->description('This signature is saved permanently on the dentist\'s profile and will be used to automatically sign patients\' informed consent forms.')
+                ->schema([
+                    SignaturePad::make('signature')
+                        ->label('Dentist E-Signature')
+                        ->columnSpanFull(),
+                ]),
 
             Section::make('Weekly Schedule')
                 ->schema([

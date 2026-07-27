@@ -26,9 +26,21 @@ class AuthenticatedSessionController extends Controller
             return back()->withErrors(['email' => 'These credentials do not match our records.'])->onlyInput('email');
         }
 
+        $user = auth()->user();
+
+        if ($user->hasRole('patient') && ! $user->is_active) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return back()->withErrors([
+                'email' => 'Your registration is still pending approval by our staff. We\'ll email you once your account is approved.',
+            ])->onlyInput('email');
+        }
+
         $request->session()->regenerate();
 
-        if (auth()->user()->hasRole(['super_admin', 'admin', 'receptionist', 'dentist'])) {
+        if ($user->hasRole(['super_admin', 'admin', 'receptionist', 'dentist'])) {
             return redirect('/admin');
         }
 

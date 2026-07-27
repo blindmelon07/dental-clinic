@@ -142,7 +142,20 @@
       "Bash(curl -s http://localhost:8000/forgot-password)",
       "Bash(curl -s http://localhost:8000/reset-password/test-token-123?email=test@test.com)",
       "Bash(curl -s http://localhost:8000/login)",
-      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8000/about)"
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8000/about)",
+      "Bash(powershell -NoProfile -Command \"Get-NetTCPConnection -LocalPort 5173 -ErrorAction SilentlyContinue | Select-Object State\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost/DentCare/public/register --max-time 5)",
+      "Bash(curl -s -o /dev/null -w \"root:%{http_code}\\\\n\" http://localhost/ --max-time 5)",
+      "Bash(curl -sv -o /dev/null http://localhost/DentCare/public/register --max-time 8)",
+      "Bash(python3 -c \"import playwright; print\\('playwright python ok'\\)\")",
+      "Bash(npx --yes playwright --version)",
+      "Bash(node -e \"require.resolve\\('playwright'\\)\")",
+      "Bash(npx --yes playwright install --dry-run chromium)",
+      "Bash(xargs -I{} basename {})",
+      "Bash(php -l app/Http/Controllers/Auth/AuthenticatedSessionController.php)",
+      "Bash(php -l app/Filament/Pages/PatientApprovals.php)",
+      "Bash(php -l routes/auth.php)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost/DentCare/public/admin/patient-approvals --max-time 8)"
     ]
   }
 }

@@ -16,11 +16,14 @@
         x-data="{
             activeTab: 'draw',
             pad: null,
-            state: @js($state),
+            state: $wire.entangle('{{ $statePath }}'),
 
             init() {
                 this.$watch('activeTab', (tab) => {
                     if (tab === 'draw') this.$nextTick(() => this.initPad());
+                });
+                this.$watch('state', () => {
+                    if (this.pad && ! this.state) this.pad.clear();
                 });
                 this.$nextTick(() => this.initPad());
             },
@@ -39,7 +42,6 @@
                 @if(!$isDisabled)
                     this.pad.addEventListener('endStroke', () => {
                         this.state = this.pad.toDataURL();
-                        $wire.set('{{ $statePath }}', this.state);
                     });
                 @else
                     this.pad.off();
@@ -49,7 +51,6 @@
             clearDraw() {
                 if (this.pad) this.pad.clear();
                 this.state = null;
-                $wire.set('{{ $statePath }}', null);
             },
 
             handleUpload(event) {
@@ -63,7 +64,6 @@
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     this.state = e.target.result;
-                    $wire.set('{{ $statePath }}', this.state);
                 };
                 reader.readAsDataURL(file);
             },
@@ -71,7 +71,6 @@
             removeSignature() {
                 this.state = null;
                 if (this.pad) this.pad.clear();
-                $wire.set('{{ $statePath }}', null);
                 if (this.$refs.fileInput) this.$refs.fileInput.value = '';
             }
         }"
