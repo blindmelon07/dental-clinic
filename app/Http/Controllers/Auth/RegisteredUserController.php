@@ -26,22 +26,22 @@ class RegisteredUserController extends Controller
             'cityOptions'             => PatientResource::cityOptions(),
             'drugAllergyOptions'      => PatientResource::drugAllergyOptions(),
             'medicalConditionOptions' => PatientResource::medicalConditionOptions(),
-            'defaultDentist'          => $this->defaultDentist(),
+            'dentists'                => $this->activeDentists(),
         ]);
     }
 
-    protected function defaultDentist(): ?Dentist
+    protected function activeDentists()
     {
         $clinic = Clinic::where('is_active', true)->first() ?? Clinic::first();
 
         if (! $clinic) {
-            return null;
+            return collect();
         }
 
         return Dentist::where('clinic_id', $clinic->id)
             ->where('is_active', true)
             ->with('user')
-            ->first();
+            ->get();
     }
 
     public function store(Request $request): RedirectResponse
@@ -134,6 +134,7 @@ class RegisteredUserController extends Controller
             'consent_dentures_initials'         => 'nullable|string|max:10',
             'consent_agreed'                    => 'required|accepted',
             'consent_patient_signature'          => 'required|string',
+            'consent_dentist_id'                 => 'nullable|exists:dentists,id',
         ]);
 
         $user = User::create([
@@ -151,13 +152,24 @@ class RegisteredUserController extends Controller
         if ($clinic) {
             $user->update(['clinic_id' => $clinic->id]);
 
-            $dentist = Dentist::where('clinic_id', $clinic->id)
-                ->where('is_active', true)
-                ->with('user')
-                ->first();
+            $dentist = null;
+
+            if (! empty($validated['consent_dentist_id'])) {
+                $dentist = Dentist::where('clinic_id', $clinic->id)
+                    ->where('is_active', true)
+                    ->with('user')
+                    ->find($validated['consent_dentist_id']);
+            }
+
+            if (! $dentist) {
+                $dentist = Dentist::where('clinic_id', $clinic->id)
+                    ->where('is_active', true)
+                    ->with('user')
+                    ->first();
+            }
 
             Patient::create([
-                ...array_diff_key($validated, array_flip(['name', 'password'])),
+                ...array_diff_key($validated, array_flip(['name', 'password', 'consent_dentist_id'])),
                 'user_id'        => $user->id,
                 'clinic_id'      => $clinic->id,
                 'patient_number' => 'PT-' . date('Ymd') . '-' . str_pad(

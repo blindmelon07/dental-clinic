@@ -515,18 +515,28 @@
                                     <x-signature-field name="consent_patient_signature" label="Patient / Parent / Guardian Signature" :required="true" />
                                 </div>
 
-                                @if ($defaultDentist)
-                                    @php $dentistDisplayName = preg_replace('/^dr\.?\s*/i', '', $defaultDentist->full_name); @endphp
+                                @if ($dentists->isNotEmpty())
                                     <div>
-                                        <label class="block text-sm font-medium text-slate-700 mb-1.5">Attending Dentist</label>
-                                        <p class="text-sm text-slate-600 mb-2">{{ $dentistDisplayName }}</p>
-                                        <div class="inline-block border border-slate-200 rounded-lg bg-white p-2">
-                                            @if ($defaultDentist->signature)
-                                                <img src="{{ $defaultDentist->signature }}" alt="{{ $dentistDisplayName }} signature" class="max-h-24 max-w-xs object-contain">
-                                            @else
-                                                <p class="text-xs text-slate-400 px-2 py-6">No signature on file</p>
-                                            @endif
+                                        <label for="consent_dentist_id" class="block text-sm font-medium text-slate-700 mb-1.5">
+                                            Attending Dentist <span class="text-red-500">*</span>
+                                        </label>
+                                        <select id="consent_dentist_id" name="consent_dentist_id" required class="input-field">
+                                            <option value="">Select a dentist</option>
+                                            @foreach ($dentists as $dentist)
+                                                @php $dentistDisplayName = preg_replace('/^dr\.?\s*/i', '', $dentist->full_name); @endphp
+                                                <option value="{{ $dentist->id }}"
+                                                        data-signature="{{ $dentist->signature }}"
+                                                        @selected(old('consent_dentist_id') == $dentist->id)>
+                                                    Dr. {{ $dentistDisplayName }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('consent_dentist_id') <p role="alert" class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+
+                                        <div id="attending-dentist-signature-wrap" class="mt-2 inline-block border border-slate-200 rounded-lg bg-white p-2 hidden">
+                                            <img id="attending-dentist-signature" src="" alt="Dentist signature" class="max-h-24 max-w-xs object-contain">
                                         </div>
+                                        <p id="attending-dentist-no-signature" class="text-xs text-slate-400 mt-2 hidden">No signature on file</p>
                                     </div>
                                 @endif
                             </div>
@@ -647,6 +657,35 @@
             });
 
             render(false);
+        })();
+
+        (function () {
+            var select = document.getElementById('consent_dentist_id');
+            if (!select) return;
+
+            var wrap = document.getElementById('attending-dentist-signature-wrap');
+            var img = document.getElementById('attending-dentist-signature');
+            var noSig = document.getElementById('attending-dentist-no-signature');
+
+            function updatePreview() {
+                var option = select.options[select.selectedIndex];
+                var signature = option ? option.dataset.signature : '';
+
+                wrap.classList.add('hidden');
+                noSig.classList.add('hidden');
+
+                if (!select.value) return;
+
+                if (signature) {
+                    img.src = signature;
+                    wrap.classList.remove('hidden');
+                } else {
+                    noSig.classList.remove('hidden');
+                }
+            }
+
+            select.addEventListener('change', updatePreview);
+            updatePreview();
         })();
 
         (function () {
