@@ -176,7 +176,8 @@
       "Bash(php -l app/Filament/Resources/DentalRecordResource.php)",
       "Bash(php -l database/migrations/2026_07_29_000001_make_file_path_nullable_on_dental_xrays_table.php)",
       "Bash(php -l app/Filament/Resources/ServiceResource.php)",
-      "Bash(php -l app/Filament/Resources/XrayTypeResource.php)"
+      "Bash(php -l app/Filament/Resources/XrayTypeResource.php)",
+      "Bash(php -l app/Filament/Resources/PrescriptionResource.php)"
     ]
   }
 }

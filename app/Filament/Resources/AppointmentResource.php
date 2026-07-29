@@ -60,7 +60,7 @@ class AppointmentResource extends Resource
                     Select::make('dentist_id')
                         ->label('Dentist')
                         ->relationship('dentist', 'id')
-                        ->getOptionLabelFromRecordUsing(fn (Dentist $record) => $record->full_name)
+                        ->getOptionLabelFromRecordUsing(fn (Dentist $record) => $record->user->name)
                         ->searchable()
                         ->preload()
                         ->required()
@@ -133,8 +133,7 @@ class AppointmentResource extends Resource
                     TextEntry::make('status')->badge()
                         ->color(fn (AppointmentStatus $state): string => $state->color()),
                     TextEntry::make('patient.full_name')->label('Patient'),
-                    TextEntry::make('dentist.user.name')->label('Dentist')
-                        ->formatStateUsing(fn ($state) => 'Dr. ' . $state),
+                    TextEntry::make('dentist.user.name')->label('Dentist'),
                     TextEntry::make('service.display_name')->label('Service'),
                     TextEntry::make('type')->badge(),
                     TextEntry::make('appointment_date')->date(),

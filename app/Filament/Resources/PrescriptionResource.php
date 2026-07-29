@@ -51,7 +51,7 @@ class PrescriptionResource extends Resource
                     Select::make('dentist_id')
                         ->label('Prescribing Dentist')
                         ->relationship('dentist', 'id')
-                        ->getOptionLabelFromRecordUsing(fn (Dentist $record) => 'Dr. ' . $record->user->name)
+                        ->getOptionLabelFromRecordUsing(fn (Dentist $record) => $record->user->name)
                         ->searchable()
                         ->preload()
                         ->required(),
@@ -126,8 +126,7 @@ class PrescriptionResource extends Resource
                     TextEntry::make('prescription_number')->label('Rx #')->copyable(),
                     TextEntry::make('prescribed_date')->date(),
                     TextEntry::make('patient.full_name')->label('Patient'),
-                    TextEntry::make('dentist.user.name')->label('Prescribing Dentist')
-                        ->formatStateUsing(fn ($state) => 'Dr. ' . $state),
+                    TextEntry::make('dentist.user.name')->label('Prescribing Dentist'),
                     TextEntry::make('appointment.appointment_number')->label('Appointment')->placeholder('—'),
                     TextEntry::make('diagnosis')->placeholder('—')->columnSpanFull(),
                 ])->columns(2),

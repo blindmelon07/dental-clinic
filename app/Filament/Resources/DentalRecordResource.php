@@ -55,7 +55,7 @@ class DentalRecordResource extends Resource
                     Select::make('dentist_id')
                         ->label('Dentist')
                         ->relationship('dentist', 'id')
-                        ->getOptionLabelFromRecordUsing(fn (Dentist $record) => $record->full_name)
+                        ->getOptionLabelFromRecordUsing(fn (Dentist $record) => $record->user->name)
                         ->searchable()
                         ->preload()
                         ->required(),
@@ -136,8 +136,7 @@ class DentalRecordResource extends Resource
                 ->icon('heroicon-o-calendar-days')
                 ->schema([
                     TextEntry::make('patient.full_name')->label('Patient'),
-                    TextEntry::make('dentist.user.name')->label('Dentist')
-                        ->formatStateUsing(fn ($state) => 'Dr. ' . $state),
+                    TextEntry::make('dentist.user.name')->label('Dentist'),
                     TextEntry::make('visit_date')->date(),
                     TextEntry::make('appointment.appointment_number')->label('Appointment')->placeholder('—'),
                 ])->columns(2),
