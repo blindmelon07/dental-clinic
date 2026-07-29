@@ -105,6 +105,23 @@ class PatientApprovals extends Page implements Tables\Contracts\HasTable
                             ->success()
                             ->send();
                     }),
+                Action::make('remove')
+                    ->label('Remove')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->modalHeading('Remove registration')
+                    ->modalDescription('This permanently deletes this pending sign-up. They will need to register again if they want an account.')
+                    ->action(function (User $record) {
+                        $name = $record->name;
+                        $record->delete();
+
+                        Notification::make()
+                            ->title('Registration removed')
+                            ->body($name . '\'s pending registration was removed.')
+                            ->success()
+                            ->send();
+                    }),
             ])
             ->emptyStateHeading('No pending registrations')
             ->emptyStateDescription('New patient sign-ups awaiting approval will appear here.')
