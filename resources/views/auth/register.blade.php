@@ -516,12 +516,13 @@
                                 </div>
 
                                 @if ($defaultDentist)
+                                    @php $dentistDisplayName = preg_replace('/^dr\.?\s*/i', '', $defaultDentist->full_name); @endphp
                                     <div>
                                         <label class="block text-sm font-medium text-slate-700 mb-1.5">Attending Dentist</label>
-                                        <p class="text-sm text-slate-600 mb-2">{{ $defaultDentist->full_name }}</p>
+                                        <p class="text-sm text-slate-600 mb-2">{{ $dentistDisplayName }}</p>
                                         <div class="inline-block border border-slate-200 rounded-lg bg-white p-2">
                                             @if ($defaultDentist->signature)
-                                                <img src="{{ $defaultDentist->signature }}" alt="{{ $defaultDentist->full_name }} signature" class="max-h-24 max-w-xs object-contain">
+                                                <img src="{{ $defaultDentist->signature }}" alt="{{ $dentistDisplayName }} signature" class="max-h-24 max-w-xs object-contain">
                                             @else
                                                 <p class="text-xs text-slate-400 px-2 py-6">No signature on file</p>
                                             @endif

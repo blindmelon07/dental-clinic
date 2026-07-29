@@ -165,7 +165,11 @@
       "Bash(npx playwright *)",
       "Bash(php -l app/Livewire/Patient/BookAppointment.php)",
       "Bash(php -l app/Filament/Pages/SiteSettings.php)",
-      "Bash(php -l app/Models/SiteSetting.php)"
+      "Bash(php -l app/Models/SiteSetting.php)",
+      "Bash(curl -s \"http://localhost/DentCare/public/register\")",
+      "Bash(grep -o \"Attending Dentist.\\\\{0,400\\\\}\")",
+      "Bash(curl -s \"http://localhost/DentCare/public/register\" -o /tmp/reg.html)",
+      "Bash(curl -s \"http://localhost/DentCare/public/register\" -o /tmp/reg2.html)"
     ]
   }
 }
