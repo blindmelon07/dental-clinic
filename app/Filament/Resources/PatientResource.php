@@ -459,13 +459,13 @@ class PatientResource extends Resource
                                     Select::make('consent_dentist_id')
                                         ->label('Dentist Name')
                                         ->relationship('dentist', 'id')
-                                        ->getOptionLabelFromRecordUsing(fn (Dentist $record) => $record->full_name)
+                                        ->getOptionLabelFromRecordUsing(fn (Dentist $record) => $record->user->name)
                                         ->searchable()
                                         ->preload()
                                         ->live()
                                         ->afterStateUpdated(function (Set $set, ?string $state) {
                                             $dentist = $state ? Dentist::find($state) : null;
-                                            $set('consent_dentist_name', $dentist?->full_name);
+                                            $set('consent_dentist_name', $dentist?->user->name);
                                             $set('consent_dentist_signature', $dentist?->signature);
                                         }),
                                     Hidden::make('consent_dentist_name')->dehydrated(),
