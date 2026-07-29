@@ -177,7 +177,11 @@
       "Bash(php -l database/migrations/2026_07_29_000001_make_file_path_nullable_on_dental_xrays_table.php)",
       "Bash(php -l app/Filament/Resources/ServiceResource.php)",
       "Bash(php -l app/Filament/Resources/XrayTypeResource.php)",
-      "Bash(php -l app/Filament/Resources/PrescriptionResource.php)"
+      "Bash(php -l app/Filament/Resources/PrescriptionResource.php)",
+      "Bash(Select-String -Pattern \"invoice|payment|medicine\")",
+      "Bash(php -l app/Filament/Widgets/BillingStatsWidget.php)",
+      "Bash(php -l app/Filament/Widgets/InventoryStatsWidget.php)",
+      "Bash(php -l app/Models/DentalRecord.php)"
     ]
   }
 }

@@ -40,6 +40,10 @@ class InventoryStatsWidget extends BaseWidget
             ->whereYear('dispensed_at', now()->year)
             ->count();
 
+        $dailyIncome = MedicineDispensing::whereDate('dispensed_at', today())
+            ->get()
+            ->sum(fn (MedicineDispensing $d) => $d->quantity * $d->unit_price);
+
         return [
             Stat::make('Total Medicines', $total)
                 ->description('Active items in inventory')
@@ -70,6 +74,11 @@ class InventoryStatsWidget extends BaseWidget
                 ->description('Transactions in ' . now()->format('F'))
                 ->icon('heroicon-o-clipboard-document-check')
                 ->color('info'),
+
+            Stat::make('Daily Income', '₱' . number_format($dailyIncome, 2))
+                ->description('Medicine dispensed today')
+                ->icon('heroicon-o-currency-dollar')
+                ->color($dailyIncome > 0 ? 'success' : 'gray'),
         ];
     }
 }

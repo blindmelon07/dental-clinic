@@ -45,4 +45,11 @@ class DentalRecord extends Model
     {
         return $this->hasMany(DentalXray::class);
     }
+
+    public function getTotalAttribute(): float
+    {
+        $names = filled($this->diagnosis) ? array_map('trim', explode(',', $this->diagnosis)) : [];
+
+        return Service::totalForDisplayNames($names);
+    }
 }

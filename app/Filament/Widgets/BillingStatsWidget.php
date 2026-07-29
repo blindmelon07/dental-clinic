@@ -16,6 +16,10 @@ class BillingStatsWidget extends BaseWidget
 
     protected function getStats(): array
     {
+        $todayIncome = Payment::whereDate('paid_at', today())->sum('amount');
+
+        $yesterdayIncome = Payment::whereDate('paid_at', today()->subDay())->sum('amount');
+
         $monthRevenue = Payment::whereMonth('paid_at', now()->month)
             ->whereYear('paid_at', now()->year)
             ->sum('amount');
@@ -47,7 +51,16 @@ class BillingStatsWidget extends BaseWidget
             ? ($trend >= 0 ? "↑ {$trend}% vs last month" : "↓ " . abs($trend) . "% vs last month")
             : 'No data for last month';
 
+        $dailyTrendDesc = $yesterdayIncome > 0
+            ? ($todayIncome >= $yesterdayIncome ? '↑ vs yesterday' : '↓ vs yesterday')
+            : 'Collected today';
+
         return [
+            Stat::make('Daily Income', '₱' . number_format($todayIncome, 2))
+                ->description($dailyTrendDesc)
+                ->icon('heroicon-o-currency-dollar')
+                ->color($todayIncome > 0 ? 'success' : 'gray'),
+
             Stat::make('Monthly Revenue', '₱' . number_format($monthRevenue, 2))
                 ->description($trendDesc)
                 ->icon('heroicon-o-banknotes')

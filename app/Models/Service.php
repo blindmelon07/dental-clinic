@@ -41,6 +41,19 @@ class Service extends Model
         return $categoryName ? "{$categoryName} – {$this->name}" : $this->name;
     }
 
+    public static function totalForDisplayNames(array $displayNames): float
+    {
+        if (empty($displayNames)) {
+            return 0;
+        }
+
+        return static::where('is_active', true)
+            ->with('category')
+            ->get()
+            ->filter(fn (Service $service) => in_array($service->display_name, $displayNames, true))
+            ->sum(fn (Service $service) => (float) $service->price);
+    }
+
     public function appointments(): HasMany
     {
         return $this->hasMany(Appointment::class);
