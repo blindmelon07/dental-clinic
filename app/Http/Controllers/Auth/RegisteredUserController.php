@@ -66,7 +66,7 @@ class RegisteredUserController extends Controller
 
             // Contact & address
             'address'   => 'required|string',
-            'city'      => 'required|string|max:100',
+            'city'      => 'nullable|string|max:100',
             'home_no'   => 'nullable|string|max:30',
             'office_no' => 'nullable|string|max:30',
 
@@ -133,7 +133,7 @@ class RegisteredUserController extends Controller
             'consent_dentures_initials'         => 'nullable|string|max:10',
             'consent_agreed'                    => 'required|accepted',
             'consent_patient_signature'          => 'required|string',
-            'consent_dentist_id'                 => 'nullable|exists:dentists,id',
+            'consent_dentist_id'                 => 'required|exists:dentists,id',
         ]);
 
         $user = User::create([

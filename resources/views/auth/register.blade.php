@@ -220,9 +220,9 @@
                                 </div>
                                 <div>
                                     <label for="city" class="block text-sm font-medium text-slate-700 mb-1.5">
-                                        City <span class="text-red-500" aria-hidden="true">*</span>
+                                        City
                                     </label>
-                                    <select id="city" name="city" required
+                                    <select id="city" name="city"
                                             class="input-field {{ $errors->has('city') ? 'border-red-400' : '' }}">
                                         <option value="">Select city</option>
                                         @foreach ($cityOptions as $value => $label)
