@@ -565,7 +565,18 @@
     <script>
         (function () {
             var wizard = document.getElementById('registration-wizard');
-            if (!wizard || wizard.dataset.hasErrors === '1') return;
+            if (!wizard) return;
+
+            if (wizard.dataset.hasErrors === '1') {
+                // Validation failed server-side: show every step flattened (so all
+                // errors are visible at once) and swap Next for the real submit button.
+                document.getElementById('wizard-next').classList.add('hidden');
+                document.getElementById('wizard-submit').classList.remove('hidden');
+                document.getElementById('wizard-back').classList.add('hidden');
+                document.getElementById('wizard-progress-text').classList.add('hidden');
+                document.getElementById('wizard-progress-bar').parentElement.classList.add('hidden');
+                return;
+            }
 
             var steps = Array.prototype.slice.call(wizard.querySelectorAll('.wizard-step'));
             var total = steps.length;
