@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Enums\InvoiceStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use RuntimeException;
 
 class DentalRecord extends Model
 {
@@ -46,10 +48,63 @@ class DentalRecord extends Model
         return $this->hasMany(DentalXray::class);
     }
 
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
     public function getTotalAttribute(): float
     {
-        $names = filled($this->diagnosis) ? array_map('trim', explode(',', $this->diagnosis)) : [];
+        return Service::totalForDisplayNames($this->diagnosisNames());
+    }
 
-        return Service::totalForDisplayNames($names);
+    public function diagnosisNames(): array
+    {
+        return filled($this->diagnosis) ? array_map('trim', explode(',', $this->diagnosis)) : [];
+    }
+
+    public function diagnosisServices(): \Illuminate\Support\Collection
+    {
+        $names = $this->diagnosisNames();
+
+        return Service::where('is_active', true)
+            ->with('category')
+            ->get()
+            ->filter(fn (Service $service) => in_array($service->display_name, $names, true));
+    }
+
+    public function createInvoice(): Invoice
+    {
+        $services = $this->diagnosisServices();
+
+        if ($services->isEmpty()) {
+            throw new RuntimeException('No active services match this diagnosis — cannot generate an invoice.');
+        }
+
+        $invoice = Invoice::create([
+            'invoice_number'   => Invoice::generateNumber(),
+            'clinic_id'        => $this->patient->clinic_id,
+            'patient_id'       => $this->patient_id,
+            'appointment_id'   => $this->appointment_id,
+            'dental_record_id' => $this->id,
+            'status'           => InvoiceStatus::Draft,
+            'invoice_date'     => today(),
+            'due_date'         => today()->addDays(7),
+            'notes'            => 'Generated from dental record visit on ' . $this->visit_date->format('M d, Y') . '.',
+        ]);
+
+        foreach ($services as $service) {
+            $invoice->items()->create([
+                'service_id'  => $service->id,
+                'description' => $service->display_name,
+                'quantity'    => 1,
+                'unit_price'  => $service->price,
+                'total'       => $service->price,
+            ]);
+        }
+
+        $invoice->recalculate();
+
+        return $invoice;
     }
 }

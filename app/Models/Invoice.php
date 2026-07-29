@@ -14,7 +14,7 @@ class Invoice extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'invoice_number', 'clinic_id', 'patient_id', 'appointment_id', 'status',
+        'invoice_number', 'clinic_id', 'patient_id', 'appointment_id', 'dental_record_id', 'status',
         'invoice_date', 'due_date', 'subtotal', 'discount_amount', 'discount_type',
         'tax_rate', 'tax_amount', 'total', 'amount_paid', 'balance_due', 'notes', 'paid_at',
     ];
@@ -49,6 +49,11 @@ class Invoice extends Model
     public function appointment(): BelongsTo
     {
         return $this->belongsTo(Appointment::class);
+    }
+
+    public function dentalRecord(): BelongsTo
+    {
+        return $this->belongsTo(DentalRecord::class);
     }
 
     public function items(): HasMany

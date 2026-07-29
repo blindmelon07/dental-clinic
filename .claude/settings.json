@@ -181,7 +181,15 @@
       "Bash(Select-String -Pattern \"invoice|payment|medicine\")",
       "Bash(php -l app/Filament/Widgets/BillingStatsWidget.php)",
       "Bash(php -l app/Filament/Widgets/InventoryStatsWidget.php)",
-      "Bash(php -l app/Models/DentalRecord.php)"
+      "Bash(php -l app/Models/DentalRecord.php)",
+      "Bash(php -l app/Models/Invoice.php)",
+      "Bash(php -l \"app/Filament/Resources/DentalRecordResource/Pages/ViewDentalRecord.php\")",
+      "Bash(php -l \"app/Filament/Resources/DentalRecordResource/Pages/EditDentalRecord.php\")",
+      "Bash(php -l \"database/migrations/2026_07_29_000000_add_dental_record_id_to_invoices_table.php\")",
+      "Bash(php -l database/seeders/DentalRecordSeeder.php)",
+      "Bash(php -l app/Filament/Pages/AppointmentCalendar.php)",
+      "Bash(php -l database/seeders/AppointmentSeeder.php)",
+      "Bash(xargs cat)"
     ]
   }
 }
