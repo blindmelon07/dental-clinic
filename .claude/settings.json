@@ -189,7 +189,8 @@
       "Bash(php -l database/seeders/DentalRecordSeeder.php)",
       "Bash(php -l app/Filament/Pages/AppointmentCalendar.php)",
       "Bash(php -l database/seeders/AppointmentSeeder.php)",
-      "Bash(xargs cat)"
+      "Bash(xargs cat)",
+      "Bash(git remote *)"
     ]
   }
 }
