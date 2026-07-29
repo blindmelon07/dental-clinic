@@ -25,7 +25,7 @@
                 <svg class="w-4 h-4 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.834-1.964-.834-2.732 0L3.07 16.5C2.3 17.333 3.262 19 4.802 19z"/>
                 </svg>
-                <p class="text-sm text-amber-700 font-medium">Your patient profile is being set up. Please contact the clinic.</p>
+                <p class="text-sm text-amber-700 font-medium">Your registration is pending approval by our staff. You'll be notified by email once it's approved.</p>
             </div>
         @endif
         </div>

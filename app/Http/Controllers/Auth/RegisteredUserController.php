@@ -6,7 +6,6 @@ use App\Filament\Resources\PatientResource;
 use App\Http\Controllers\Controller;
 use App\Models\Clinic;
 use App\Models\Dentist;
-use App\Models\Patient;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
@@ -168,18 +167,16 @@ class RegisteredUserController extends Controller
                     ->first();
             }
 
-            Patient::create([
-                ...array_diff_key($validated, array_flip(['name', 'password', 'consent_dentist_id'])),
-                'user_id'        => $user->id,
-                'clinic_id'      => $clinic->id,
-                'patient_number' => 'PT-' . date('Ymd') . '-' . str_pad(
-                    Patient::whereDate('created_at', today())->count() + 1,
-                    4, '0', STR_PAD_LEFT
-                ),
-                'consent_date'             => today(),
-                'consent_dentist_id'       => $dentist?->id,
-                'consent_dentist_name'     => $dentist?->full_name,
-                'consent_dentist_signature'=> $dentist?->signature,
+            // The patient record itself is created on approval (see PatientApprovals),
+            // not at registration, so unapproved sign-ups never appear as patients.
+            $user->update([
+                'pending_patient_data' => [
+                    ...array_diff_key($validated, array_flip(['name', 'password', 'consent_dentist_id'])),
+                    'consent_date'              => today()->toDateString(),
+                    'consent_dentist_id'        => $dentist?->id,
+                    'consent_dentist_name'      => $dentist?->full_name,
+                    'consent_dentist_signature' => $dentist?->signature,
+                ],
             ]);
         }
 

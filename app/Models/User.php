@@ -31,6 +31,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
         'city',
         'is_active',
         'clinic_id',
+        'pending_patient_data',
     ];
 
     protected $hidden = [
@@ -46,6 +47,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
             'date_of_birth'     => 'date',
             'gender'            => Gender::class,
             'is_active'         => 'boolean',
+            'pending_patient_data' => 'array',
         ];
     }
 

@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Mail\WelcomeMail;
+use App\Models\Patient;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
@@ -11,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -51,7 +53,6 @@ class PatientApprovals extends Page implements Tables\Contracts\HasTable
                 TextColumn::make('name')->label('Name')->searchable(),
                 TextColumn::make('email')->searchable(),
                 TextColumn::make('phone')->label('Phone'),
-                TextColumn::make('patient.patient_number')->label('Patient No.')->placeholder('—'),
                 TextColumn::make('created_at')->label('Registered')->dateTime('M j, Y g:i A')->sortable(),
             ])
             ->recordActions([
@@ -60,9 +61,36 @@ class PatientApprovals extends Page implements Tables\Contracts\HasTable
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->requiresConfirmation()
-                    ->modalDescription('This patient will be able to book appointments immediately.')
+                    ->modalDescription('This will create the patient record and let them book appointments immediately.')
                     ->action(function (User $record) {
-                        $record->update(['is_active' => true]);
+                        $data = $record->pending_patient_data;
+
+                        if (empty($data)) {
+                            Notification::make()
+                                ->title('Cannot approve')
+                                ->body('No registration data found for ' . $record->name . '.')
+                                ->danger()
+                                ->send();
+
+                            return;
+                        }
+
+                        DB::transaction(function () use ($record, $data) {
+                            Patient::create([
+                                ...$data,
+                                'user_id'        => $record->id,
+                                'clinic_id'      => $record->clinic_id,
+                                'patient_number' => 'PT-' . date('Ymd') . '-' . str_pad(
+                                    Patient::whereDate('created_at', today())->count() + 1,
+                                    4, '0', STR_PAD_LEFT
+                                ),
+                            ]);
+
+                            $record->update([
+                                'is_active'             => true,
+                                'pending_patient_data'  => null,
+                            ]);
+                        });
 
                         try {
                             $record->load('patient');
