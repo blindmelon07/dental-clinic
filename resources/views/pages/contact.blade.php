@@ -19,8 +19,8 @@
     <section class="py-16 sm:py-20 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="card text-center">
-                    <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-blue-50 text-blue-700 mx-auto mb-4">
+                <div class="card text-center p-7">
+                    <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-blue-50 text-blue-700 ring-1 ring-blue-700/10 mx-auto mb-4">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
                         </svg>
@@ -28,8 +28,8 @@
                     <h3 class="font-heading font-bold text-slate-900">Phone</h3>
                     <p class="mt-2 text-sm text-slate-600">{{ $settings->phone ?: 'Coming soon' }}</p>
                 </div>
-                <div class="card text-center">
-                    <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-blue-50 text-blue-700 mx-auto mb-4">
+                <div class="card text-center p-7">
+                    <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-blue-50 text-blue-700 ring-1 ring-blue-700/10 mx-auto mb-4">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                         </svg>
@@ -37,8 +37,8 @@
                     <h3 class="font-heading font-bold text-slate-900">Email</h3>
                     <p class="mt-2 text-sm text-slate-600 break-all">{{ $settings->email ?: 'Coming soon' }}</p>
                 </div>
-                <div class="card text-center">
-                    <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-blue-50 text-blue-700 mx-auto mb-4">
+                <div class="card text-center p-7">
+                    <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-blue-50 text-blue-700 ring-1 ring-blue-700/10 mx-auto mb-4">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -49,8 +49,8 @@
                         {{ $settings->address ?: 'Address coming soon' }}@if($settings->address && $settings->city), @endif{{ $settings->city }}
                     </p>
                 </div>
-                <div class="card text-center">
-                    <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-blue-50 text-blue-700 mx-auto mb-4">
+                <div class="card text-center p-7">
+                    <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-blue-50 text-blue-700 ring-1 ring-blue-700/10 mx-auto mb-4">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
@@ -70,7 +70,7 @@
             <div class="grid lg:grid-cols-2 gap-12">
 
                 {{-- Contact Form --}}
-                <div class="card">
+                <div class="card p-6 sm:p-8">
                     <h2 class="font-heading text-2xl font-bold text-slate-900">Send Us a Message</h2>
                     <p class="mt-2 text-sm text-slate-600">Fill out the form below and we'll respond as soon as we can.</p>
 
@@ -139,32 +139,38 @@
                     <div class="aspect-[4/3] rounded-3xl overflow-hidden shadow-xl">
                         <img src="{{ $settings->contact_location_image ? asset('storage/' . $settings->contact_location_image) : 'https://picsum.photos/seed/dental-clinic-location/800/600' }}" alt="Our clinic location" class="w-full h-full object-cover" loading="lazy">
                     </div>
-                    <div class="card">
-                        <h3 class="font-heading font-bold text-slate-900 mb-3">Visit Our Clinic</h3>
-                        <div class="space-y-3 text-sm">
+                    <div class="card p-6 sm:p-7">
+                        <h3 class="font-heading font-bold text-slate-900 mb-4">Visit Our Clinic</h3>
+                        <div class="space-y-4 text-sm">
                             @if($settings->address || $settings->city)
-                                <div class="flex items-start gap-3">
-                                    <svg class="w-5 h-5 text-blue-700 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    </svg>
-                                    <span class="text-slate-700">{{ $settings->address }}@if($settings->address && $settings->city), @endif{{ $settings->city }}</span>
+                                <div class="flex items-start gap-3.5">
+                                    <span class="flex items-center justify-center w-9 h-9 rounded-lg bg-blue-50 ring-1 ring-blue-700/10 flex-shrink-0">
+                                        <svg class="w-4.5 h-4.5 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        </svg>
+                                    </span>
+                                    <span class="text-slate-700 pt-1.5 leading-relaxed">{{ $settings->address }}@if($settings->address && $settings->city), @endif{{ $settings->city }}</span>
                                 </div>
                             @endif
                             @if($settings->phone)
-                                <div class="flex items-center gap-3">
-                                    <svg class="w-5 h-5 text-blue-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
-                                    </svg>
+                                <div class="flex items-center gap-3.5">
+                                    <span class="flex items-center justify-center w-9 h-9 rounded-lg bg-blue-50 ring-1 ring-blue-700/10 flex-shrink-0">
+                                        <svg class="w-4.5 h-4.5 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                                        </svg>
+                                    </span>
                                     <span class="text-slate-700">{{ $settings->phone }}</span>
                                 </div>
                             @endif
                             @if($settings->email)
-                                <div class="flex items-center gap-3">
-                                    <svg class="w-5 h-5 text-blue-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                                    </svg>
-                                    <span class="text-slate-700">{{ $settings->email }}</span>
+                                <div class="flex items-center gap-3.5">
+                                    <span class="flex items-center justify-center w-9 h-9 rounded-lg bg-blue-50 ring-1 ring-blue-700/10 flex-shrink-0">
+                                        <svg class="w-4.5 h-4.5 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                        </svg>
+                                    </span>
+                                    <span class="text-slate-700 break-all">{{ $settings->email }}</span>
                                 </div>
                             @endif
                         </div>
