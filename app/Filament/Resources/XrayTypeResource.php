@@ -20,7 +20,9 @@ class XrayTypeResource extends Resource
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-photo';
     protected static string|\UnitEnum|null $navigationGroup = 'Clinic Operations';
     protected static ?int $navigationSort = 4;
-    protected static ?string $navigationLabel = 'X-Ray Types';
+    protected static ?string $navigationLabel = 'Radiographs';
+    protected static ?string $modelLabel = 'Radiograph';
+    protected static ?string $pluralModelLabel = 'Radiographs';
 
     public static function canViewAny(): bool   { return auth()->user()?->can('view_any_xray_type'); }
     public static function canView(\Illuminate\Database\Eloquent\Model $r): bool { return auth()->user()?->can('view_xray_type'); }

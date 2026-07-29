@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\DentalRecordResource\Pages;
 use App\Models\DentalRecord;
+use App\Models\Dentist;
 use App\Models\Patient;
 use App\Models\Service;
 use App\Models\XrayType;
@@ -42,6 +43,7 @@ class DentalRecordResource extends Resource
     {
         return $schema->components([
             Section::make('Visit Information')
+                ->icon('heroicon-o-calendar-days')
                 ->schema([
                     Select::make('patient_id')
                         ->label('Patient')
@@ -52,21 +54,25 @@ class DentalRecordResource extends Resource
                         ->required(),
                     Select::make('dentist_id')
                         ->label('Dentist')
-                        ->relationship('dentist.user', 'name')
+                        ->relationship('dentist', 'id')
+                        ->getOptionLabelFromRecordUsing(fn (Dentist $record) => $record->full_name)
                         ->searchable()
                         ->preload()
                         ->required(),
+                    DatePicker::make('visit_date')->required()->default(today()),
                     Select::make('appointment_id')
                         ->label('Appointment')
                         ->relationship('appointment', 'appointment_number')
                         ->searchable()
                         ->nullable(),
-                    DatePicker::make('visit_date')->required()->default(today()),
                 ])->columns(2),
 
             Section::make('Clinical Assessment')
+                ->icon('heroicon-o-clipboard-document-check')
                 ->schema([
-                    Textarea::make('chief_complaint')->rows(3),
+                    Textarea::make('chief_complaint')
+                        ->rows(2)
+                        ->columnSpanFull(),
                     Select::make('diagnosis')
                         ->label('Diagnosis')
                         ->multiple()
@@ -78,6 +84,7 @@ class DentalRecordResource extends Resource
                         ->searchable()
                         ->preload()
                         ->required()
+                        ->columnSpanFull()
                         ->afterStateHydrated(function (Select $component, $state) {
                             $component->state(filled($state) ? array_map('trim', explode(',', $state)) : []);
                         })
@@ -87,13 +94,17 @@ class DentalRecordResource extends Resource
                 ])->columns(2),
 
             Section::make('Prescription & Follow-up')
+                ->icon('heroicon-o-clipboard-document-list')
                 ->schema([
                     Textarea::make('prescription')->rows(4),
                     Textarea::make('notes')->rows(4),
-                    TextInput::make('next_visit_recommendation'),
+                    TextInput::make('next_visit_recommendation')
+                        ->placeholder('e.g. Return in 2 weeks for follow-up')
+                        ->columnSpanFull(),
                 ])->columns(2),
 
             Section::make('X-Ray Images')
+                ->icon('heroicon-o-photo')
                 ->schema([
                     Repeater::make('xrays')
                         ->relationship()
@@ -103,10 +114,17 @@ class DentalRecordResource extends Resource
                                 ->image()
                                 ->directory('xrays'),
                             Select::make('xray_type')
+                                ->label('X-Ray Type')
                                 ->options(fn () => XrayType::where('is_active', true)->orderBy('sort_order')->pluck('name', 'name'))
                                 ->searchable(),
-                            Textarea::make('findings')->rows(2),
-                        ])->columns(3)->addActionLabel('Add X-Ray'),
+                            Textarea::make('findings')
+                                ->rows(2)
+                                ->columnSpanFull(),
+                        ])
+                        ->columns(2)
+                        ->itemLabel(fn (array $state): ?string => $state['xray_type'] ?? 'New X-Ray')
+                        ->collapsible()
+                        ->addActionLabel('Add X-Ray'),
                 ]),
         ]);
     }
@@ -115,30 +133,34 @@ class DentalRecordResource extends Resource
     {
         return $schema->components([
             Section::make('Visit Information')
+                ->icon('heroicon-o-calendar-days')
                 ->schema([
-                    TextEntry::make('visit_date')->date(),
                     TextEntry::make('patient.full_name')->label('Patient'),
                     TextEntry::make('dentist.user.name')->label('Dentist')
                         ->formatStateUsing(fn ($state) => 'Dr. ' . $state),
+                    TextEntry::make('visit_date')->date(),
                     TextEntry::make('appointment.appointment_number')->label('Appointment')->placeholder('—'),
                 ])->columns(2),
 
             Section::make('Clinical Assessment')
+                ->icon('heroicon-o-clipboard-document-check')
                 ->schema([
-                    TextEntry::make('chief_complaint')->label('Chief Complaint')->placeholder('—'),
-                    TextEntry::make('diagnosis'),
+                    TextEntry::make('chief_complaint')->label('Chief Complaint')->placeholder('—')->columnSpanFull(),
+                    TextEntry::make('diagnosis')->columnSpanFull(),
                     TextEntry::make('treatment_plan')->label('Treatment Plan')->placeholder('—'),
                     TextEntry::make('treatment_done')->label('Treatment Done')->placeholder('—'),
                 ])->columns(2),
 
             Section::make('Prescription & Follow-up')
+                ->icon('heroicon-o-clipboard-document-list')
                 ->schema([
                     TextEntry::make('prescription')->placeholder('—'),
                     TextEntry::make('notes')->placeholder('—'),
-                    TextEntry::make('next_visit_recommendation')->label('Next Visit Recommendation')->placeholder('—'),
+                    TextEntry::make('next_visit_recommendation')->label('Next Visit Recommendation')->placeholder('—')->columnSpanFull(),
                 ])->columns(2),
 
             Section::make('X-Ray Images')
+                ->icon('heroicon-o-photo')
                 ->schema([
                     RepeatableEntry::make('xrays')
                         ->schema([
