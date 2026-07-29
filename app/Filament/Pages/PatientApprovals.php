@@ -64,8 +64,9 @@ class PatientApprovals extends Page implements Tables\Contracts\HasTable
                     ->modalDescription('This will create the patient record and let them book appointments immediately.')
                     ->action(function (User $record) {
                         $data = $record->pending_patient_data;
+                        $hasExistingPatient = $record->patient()->exists();
 
-                        if (empty($data)) {
+                        if (empty($data) && ! $hasExistingPatient) {
                             Notification::make()
                                 ->title('Cannot approve')
                                 ->body('No registration data found for ' . $record->name . '.')
@@ -75,16 +76,18 @@ class PatientApprovals extends Page implements Tables\Contracts\HasTable
                             return;
                         }
 
-                        DB::transaction(function () use ($record, $data) {
-                            Patient::create([
-                                ...$data,
-                                'user_id'        => $record->id,
-                                'clinic_id'      => $record->clinic_id,
-                                'patient_number' => 'PT-' . date('Ymd') . '-' . str_pad(
-                                    Patient::whereDate('created_at', today())->count() + 1,
-                                    4, '0', STR_PAD_LEFT
-                                ),
-                            ]);
+                        DB::transaction(function () use ($record, $data, $hasExistingPatient) {
+                            if (! $hasExistingPatient) {
+                                Patient::create([
+                                    ...$data,
+                                    'user_id'        => $record->id,
+                                    'clinic_id'      => $record->clinic_id,
+                                    'patient_number' => 'PT-' . date('Ymd') . '-' . str_pad(
+                                        Patient::whereDate('created_at', today())->count() + 1,
+                                        4, '0', STR_PAD_LEFT
+                                    ),
+                                ]);
+                            }
 
                             $record->update([
                                 'is_active'             => true,

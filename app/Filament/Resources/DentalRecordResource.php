@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\DentalRecordResource\Pages;
 use App\Models\DentalRecord;
 use App\Models\Patient;
+use App\Models\Service;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
@@ -65,7 +66,17 @@ class DentalRecordResource extends Resource
             Section::make('Clinical Assessment')
                 ->schema([
                     Textarea::make('chief_complaint')->rows(3),
-                    Textarea::make('diagnosis')->required()->rows(4),
+                    Select::make('diagnosis')
+                        ->label('Diagnosis')
+                        ->multiple()
+                        ->options(fn () => Service::where('is_active', true)->orderBy('name')->pluck('name', 'name'))
+                        ->searchable()
+                        ->preload()
+                        ->required()
+                        ->afterStateHydrated(function (Select $component, $state) {
+                            $component->state(filled($state) ? array_map('trim', explode(',', $state)) : []);
+                        })
+                        ->dehydrateStateUsing(fn ($state) => is_array($state) ? implode(', ', $state) : $state),
                     Textarea::make('treatment_plan')->rows(4),
                     Textarea::make('treatment_done')->rows(4),
                 ])->columns(2),
