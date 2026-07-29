@@ -7,7 +7,6 @@ use App\Livewire\Patient\BookAppointment;
 use App\Livewire\Patient\Dashboard;
 use App\Livewire\Patient\MyAppointments;
 use App\Livewire\Patient\MyInvoices;
-use App\Livewire\Patient\MyRecords;
 use App\Livewire\Patient\Profile;
 use App\Models\Prescription;
 use Illuminate\Support\Facades\Route;
@@ -24,7 +23,6 @@ Route::middleware(['auth'])->prefix('patient')->name('patient.')->group(function
     Route::get('/dashboard', Dashboard::class)->name('dashboard');
     Route::get('/appointments', MyAppointments::class)->name('appointments');
     Route::get('/book', BookAppointment::class)->name('book');
-    Route::get('/records', MyRecords::class)->name('records');
     Route::get('/invoices', MyInvoices::class)->name('invoices');
     Route::get('/profile', Profile::class)->name('profile');
 });

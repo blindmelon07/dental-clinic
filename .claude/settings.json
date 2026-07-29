@@ -169,7 +169,8 @@
       "Bash(curl -s \"http://localhost/DentCare/public/register\")",
       "Bash(grep -o \"Attending Dentist.\\\\{0,400\\\\}\")",
       "Bash(curl -s \"http://localhost/DentCare/public/register\" -o /tmp/reg.html)",
-      "Bash(curl -s \"http://localhost/DentCare/public/register\" -o /tmp/reg2.html)"
+      "Bash(curl -s \"http://localhost/DentCare/public/register\" -o /tmp/reg2.html)",
+      "Bash(php -l routes/web.php)"
     ]
   }
 }

@@ -32,16 +32,6 @@ class Dashboard extends Component
     }
 
     #[Computed]
-    public function recentRecords()
-    {
-        return \App\Models\DentalRecord::with('dentist.user')
-            ->where('patient_id', $this->patient?->id)
-            ->orderBy('visit_date', 'desc')
-            ->limit(3)
-            ->get();
-    }
-
-    #[Computed]
     public function unpaidInvoices()
     {
         return Invoice::where('patient_id', $this->patient?->id)
