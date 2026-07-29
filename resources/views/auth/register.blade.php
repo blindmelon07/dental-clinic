@@ -510,8 +510,24 @@
 
                             <x-bool-field name="consent_agreed" label="Patient / Parent / Guardian agrees to the above informed consent" :required="true" />
 
-                            <div class="mt-4">
-                                <x-signature-field name="consent_patient_signature" label="Patient / Parent / Guardian Signature" :required="true" />
+                            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                <div>
+                                    <x-signature-field name="consent_patient_signature" label="Patient / Parent / Guardian Signature" :required="true" />
+                                </div>
+
+                                @if ($defaultDentist)
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-700 mb-1.5">Attending Dentist</label>
+                                        <p class="text-sm text-slate-600 mb-2">{{ $defaultDentist->full_name }}</p>
+                                        <div class="inline-block border border-slate-200 rounded-lg bg-white p-2">
+                                            @if ($defaultDentist->signature)
+                                                <img src="{{ $defaultDentist->signature }}" alt="{{ $defaultDentist->full_name }} signature" class="max-h-24 max-w-xs object-contain">
+                                            @else
+                                                <p class="text-xs text-slate-400 px-2 py-6">No signature on file</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
                         </fieldset>
                     </section>

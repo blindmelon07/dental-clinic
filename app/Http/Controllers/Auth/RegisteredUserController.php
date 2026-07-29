@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Filament\Resources\PatientResource;
 use App\Http\Controllers\Controller;
 use App\Models\Clinic;
+use App\Models\Dentist;
 use App\Models\Patient;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
@@ -25,7 +26,22 @@ class RegisteredUserController extends Controller
             'cityOptions'             => PatientResource::cityOptions(),
             'drugAllergyOptions'      => PatientResource::drugAllergyOptions(),
             'medicalConditionOptions' => PatientResource::medicalConditionOptions(),
+            'defaultDentist'          => $this->defaultDentist(),
         ]);
+    }
+
+    protected function defaultDentist(): ?Dentist
+    {
+        $clinic = Clinic::where('is_active', true)->first() ?? Clinic::first();
+
+        if (! $clinic) {
+            return null;
+        }
+
+        return Dentist::where('clinic_id', $clinic->id)
+            ->where('is_active', true)
+            ->with('user')
+            ->first();
     }
 
     public function store(Request $request): RedirectResponse
@@ -135,6 +151,11 @@ class RegisteredUserController extends Controller
         if ($clinic) {
             $user->update(['clinic_id' => $clinic->id]);
 
+            $dentist = Dentist::where('clinic_id', $clinic->id)
+                ->where('is_active', true)
+                ->with('user')
+                ->first();
+
             Patient::create([
                 ...array_diff_key($validated, array_flip(['name', 'password'])),
                 'user_id'        => $user->id,
@@ -143,7 +164,10 @@ class RegisteredUserController extends Controller
                     Patient::whereDate('created_at', today())->count() + 1,
                     4, '0', STR_PAD_LEFT
                 ),
-                'consent_date' => today(),
+                'consent_date'             => today(),
+                'consent_dentist_id'       => $dentist?->id,
+                'consent_dentist_name'     => $dentist?->full_name,
+                'consent_dentist_signature'=> $dentist?->signature,
             ]);
         }
 
