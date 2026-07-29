@@ -58,6 +58,13 @@ class PermissionSeeder extends Seeder
         'update_service',
         'delete_service',
 
+        // X-Ray Types
+        'view_any_xray_type',
+        'view_xray_type',
+        'create_xray_type',
+        'update_xray_type',
+        'delete_xray_type',
+
         // Dentists
         'view_any_dentist',
         'view_dentist',
@@ -91,6 +98,7 @@ class PermissionSeeder extends Seeder
             'view_any_invoice', 'view_invoice', 'create_invoice', 'update_invoice', 'delete_invoice',
             'view_any_service_category', 'view_service_category', 'create_service_category', 'update_service_category', 'delete_service_category',
             'view_any_service', 'view_service', 'create_service', 'update_service', 'delete_service',
+            'view_any_xray_type', 'view_xray_type', 'create_xray_type', 'update_xray_type', 'delete_xray_type',
             'view_any_dentist', 'view_dentist', 'create_dentist', 'update_dentist', 'delete_dentist',
             'view_any_user', 'view_user', 'create_user', 'update_user',
         ],
@@ -112,6 +120,7 @@ class PermissionSeeder extends Seeder
             'view_any_prescription', 'view_prescription', 'create_prescription', 'update_prescription',
             'view_any_service_category', 'view_service_category',
             'view_any_service', 'view_service', 'update_service',
+            'view_any_xray_type', 'view_xray_type',
             'view_any_dentist', 'view_dentist',
         ],
 

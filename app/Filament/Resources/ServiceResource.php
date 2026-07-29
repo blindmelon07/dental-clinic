@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ServiceResource\Pages;
 use App\Models\Service;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -40,7 +41,22 @@ class ServiceResource extends Resource
                         ->relationship('category', 'name')
                         ->searchable()
                         ->preload()
-                        ->required(),
+                        ->required()
+                        ->createOptionForm([
+                            TextInput::make('name')
+                                ->required()
+                                ->maxLength(150),
+                            ColorPicker::make('color')
+                                ->default('#3B82F6'),
+                            TextInput::make('sort_order')
+                                ->numeric()
+                                ->default(0),
+                            Toggle::make('is_active')
+                                ->default(true),
+                        ])
+                        ->createOptionAction(
+                            fn ($action) => $action->visible(fn () => auth()->user()?->can('create_service_category'))
+                        ),
                     TextInput::make('name')->required()->maxLength(150)->live(onBlur: true),
                     Textarea::make('description')->rows(3),
                     TextInput::make('price')->numeric()->prefix('₱')->required(),

@@ -6,6 +6,7 @@ use App\Filament\Resources\DentalRecordResource\Pages;
 use App\Models\DentalRecord;
 use App\Models\Patient;
 use App\Models\Service;
+use App\Models\XrayType;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
@@ -96,11 +97,10 @@ class DentalRecordResource extends Resource
                             FileUpload::make('file_path')
                                 ->label('X-Ray Image')
                                 ->image()
-                                ->directory('xrays')
-                                ->required(),
+                                ->directory('xrays'),
                             Select::make('xray_type')
-                                ->options(['panoramic' => 'Panoramic', 'periapical' => 'Periapical', 'bitewing' => 'Bitewing', 'occlusal' => 'Occlusal'])
-                                ->required(),
+                                ->options(fn () => XrayType::where('is_active', true)->orderBy('sort_order')->pluck('name', 'name'))
+                                ->searchable(),
                             Textarea::make('findings')->rows(2),
                         ])->columns(3)->addActionLabel('Add X-Ray'),
                 ]),

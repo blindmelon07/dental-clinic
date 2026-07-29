@@ -173,7 +173,9 @@
       "Bash(php -l routes/web.php)",
       "Bash(php -l app/Models/User.php)",
       "Bash(php -l database/migrations/2026_07_29_000000_add_pending_patient_data_to_users_table.php)",
-      "Bash(php -l app/Filament/Resources/DentalRecordResource.php)"
+      "Bash(php -l app/Filament/Resources/DentalRecordResource.php)",
+      "Bash(php -l database/migrations/2026_07_29_000001_make_file_path_nullable_on_dental_xrays_table.php)",
+      "Bash(php -l app/Filament/Resources/ServiceResource.php)"
     ]
   }
 }
