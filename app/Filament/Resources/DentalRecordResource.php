@@ -94,7 +94,7 @@ class DentalRecordResource extends Resource
                     ->searchable()
                     ->preload()
                     ->required(),
-                DatePicker::make('visit_date')->required()->default(today()),
+                DatePicker::make('visit_date')->default(today()),
                 Select::make('appointment_id')
                     ->label('Appointment')
                     ->relationship('appointment', 'appointment_number')
