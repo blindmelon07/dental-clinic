@@ -205,7 +205,9 @@
       "Bash(php -l app/Filament/Resources/DentalRecordResource/Pages/CreateDentalRecord.php)",
       "Bash(php -l app/Filament/Resources/DentalRecordResource/Pages/EditDentalRecord.php)",
       "Bash(php -l app/Filament/Resources/DentalRecordResource/Pages/ViewDentalRecord.php)",
-      "Bash(php -l app/Filament/Pages/Reports.php)"
+      "Bash(php -l app/Filament/Pages/Reports.php)",
+      "Bash(php -l resources/views/filament/pages/reports-pdf.blade.php)",
+      "Bash(xargs -I{} echo {})"
     ]
   }
 }

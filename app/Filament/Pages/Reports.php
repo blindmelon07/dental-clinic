@@ -12,6 +12,8 @@ use App\Models\Medicine;
 use App\Models\MedicineDispensing;
 use App\Models\Patient;
 use App\Models\Payment;
+use App\Models\SiteSetting;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Filament\Pages\Page;
 use Illuminate\Contracts\Database\Eloquent\Builder;
@@ -271,11 +273,14 @@ class Reports extends Page
         return "{$this->startDate}_to_{$this->endDate}";
     }
 
-    public function exportRevenue(): StreamedResponse
+    /**
+     * @return array<int, array{0: string, 1: array<int, string>, 2: array<int, array<int, mixed>>}>
+     */
+    protected function revenueSections(): array
     {
         $summary = $this->getRevenueSummary();
 
-        return $this->csvResponse("revenue-report-{$this->rangeSuffix()}.csv", [
+        return [
             ['Summary', ['Metric', 'Value'], [
                 ['Total Collected', $summary['totalCollected']],
                 ['Total Invoiced', $summary['totalInvoiced']],
@@ -294,14 +299,17 @@ class Reports extends Page
                     $invoice->status->label(),
                     $invoice->total,
                 ])->all()],
-        ]);
+        ];
     }
 
-    public function exportAppointments(): StreamedResponse
+    /**
+     * @return array<int, array{0: string, 1: array<int, string>, 2: array<int, array<int, mixed>>}>
+     */
+    protected function appointmentSections(): array
     {
         $summary = $this->getAppointmentSummary();
 
-        return $this->csvResponse("appointments-report-{$this->rangeSuffix()}.csv", [
+        return [
             ['Summary', ['Metric', 'Value'], [
                 ['Total Appointments', $summary['total']],
             ]],
@@ -309,28 +317,34 @@ class Reports extends Page
                 ->map(fn (array $r) => [$r['label'], $r['count']])->all()],
             ['By Dentist', ['Dentist', 'Total', 'Completed'], $this->getAppointmentsByDentist()
                 ->map(fn (array $r) => [$r['name'], $r['count'], $r['completed']])->all()],
-        ]);
+        ];
     }
 
-    public function exportPatients(): StreamedResponse
+    /**
+     * @return array<int, array{0: string, 1: array<int, string>, 2: array<int, array<int, mixed>>}>
+     */
+    protected function patientSections(): array
     {
         $summary = $this->getPatientRecordSummary();
 
-        return $this->csvResponse("patients-report-{$this->rangeSuffix()}.csv", [
+        return [
             ['Summary', ['Metric', 'Value'], [
                 ['New Patients', $summary['newPatients']],
                 ['Dental Visits', $summary['visits']],
             ]],
             ['Top Diagnoses', ['Diagnosis', 'Occurrences'], $this->getTopDiagnoses()
                 ->map(fn (array $r) => [$r['name'], $r['count']])->all()],
-        ]);
+        ];
     }
 
-    public function exportInventory(): StreamedResponse
+    /**
+     * @return array<int, array{0: string, 1: array<int, string>, 2: array<int, array<int, mixed>>}>
+     */
+    protected function inventorySections(): array
     {
         $summary = $this->getInventorySummary();
 
-        return $this->csvResponse("inventory-report-{$this->rangeSuffix()}.csv", [
+        return [
             ['Summary', ['Metric', 'Value'], [
                 ['Low Stock Medicines', $summary['lowStock']],
                 ['Dispensed Quantity', $summary['dispensedQty']],
@@ -342,6 +356,111 @@ class Reports extends Page
                 ])->all()],
             ['Top Dispensed Medicines', ['Medicine', 'Quantity', 'Cost'], $this->getTopDispensedMedicines()
                 ->map(fn (array $r) => [$r['name'], $r['qty'], $r['cost']])->all()],
+        ];
+    }
+
+    public function exportRevenue(): StreamedResponse
+    {
+        return $this->csvResponse("revenue-report-{$this->rangeSuffix()}.csv", $this->revenueSections());
+    }
+
+    public function exportAppointments(): StreamedResponse
+    {
+        return $this->csvResponse("appointments-report-{$this->rangeSuffix()}.csv", $this->appointmentSections());
+    }
+
+    public function exportPatients(): StreamedResponse
+    {
+        return $this->csvResponse("patients-report-{$this->rangeSuffix()}.csv", $this->patientSections());
+    }
+
+    public function exportInventory(): StreamedResponse
+    {
+        return $this->csvResponse("inventory-report-{$this->rangeSuffix()}.csv", $this->inventorySections());
+    }
+
+    // ── PDF export ───────────────────────────────────────────────────────
+
+    protected function rangeLabel(): string
+    {
+        return Carbon::parse($this->startDate)->format('M d, Y') . ' – ' . Carbon::parse($this->endDate)->format('M d, Y');
+    }
+
+    protected function logoDataUri(): string
+    {
+        $setting = SiteSetting::instance();
+        $path = null;
+
+        if ($setting->logo) {
+            $candidate = storage_path('app/public/' . $setting->logo);
+
+            if (is_file($candidate)) {
+                $path = $candidate;
+            }
+        }
+
+        $path ??= public_path('images/logo.png');
+
+        if (! is_file($path)) {
+            return '';
+        }
+
+        $mime = match (strtolower(pathinfo($path, PATHINFO_EXTENSION))) {
+            'jpg', 'jpeg' => 'image/jpeg',
+            'svg' => 'image/svg+xml',
+            default => 'image/png',
+        };
+
+        return "data:{$mime};base64," . base64_encode(file_get_contents($path));
+    }
+
+    /**
+     * @param  array<int, array{0: string, 1: array<int, string>, 2: array<int, array<int, mixed>>}>  $sections
+     *
+     * Wrapped in streamDownload() rather than returning dompdf's own ->download()
+     * response directly: Livewire's file-download support only recognizes
+     * StreamedResponse/BinaryFileResponse return values from an action, and
+     * dompdf's download() returns a plain Response — which Livewire would
+     * silently ignore, so the browser would never actually download the file.
+     */
+    protected function pdfResponse(string $filename, string $title, array $sections): StreamedResponse
+    {
+        $setting = SiteSetting::instance();
+
+        $pdf = Pdf::loadView('filament.pages.reports-pdf', [
+            'title' => $title,
+            'rangeLabel' => $this->rangeLabel(),
+            'sections' => $sections,
+            'clinicName' => $setting->clinic_name,
+            'clinicAddress' => $setting->address,
+            'clinicCity' => $setting->city,
+            'clinicPhone' => $setting->phone,
+            'logoDataUri' => $this->logoDataUri(),
+            'generatedAt' => now()->format('M d, Y g:i A'),
         ]);
+
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->output();
+        }, $filename, ['Content-Type' => 'application/pdf']);
+    }
+
+    public function exportRevenuePdf(): StreamedResponse
+    {
+        return $this->pdfResponse("revenue-report-{$this->rangeSuffix()}.pdf", 'Revenue Report', $this->revenueSections());
+    }
+
+    public function exportAppointmentsPdf(): StreamedResponse
+    {
+        return $this->pdfResponse("appointments-report-{$this->rangeSuffix()}.pdf", 'Appointments Report', $this->appointmentSections());
+    }
+
+    public function exportPatientsPdf(): StreamedResponse
+    {
+        return $this->pdfResponse("patients-report-{$this->rangeSuffix()}.pdf", 'Patients & Records Report', $this->patientSections());
+    }
+
+    public function exportInventoryPdf(): StreamedResponse
+    {
+        return $this->pdfResponse("inventory-report-{$this->rangeSuffix()}.pdf", 'Inventory Report', $this->inventorySections());
     }
 }

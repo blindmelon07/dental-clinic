@@ -24,19 +24,35 @@
                 <button type="button" wire:click="setTab('inventory')" @class(['rpt-tab', 'is-active' => $activeTab === 'inventory'])>Inventory</button>
             </div>
 
-            <x-filament::button
-                size="sm"
-                color="gray"
-                icon="heroicon-o-arrow-down-tray"
-                wire:click="{{ match ($activeTab) {
-                    'appointments' => 'exportAppointments',
-                    'patients' => 'exportPatients',
-                    'inventory' => 'exportInventory',
-                    default => 'exportRevenue',
-                } }}"
-            >
-                Export CSV
-            </x-filament::button>
+            <div class="rpt-export-group">
+                <x-filament::button
+                    size="sm"
+                    color="gray"
+                    icon="heroicon-o-arrow-down-tray"
+                    wire:click="{{ match ($activeTab) {
+                        'appointments' => 'exportAppointments',
+                        'patients' => 'exportPatients',
+                        'inventory' => 'exportInventory',
+                        default => 'exportRevenue',
+                    } }}"
+                >
+                    Export CSV
+                </x-filament::button>
+
+                <x-filament::button
+                    size="sm"
+                    color="gray"
+                    icon="heroicon-o-document-arrow-down"
+                    wire:click="{{ match ($activeTab) {
+                        'appointments' => 'exportAppointmentsPdf',
+                        'patients' => 'exportPatientsPdf',
+                        'inventory' => 'exportInventoryPdf',
+                        default => 'exportRevenuePdf',
+                    } }}"
+                >
+                    Export PDF
+                </x-filament::button>
+            </div>
         </div>
 
         {{-- Revenue --}}
@@ -303,6 +319,7 @@
         }
         .dark .rpt-tabs-row { border-color: rgba(255, 255, 255, 0.1); }
         .rpt-tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .rpt-export-group { display: flex; flex-wrap: wrap; gap: 0.5rem; }
         .rpt-tab {
             padding: 0.4rem 1rem;
             border-radius: 9999px;
