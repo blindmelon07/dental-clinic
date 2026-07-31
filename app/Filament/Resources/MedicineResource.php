@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\MedicineResource\Pages;
 use App\Models\Medicine;
+use App\Models\MedicineForm;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -29,7 +30,7 @@ class MedicineResource extends Resource
     protected static ?string $model = Medicine::class;
     protected static string|\BackedEnum|null $navigationIcon  = 'heroicon-o-beaker';
     protected static string|\UnitEnum|null   $navigationGroup = 'Inventory';
-    protected static ?int    $navigationSort  = 1;
+    protected static ?int    $navigationSort  = 2;
     protected static ?string $navigationLabel = 'Medicines';
 
     public static function getNavigationBadge(): ?string
@@ -70,18 +71,13 @@ class MedicineResource extends Resource
                         ->searchable()
                         ->preload(),
 
-                    Select::make('form')
-                        ->options([
-                            'tablet'    => 'Tablet',
-                            'capsule'   => 'Capsule',
-                            'syrup'     => 'Syrup / Liquid',
-                            'ointment'  => 'Ointment / Cream',
-                            'drops'     => 'Drops',
-                            'injection' => 'Injection',
-                            'other'     => 'Other',
-                        ])
+                    Select::make('medicine_form_id')
+                        ->label('Form')
+                        ->relationship('form', 'name')
                         ->required()
-                        ->default('tablet'),
+                        ->searchable()
+                        ->preload()
+                        ->default(fn () => MedicineForm::where('slug', 'tablet')->value('id')),
 
                     TextInput::make('strength')
                         ->placeholder('e.g. 500mg, 250mg/5ml')
@@ -142,7 +138,7 @@ class MedicineResource extends Resource
                     TextEntry::make('category.name')
                         ->label('Category')
                         ->placeholder('—'),
-                    TextEntry::make('form')->badge()->formatStateUsing(fn ($state) => ucfirst($state)),
+                    TextEntry::make('form.name')->label('Form')->badge(),
                     TextEntry::make('strength')->placeholder('—'),
                 ])->columns(3),
 
@@ -188,9 +184,9 @@ class MedicineResource extends Resource
                     ->placeholder('—')
                     ->sortable(),
 
-                TextColumn::make('form')
-                    ->badge()
-                    ->formatStateUsing(fn ($state) => ucfirst($state)),
+                TextColumn::make('form.name')
+                    ->label('Form')
+                    ->badge(),
 
                 TextColumn::make('strength')->placeholder('—'),
 
@@ -223,13 +219,9 @@ class MedicineResource extends Resource
                     ->label('Category')
                     ->relationship('category', 'name'),
 
-                SelectFilter::make('form')
-                    ->options([
-                        'tablet'   => 'Tablet', 'capsule'  => 'Capsule',
-                        'syrup'    => 'Syrup',  'ointment' => 'Ointment',
-                        'drops'    => 'Drops',  'injection'=> 'Injection',
-                        'other'    => 'Other',
-                    ]),
+                SelectFilter::make('medicine_form_id')
+                    ->label('Form')
+                    ->relationship('form', 'name'),
 
                 TernaryFilter::make('low_stock')
                     ->label('Low Stock Only')

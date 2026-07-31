@@ -7,11 +7,14 @@ use App\Models\Medicine;
 use App\Models\MedicineDispensing;
 use App\Models\Patient;
 use App\Models\Prescription;
+use App\Models\User;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -86,11 +89,17 @@ class MedicineDispensingResource extends Resource
                         ->default(0)
                         ->label('Unit Price (₱)'),
 
-                    Select::make('dispensed_by')
+                    Placeholder::make('dispensed_by_display')
                         ->label('Dispensed By')
-                        ->relationship('dispensedBy', 'name')
+                        ->content(function (Get $get) {
+                            $user = User::find($get('dispensed_by') ?? auth()->id());
+
+                            return $user?->role_and_name_label ?? '—';
+                        }),
+
+                    Hidden::make('dispensed_by')
                         ->default(fn () => auth()->id())
-                        ->required(),
+                        ->dehydrated(),
 
                     DateTimePicker::make('dispensed_at')
                         ->label('Dispensed At')
@@ -113,7 +122,7 @@ class MedicineDispensingResource extends Resource
                     TextEntry::make('prescription.prescription_number')->label('Prescription #')->placeholder('—'),
                     TextEntry::make('quantity'),
                     TextEntry::make('unit_price')->prefix('₱'),
-                    TextEntry::make('dispensedBy.name')->label('Dispensed By'),
+                    TextEntry::make('dispensed_by_label')->label('Dispensed By'),
                     TextEntry::make('dispensed_at')->dateTime(),
                 ])->columns(3),
 
@@ -158,7 +167,7 @@ class MedicineDispensingResource extends Resource
                     ->label('Prescription #')
                     ->placeholder('—'),
 
-                TextColumn::make('dispensedBy.name')->label('Dispensed By'),
+                TextColumn::make('dispensed_by_label')->label('Dispensed By'),
             ])
             ->filters([
                 SelectFilter::make('medicine_id')

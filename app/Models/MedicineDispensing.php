@@ -59,4 +59,9 @@ class MedicineDispensing extends Model
     {
         return $this->quantity * $this->unit_price;
     }
+
+    public function getDispensedByLabelAttribute(): string
+    {
+        return $this->dispensedBy?->role_and_name_label ?? '—';
+    }
 }

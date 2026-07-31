@@ -197,7 +197,9 @@
       "Bash(php -l app/Filament/Resources/MedicineResource.php)",
       "Bash(php -l app/Models/Medicine.php)",
       "Bash(php -l app/Models/MedicineCategory.php)",
-      "Bash(php -l database/seeders/MedicineSeeder.php)"
+      "Bash(php -l database/seeders/MedicineSeeder.php)",
+      "Bash(php -l app/Filament/Resources/MedicineDispensingResource.php)",
+      "Bash(php -l app/Models/MedicineDispensing.php)"
     ]
   }
 }

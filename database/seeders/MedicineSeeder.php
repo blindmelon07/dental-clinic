@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Medicine;
 use App\Models\MedicineCategory;
+use App\Models\MedicineForm;
 use Illuminate\Database\Seeder;
 
 class MedicineSeeder extends Seeder
@@ -11,6 +12,7 @@ class MedicineSeeder extends Seeder
     public function run(): void
     {
         $categoryIdsBySlug = MedicineCategory::pluck('id', 'slug');
+        $formIdsBySlug = MedicineForm::pluck('id', 'slug');
 
         $medicines = [
 
@@ -399,11 +401,14 @@ class MedicineSeeder extends Seeder
             $medicine['medicine_category_id'] = $categoryIdsBySlug[$medicine['category']] ?? null;
             unset($medicine['category']);
 
+            $medicine['medicine_form_id'] = $formIdsBySlug[$medicine['form']] ?? null;
+            unset($medicine['form']);
+
             Medicine::firstOrCreate(
                 [
-                    'name'     => $medicine['name'],
-                    'strength' => $medicine['strength'],
-                    'form'     => $medicine['form'],
+                    'name'             => $medicine['name'],
+                    'strength'         => $medicine['strength'],
+                    'medicine_form_id' => $medicine['medicine_form_id'],
                 ],
                 array_merge($medicine, ['is_active' => true])
             );

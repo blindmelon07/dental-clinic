@@ -82,4 +82,16 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
     {
         return $this->name;
     }
+
+    public function getRoleLabelAttribute(): ?string
+    {
+        $role = $this->getRoleNames()->first();
+
+        return $role ? ucwords(str_replace('_', ' ', $role)) : null;
+    }
+
+    public function getRoleAndNameLabelAttribute(): string
+    {
+        return $this->role_label ? "{$this->role_label} - {$this->name}" : $this->name;
+    }
 }

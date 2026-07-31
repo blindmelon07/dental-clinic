@@ -52,8 +52,12 @@
             startPaint(n) {
                 if (this.isDisabled || this.mode !== 'stamp') return;
                 this.painting = true;
-                const current = this.ensureState().teeth[n] ?? null;
-                this.paintValue = (current === this.selected) ? null : this.selected;
+                if (this.selected === 'DELETE') {
+                    this.paintValue = null;
+                } else {
+                    const current = this.ensureState().teeth[n] ?? null;
+                    this.paintValue = (current === this.selected) ? null : this.selected;
+                }
                 this.applyTooth(n);
             },
             applyTooth(n) {
@@ -184,6 +188,16 @@
                 </button>
             </template>
 
+            <button
+                type="button"
+                x-on:click="selected = 'DELETE'"
+                :class="{ 'is-active': selected === 'DELETE' }"
+                class="tooth-chart-swatch tooth-chart-swatch-delete"
+            >
+                <span class="tooth-chart-dot tooth-chart-dot-delete">&times;</span>
+                <span>Delete</span>
+            </button>
+
             <button type="button" x-on:click="clearTeeth()" class="tooth-chart-clear">
                 Clear Teeth
             </button>
@@ -206,7 +220,7 @@
         </div>
 
         <p class="tooth-chart-hint" x-show="mode === 'stamp'">
-            Pick a condition above, then click or drag across teeth to paint them &mdash; no need to click every tooth one by one. Click a painted tooth again to reset it to healthy.
+            Pick a condition above, then click or drag across teeth to paint them &mdash; no need to click every tooth one by one. Click a painted tooth again to reset it to healthy, or pick "Delete" to erase teeth by clicking or dragging over them.
         </p>
         <p class="tooth-chart-hint" x-show="mode === 'draw'" x-cloak>
             Click (or tap) and drag anywhere on the chart to free-hand draw a line, just like marking the paper chart.
@@ -372,6 +386,9 @@
             font-weight: 700;
             color: #fff;
         }
+
+        .tooth-chart-swatch-delete.is-active { border-color: rgb(220 38 38); box-shadow: 0 0 0 1px rgb(220 38 38); }
+        .tooth-chart-dot-delete { background: rgb(107 114 128); color: #fff; font-size: 0.75rem; }
 
         .tooth-chart-clear {
             padding: 0.25rem 0.625rem;

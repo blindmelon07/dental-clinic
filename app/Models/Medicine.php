@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Medicine extends Model
 {
     protected $fillable = [
-        'name', 'generic_name', 'brand', 'medicine_category_id', 'form',
+        'name', 'generic_name', 'brand', 'medicine_category_id', 'medicine_form_id',
         'strength', 'unit', 'current_stock', 'minimum_stock',
         'unit_price', 'expiry_date', 'description', 'is_active',
     ];
@@ -35,6 +35,11 @@ class Medicine extends Model
         return $this->belongsTo(MedicineCategory::class, 'medicine_category_id');
     }
 
+    public function form(): BelongsTo
+    {
+        return $this->belongsTo(MedicineForm::class, 'medicine_form_id');
+    }
+
     public function isLowStock(): bool
     {
         return $this->current_stock <= $this->minimum_stock;
@@ -54,7 +59,7 @@ class Medicine extends Model
     {
         $parts = [$this->name];
         if ($this->strength) $parts[] = $this->strength;
-        if ($this->form)     $parts[] = '(' . ucfirst($this->form) . ')';
+        if ($this->form)     $parts[] = '(' . $this->form->name . ')';
         return implode(' ', $parts);
     }
 }

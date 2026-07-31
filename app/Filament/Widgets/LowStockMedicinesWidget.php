@@ -27,9 +27,9 @@ class LowStockMedicinesWidget extends BaseWidget
                     ->label('Medicine')
                     ->description(fn (Medicine $r): string => implode(' · ', array_filter([$r->generic_name, $r->strength]))),
 
-                TextColumn::make('form')
-                    ->badge()
-                    ->formatStateUsing(fn ($state) => ucfirst($state)),
+                TextColumn::make('form.name')
+                    ->label('Form')
+                    ->badge(),
 
                 TextColumn::make('current_stock')
                     ->label('Current Stock')
