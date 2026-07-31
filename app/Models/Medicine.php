@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Medicine extends Model
 {
     protected $fillable = [
-        'name', 'generic_name', 'brand', 'category', 'form',
+        'name', 'generic_name', 'brand', 'medicine_category_id', 'form',
         'strength', 'unit', 'current_stock', 'minimum_stock',
         'unit_price', 'expiry_date', 'description', 'is_active',
     ];
@@ -27,6 +28,11 @@ class Medicine extends Model
     public function dispensings(): HasMany
     {
         return $this->hasMany(MedicineDispensing::class);
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(MedicineCategory::class, 'medicine_category_id');
     }
 
     public function isLowStock(): bool

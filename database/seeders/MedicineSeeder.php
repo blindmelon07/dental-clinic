@@ -3,12 +3,15 @@
 namespace Database\Seeders;
 
 use App\Models\Medicine;
+use App\Models\MedicineCategory;
 use Illuminate\Database\Seeder;
 
 class MedicineSeeder extends Seeder
 {
     public function run(): void
     {
+        $categoryIdsBySlug = MedicineCategory::pluck('id', 'slug');
+
         $medicines = [
 
             // ── Antibiotics ─────────────────────────────────────────────
@@ -393,6 +396,9 @@ class MedicineSeeder extends Seeder
         ];
 
         foreach ($medicines as $medicine) {
+            $medicine['medicine_category_id'] = $categoryIdsBySlug[$medicine['category']] ?? null;
+            unset($medicine['category']);
+
             Medicine::firstOrCreate(
                 [
                     'name'     => $medicine['name'],

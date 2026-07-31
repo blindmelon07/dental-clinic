@@ -64,19 +64,11 @@ class MedicineResource extends Resource
                         ->maxLength(255)
                         ->label('Brand / Manufacturer'),
 
-                    Select::make('category')
-                        ->options([
-                            'antibiotic'       => 'Antibiotic',
-                            'analgesic'        => 'Analgesic / Pain Reliever',
-                            'anti_inflammatory'=> 'Anti-Inflammatory',
-                            'anesthetic'       => 'Anesthetic',
-                            'antiseptic'       => 'Antiseptic',
-                            'antifungal'       => 'Antifungal',
-                            'antihistamine'    => 'Antihistamine',
-                            'vitamin'          => 'Vitamin / Supplement',
-                            'other'            => 'Other',
-                        ])
-                        ->searchable(),
+                    Select::make('medicine_category_id')
+                        ->label('Category')
+                        ->relationship('category', 'name')
+                        ->searchable()
+                        ->preload(),
 
                     Select::make('form')
                         ->options([
@@ -147,8 +139,9 @@ class MedicineResource extends Resource
                     TextEntry::make('name')->label('Medicine Name'),
                     TextEntry::make('generic_name')->placeholder('—'),
                     TextEntry::make('brand')->placeholder('—'),
-                    TextEntry::make('category')
-                        ->formatStateUsing(fn (?string $state) => $state ? ucwords(str_replace('_', ' ', $state)) : '—'),
+                    TextEntry::make('category.name')
+                        ->label('Category')
+                        ->placeholder('—'),
                     TextEntry::make('form')->badge()->formatStateUsing(fn ($state) => ucfirst($state)),
                     TextEntry::make('strength')->placeholder('—'),
                 ])->columns(3),
@@ -190,8 +183,9 @@ class MedicineResource extends Resource
                     ->sortable()
                     ->description(fn (Medicine $r): string => implode(' · ', array_filter([$r->generic_name, $r->brand]))),
 
-                TextColumn::make('category')
-                    ->formatStateUsing(fn (?string $state) => $state ? ucwords(str_replace('_', ' ', $state)) : '—')
+                TextColumn::make('category.name')
+                    ->label('Category')
+                    ->placeholder('—')
                     ->sortable(),
 
                 TextColumn::make('form')
@@ -225,18 +219,9 @@ class MedicineResource extends Resource
                 IconColumn::make('is_active')->label('Active')->boolean(),
             ])
             ->filters([
-                SelectFilter::make('category')
-                    ->options([
-                        'antibiotic'       => 'Antibiotic',
-                        'analgesic'        => 'Analgesic / Pain Reliever',
-                        'anti_inflammatory'=> 'Anti-Inflammatory',
-                        'anesthetic'       => 'Anesthetic',
-                        'antiseptic'       => 'Antiseptic',
-                        'antifungal'       => 'Antifungal',
-                        'antihistamine'    => 'Antihistamine',
-                        'vitamin'          => 'Vitamin / Supplement',
-                        'other'            => 'Other',
-                    ]),
+                SelectFilter::make('medicine_category_id')
+                    ->label('Category')
+                    ->relationship('category', 'name'),
 
                 SelectFilter::make('form')
                     ->options([

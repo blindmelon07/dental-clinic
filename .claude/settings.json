@@ -192,7 +192,12 @@
       "Bash(xargs cat)",
       "Bash(git remote *)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost/DentCare/public/admin/login --max-time 5)",
-      "Bash(php -l \"c:/xampp2/htdocs/DentCare/app/Filament/Resources/DentalRecordResource.php\")"
+      "Bash(php -l \"c:/xampp2/htdocs/DentCare/app/Filament/Resources/DentalRecordResource.php\")",
+      "Bash(php -l app/Filament/Resources/MedicineCategoryResource.php)",
+      "Bash(php -l app/Filament/Resources/MedicineResource.php)",
+      "Bash(php -l app/Models/Medicine.php)",
+      "Bash(php -l app/Models/MedicineCategory.php)",
+      "Bash(php -l database/seeders/MedicineSeeder.php)"
     ]
   }
 }
