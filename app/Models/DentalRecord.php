@@ -16,7 +16,7 @@ class DentalRecord extends Model
 
     protected $fillable = [
         'patient_id', 'dentist_id', 'appointment_id', 'visit_date',
-        'chief_complaint', 'diagnosis', 'treatment_plan', 'treatment_done',
+        'chief_complaint', 'diagnosis', 'discount', 'treatment_plan', 'treatment_done',
         'tooth_chart', 'prescription', 'notes', 'next_visit_recommendation',
     ];
 
@@ -24,6 +24,7 @@ class DentalRecord extends Model
     {
         return [
             'visit_date' => 'date',
+            'discount' => 'decimal:2',
             'tooth_chart' => 'array',
         ];
     }
@@ -53,9 +54,14 @@ class DentalRecord extends Model
         return $this->hasMany(Invoice::class);
     }
 
-    public function getTotalAttribute(): float
+    public function getSubtotalAttribute(): float
     {
         return Service::totalForDisplayNames($this->diagnosisNames());
+    }
+
+    public function getTotalAttribute(): float
+    {
+        return max(0, $this->subtotal - (float) ($this->discount ?? 0));
     }
 
     public function diagnosisNames(): array
@@ -90,6 +96,7 @@ class DentalRecord extends Model
             'status'           => InvoiceStatus::Draft,
             'invoice_date'     => today(),
             'due_date'         => today()->addDays(7),
+            'discount_amount'  => $this->discount ?? 0,
             'notes'            => 'Generated from dental record visit on ' . $this->visit_date->format('M d, Y') . '.',
         ]);
 

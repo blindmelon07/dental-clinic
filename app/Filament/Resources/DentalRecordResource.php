@@ -17,11 +17,15 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\ViewField;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\ViewEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -45,10 +49,29 @@ class DentalRecordResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            static::visitInformationSection(),
-            static::clinicalAssessmentSection(),
-            static::prescriptionSection(),
-            static::xraySection(),
+            Tabs::make()
+                ->tabs([
+                    Tab::make('Visit & Assessment')
+                        ->icon('heroicon-o-clipboard-document-check')
+                        ->schema([
+                            static::visitInformationSection(),
+                            static::clinicalAssessmentSection(),
+                        ]),
+                    Tab::make('Tooth Chart')
+                        ->icon('heroicon-o-squares-2x2')
+                        ->schema([
+                            ViewField::make('tooth_chart')
+                                ->label('')
+                                ->view('filament.forms.components.tooth-chart'),
+                        ]),
+                    Tab::make('Prescription & X-Rays')
+                        ->icon('heroicon-o-clipboard-document-list')
+                        ->schema([
+                            static::prescriptionSection(),
+                            static::xraySection(),
+                        ]),
+                ])
+                ->columnSpanFull(),
         ]);
     }
 
@@ -91,6 +114,7 @@ class DentalRecordResource extends Resource
                     ->rows(2)
                     ->columnSpanFull(),
                 static::diagnosisSelect(),
+                static::discountInput(),
                 static::diagnosisTotalPlaceholder(),
                 Textarea::make('treatment_plan')->rows(4),
                 Textarea::make('treatment_done')->rows(4),
@@ -128,16 +152,28 @@ class DentalRecordResource extends Resource
             ->all();
     }
 
+    protected static function discountInput(): TextInput
+    {
+        return TextInput::make('discount')
+            ->label('Discount')
+            ->numeric()
+            ->minValue(0)
+            ->default(0)
+            ->prefix('₱')
+            ->live();
+    }
+
     protected static function diagnosisTotalPlaceholder(): Placeholder
     {
         return Placeholder::make('diagnosis_total')
             ->label('Total')
             ->content(function (Get $get) {
                 $selected = $get('diagnosis');
+                $subtotal = Service::totalForDisplayNames(is_array($selected) ? $selected : []);
+                $total = max(0, $subtotal - (float) ($get('discount') ?? 0));
 
-                return '₱' . number_format(Service::totalForDisplayNames(is_array($selected) ? $selected : []), 2);
-            })
-            ->columnSpanFull();
+                return '₱' . number_format($total, 2);
+            });
     }
 
     protected static function prescriptionSection(): Section
@@ -200,10 +236,21 @@ class DentalRecordResource extends Resource
                 ->schema([
                     TextEntry::make('chief_complaint')->label('Chief Complaint')->placeholder('—')->columnSpanFull(),
                     TextEntry::make('diagnosis')->columnSpanFull(),
+                    TextEntry::make('subtotal')->label('Subtotal')->money('PHP'),
+                    TextEntry::make('discount')->label('Discount')->money('PHP'),
                     TextEntry::make('total')->label('Total')->money('PHP')->weight('bold')->columnSpanFull(),
                     TextEntry::make('treatment_plan')->label('Treatment Plan')->placeholder('—'),
                     TextEntry::make('treatment_done')->label('Treatment Done')->placeholder('—'),
                 ])->columns(2)->columnSpanFull(),
+
+            Section::make('Tooth Chart')
+                ->icon('heroicon-o-squares-2x2')
+                ->schema([
+                    ViewEntry::make('tooth_chart')
+                        ->label('')
+                        ->view('filament.infolists.components.tooth-chart'),
+                ])
+                ->columnSpanFull(),
 
             Section::make('Prescription & Follow-up')
                 ->icon('heroicon-o-clipboard-document-list')

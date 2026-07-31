@@ -190,7 +190,9 @@
       "Bash(php -l app/Filament/Pages/AppointmentCalendar.php)",
       "Bash(php -l database/seeders/AppointmentSeeder.php)",
       "Bash(xargs cat)",
-      "Bash(git remote *)"
+      "Bash(git remote *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost/DentCare/public/admin/login --max-time 5)",
+      "Bash(php -l \"c:/xampp2/htdocs/DentCare/app/Filament/Resources/DentalRecordResource.php\")"
     ]
   }
 }
