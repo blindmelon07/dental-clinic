@@ -73,7 +73,7 @@
 
         <div class="tc-canvas-wrap">
             {{-- Upper arch --}}
-            <div class="tc-row">
+            <div class="tc-row tc-row-primary-top">
                 <div class="tc-quad">
                     @foreach ($permQuads['ur'] as $n)
                         {!! ($primary = $primaryFor($n)) ? $cell($primary, true) : '<div class="tc-empty"></div>' !!}
@@ -118,7 +118,7 @@
                 </div>
             </div>
 
-            <div class="tc-row">
+            <div class="tc-row tc-row-primary-bottom">
                 <div class="tc-quad">
                     @foreach ($permQuads['lr'] as $n)
                         {!! ($primary = $primaryFor($n)) ? $cell($primary, true) : '<div class="tc-empty"></div>' !!}
@@ -185,6 +185,8 @@
         .tc-draw-layer { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 
         .tc-row { display: flex; align-items: center; justify-content: center; gap: 0; margin: 6px 0; width: 100%; }
+        .tc-row-primary-top { margin-bottom: 2in; }
+        .tc-row-primary-bottom { margin-top: 2in; }
         .tc-quad { flex: 1 1 0; min-width: 0; display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 6px; }
         .tc-mid { width: 2px; flex-shrink: 0; align-self: stretch; background: rgba(0, 0, 0, 0.25); margin: 0 16px; }
         .dark .tc-mid { background: rgba(255, 255, 255, 0.25); }
