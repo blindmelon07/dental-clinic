@@ -8,10 +8,13 @@ use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Support\Enums\Width;
 
 class ViewDentalRecord extends ViewRecord
 {
     protected static string $resource = DentalRecordResource::class;
+
+    protected Width|string|null $maxContentWidth = Width::Full;
 
     protected function getHeaderActions(): array
     {

@@ -8,10 +8,13 @@ use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Support\Enums\Width;
 
 class EditDentalRecord extends EditRecord
 {
     protected static string $resource = DentalRecordResource::class;
+
+    protected Width|string|null $maxContentWidth = Width::Full;
 
     protected function getHeaderActions(): array
     {

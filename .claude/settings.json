@@ -199,7 +199,12 @@
       "Bash(php -l app/Models/MedicineCategory.php)",
       "Bash(php -l database/seeders/MedicineSeeder.php)",
       "Bash(php -l app/Filament/Resources/MedicineDispensingResource.php)",
-      "Bash(php -l app/Models/MedicineDispensing.php)"
+      "Bash(php -l app/Models/MedicineDispensing.php)",
+      "Bash(php -l resources/views/filament/forms/components/tooth-chart.blade.php)",
+      "Bash(php -l resources/views/filament/infolists/components/tooth-chart.blade.php)",
+      "Bash(php -l app/Filament/Resources/DentalRecordResource/Pages/CreateDentalRecord.php)",
+      "Bash(php -l app/Filament/Resources/DentalRecordResource/Pages/EditDentalRecord.php)",
+      "Bash(php -l app/Filament/Resources/DentalRecordResource/Pages/ViewDentalRecord.php)"
     ]
   }
 }

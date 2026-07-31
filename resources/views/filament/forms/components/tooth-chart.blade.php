@@ -26,11 +26,32 @@
             paintValue: null,
             drawing: false,
             currentStroke: null,
+            conditionGroups: ['Condition', 'Restoration & Prosthetics', 'Surgery'],
             conditions: {
-                D: { label: 'Decayed / Caries', color: '#ef4444' },
-                M: { label: 'Missing', color: '#6b7280' },
-                P: { label: 'Filled / Pontic', color: '#3b82f6' },
-                Cu: { label: 'Crown', color: '#f59e0b' },
+                D:  { label: 'Decayed (Caries Indicated for Filling)', color: '#ef4444', group: 'Condition' },
+                M:  { label: 'Missing due to Caries', color: '#6b7280', group: 'Condition' },
+                F:  { label: 'Filled', color: '#3b82f6', group: 'Condition' },
+                I:  { label: 'Caries Indicated for Extraction', color: '#f97316', group: 'Condition' },
+                RF: { label: 'Root Fragment', color: '#92400e', group: 'Condition' },
+                MO: { label: 'Missing due to Other Causes', color: '#78716c', group: 'Condition' },
+                Im: { label: 'Impacted Tooth', color: '#a855f7', group: 'Condition' },
+
+                J:  { label: 'Jacket Crown', color: '#f59e0b', group: 'Restoration & Prosthetics' },
+                A:  { label: 'Amalgam Filling', color: '#64748b', group: 'Restoration & Prosthetics' },
+                AB: { label: 'Abutment', color: '#14b8a6', group: 'Restoration & Prosthetics' },
+                P:  { label: 'Pontic', color: '#06b6d4', group: 'Restoration & Prosthetics' },
+                In: { label: 'Inlay', color: '#6366f1', group: 'Restoration & Prosthetics' },
+                FX: { label: 'Fixed Cure Composite', color: '#ec4899', group: 'Restoration & Prosthetics' },
+                Rm: { label: 'Removable Denture', color: '#84cc16', group: 'Restoration & Prosthetics' },
+
+                X:  { label: 'Extraction due to Caries', color: '#dc2626', group: 'Surgery' },
+                XO: { label: 'Extraction due to Other Causes', color: '#7f1d1d', group: 'Surgery' },
+                '✓': { label: 'Present Teeth', color: '#22c55e', group: 'Surgery' },
+                Cm: { label: 'Congenitally Missing', color: '#8b5cf6', group: 'Surgery' },
+                Sp: { label: 'Supernumerary', color: '#d946ef', group: 'Surgery' },
+            },
+            conditionsIn(group) {
+                return Object.entries(this.conditions).filter(([key, condition]) => condition.group === group);
             },
             ensureState() {
                 return {
@@ -175,32 +196,43 @@
             <button type="button" x-on:click="mode = 'draw'" :class="{ 'is-active': mode === 'draw' }" class="tc-mode-btn">Draw Lines</button>
         </div>
 
-        <div class="tooth-chart-palette" x-show="mode === 'stamp'">
-            <template x-for="[key, condition] in Object.entries(conditions)" :key="key">
-                <button
-                    type="button"
-                    x-on:click="selected = key"
-                    :class="{ 'is-active': selected === key }"
-                    class="tooth-chart-swatch"
-                >
-                    <span class="tooth-chart-dot" :style="{ backgroundColor: condition.color }" x-text="key"></span>
-                    <span x-text="condition.label"></span>
-                </button>
+        <div class="tooth-chart-palette-groups" x-show="mode === 'stamp'">
+            <template x-for="group in conditionGroups" :key="group">
+                <div class="tooth-chart-palette-group">
+                    <div class="tooth-chart-group-label" x-text="group"></div>
+                    <div class="tooth-chart-palette">
+                        <template x-for="[key, condition] in conditionsIn(group)" :key="key">
+                            <button
+                                type="button"
+                                x-on:click="selected = key"
+                                :class="{ 'is-active': selected === key }"
+                                class="tooth-chart-swatch"
+                            >
+                                <span class="tooth-chart-dot" :style="{ backgroundColor: condition.color }" x-text="key"></span>
+                                <span x-text="condition.label"></span>
+                            </button>
+                        </template>
+                    </div>
+                </div>
             </template>
 
-            <button
-                type="button"
-                x-on:click="selected = 'DELETE'"
-                :class="{ 'is-active': selected === 'DELETE' }"
-                class="tooth-chart-swatch tooth-chart-swatch-delete"
-            >
-                <span class="tooth-chart-dot tooth-chart-dot-delete">&times;</span>
-                <span>Delete</span>
-            </button>
+            <div class="tooth-chart-palette-group">
+                <div class="tooth-chart-palette">
+                    <button
+                        type="button"
+                        x-on:click="selected = 'DELETE'"
+                        :class="{ 'is-active': selected === 'DELETE' }"
+                        class="tooth-chart-swatch tooth-chart-swatch-delete"
+                    >
+                        <span class="tooth-chart-dot tooth-chart-dot-delete">&times;</span>
+                        <span>Delete</span>
+                    </button>
 
-            <button type="button" x-on:click="clearTeeth()" class="tooth-chart-clear">
-                Clear Teeth
-            </button>
+                    <button type="button" x-on:click="clearTeeth()" class="tooth-chart-clear">
+                        Clear Teeth
+                    </button>
+                </div>
+            </div>
         </div>
 
         <div class="tooth-chart-palette" x-show="mode === 'draw'" x-cloak>
@@ -340,10 +372,10 @@
     </div>
 
     <style>
-        .tooth-chart { display: flex; flex-direction: column; gap: 0.5rem; user-select: none; }
+        .tooth-chart { display: flex; flex-direction: column; gap: 1.25rem; user-select: none; }
         .tooth-chart.is-disabled { opacity: 0.6; pointer-events: none; }
 
-        .tooth-chart-modes { display: flex; gap: 0.5rem; align-self: center; }
+        .tooth-chart-modes { display: flex; gap: 0.5rem; align-self: center; margin-bottom: 0.25rem; }
         .tc-mode-btn {
             padding: 0.5rem 1.25rem;
             border-radius: 9999px;
@@ -357,7 +389,18 @@
         .dark .tc-mode-btn { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.15); color: rgb(156 163 175); }
         .tc-mode-btn.is-active { background: rgb(8 145 178); border-color: rgb(8 145 178); color: #fff; }
 
-        .tooth-chart-palette { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+        .tooth-chart-palette-groups { display: flex; flex-direction: column; gap: 1rem; }
+        .tooth-chart-palette-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .tooth-chart-group-label {
+            font-size: 0.688rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: rgb(107 114 128);
+        }
+        .dark .tooth-chart-group-label { color: rgb(156 163 175); }
+
+        .tooth-chart-palette { display: flex; flex-wrap: wrap; align-items: center; gap: 0.625rem; row-gap: 0.625rem; }
         .tooth-chart-swatch {
             display: flex;
             align-items: center;
@@ -405,14 +448,14 @@
         .tooth-chart-hint, .tooth-chart-legend-note { font-size: 0.75rem; color: rgb(107 114 128); margin: 0; text-align: center; }
         .dark .tooth-chart-hint, .dark .tooth-chart-legend-note { color: rgb(156 163 175); }
 
-        .tc-canvas-wrap { position: relative; max-width: 56rem; margin: 0 auto; padding: 0.5rem 0; }
+        .tc-canvas-wrap { position: relative; width: 100%; margin: 0 auto; padding: 1.5rem 0.5rem; box-sizing: border-box; }
         .tc-draw-layer { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
 
-        .tc-row { display: flex; align-items: center; justify-content: center; gap: 0; margin: 4px 0; }
-        .tc-quad { display: grid; grid-template-columns: repeat(8, 3.25rem); gap: 6px; }
-        .tc-mid { width: 2px; align-self: stretch; background: rgba(0, 0, 0, 0.25); margin: 0 14px; }
+        .tc-row { display: flex; align-items: center; justify-content: center; gap: 0; margin: 6px 0; width: 100%; }
+        .tc-quad { flex: 1 1 0; min-width: 0; display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 6px; }
+        .tc-mid { width: 2px; flex-shrink: 0; align-self: stretch; background: rgba(0, 0, 0, 0.25); margin: 0 16px; }
         .dark .tc-mid { background: rgba(255, 255, 255, 0.25); }
-        .tc-arch-divider { height: 2px; background: rgba(0, 0, 0, 0.35); margin: 12px auto; width: 100%; max-width: 52rem; }
+        .tc-arch-divider { height: 2px; background: rgba(0, 0, 0, 0.35); margin: 16px 0; width: 100%; }
         .dark .tc-arch-divider { background: rgba(255, 255, 255, 0.3); }
 
         .tooth-chart-tooth {
@@ -420,8 +463,9 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            width: 3.25rem;
-            height: 3.5rem;
+            width: 100%;
+            min-width: 0;
+            aspect-ratio: 0.9;
             border-radius: 0.5rem;
             border: 1px solid rgba(0, 0, 0, 0.15);
             background: #fff;
@@ -431,12 +475,18 @@
         }
         .dark .tooth-chart-tooth { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.2); }
         .tooth-chart-tooth:hover { border-color: rgb(8 145 178); }
-        .tc-tooth-primary { width: 2.75rem; height: 2.75rem; border-radius: 9999px; }
-        .tc-empty { width: 3.25rem; height: 2.75rem; }
+        .tc-tooth-primary { aspect-ratio: 1; border-radius: 9999px; }
+        .tc-empty { width: 100%; min-width: 0; aspect-ratio: 1; }
 
-        .tc-num { font-size: 0.75rem; font-weight: 600; color: rgb(107 114 128); }
+        .tc-num { font-size: clamp(0.5rem, 2vw, 0.875rem); font-weight: 600; color: rgb(107 114 128); }
         .dark .tc-num { color: rgb(156 163 175); }
-        .tc-code { font-size: 1rem; font-weight: 700; color: rgb(9 9 11); }
+        .tc-code { font-size: clamp(0.563rem, 2.4vw, 1rem); font-weight: 700; color: rgb(9 9 11); }
         .dark .tc-code { color: rgb(250 250 250); }
+
+        @media (max-width: 640px) {
+            .tc-quad { gap: 3px; }
+            .tc-mid { margin: 0 8px; }
+            .tc-canvas-wrap { padding: 1rem 0.25rem; }
+        }
     </style>
 </x-dynamic-component>
