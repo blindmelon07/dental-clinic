@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Auditable;
 use Illuminate\Database\Eloquent\Model;
 
 class SiteSetting extends Model
 {
+    use Auditable;
+
     protected $fillable = [
         'logo', 'clinic_name', 'tagline', 'site_theme',
         'hero_heading', 'hero_subheading', 'hero_description',

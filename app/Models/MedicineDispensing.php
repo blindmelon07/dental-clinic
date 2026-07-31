@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Auditable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MedicineDispensing extends Model
 {
+    use Auditable;
+
     protected $fillable = [
         'medicine_id', 'patient_id', 'prescription_id',
         'dispensed_by', 'quantity', 'unit_price',
@@ -63,5 +66,10 @@ class MedicineDispensing extends Model
     public function getDispensedByLabelAttribute(): string
     {
         return $this->dispensedBy?->role_and_name_label ?? '—';
+    }
+
+    public function auditableLabel(): string
+    {
+        return trim(($this->medicine?->display_name ?? 'Medicine') . ' to ' . ($this->patient?->full_name ?? 'patient'));
     }
 }

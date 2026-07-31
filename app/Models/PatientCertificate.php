@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Auditable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PatientCertificate extends Model
 {
+    use Auditable;
+
     protected $fillable = [
         'patient_id', 'issued_by', 'type', 'certificate_number',
         'date_treated', 'issue_date', 'findings', 'treatment_done', 'notes',

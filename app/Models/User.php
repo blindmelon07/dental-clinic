@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\Gender;
+use App\Models\Concerns\Auditable;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
@@ -17,7 +18,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable implements FilamentUser, HasAvatar
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, HasRoles, Notifiable;
+    use Auditable, HasFactory, HasRoles, Notifiable;
 
     protected $fillable = [
         'name',
@@ -93,5 +94,10 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
     public function getRoleAndNameLabelAttribute(): string
     {
         return $this->role_label ? "{$this->role_label} - {$this->name}" : $this->name;
+    }
+
+    public function auditableExcluded(): array
+    {
+        return ['password', 'remember_token'];
     }
 }

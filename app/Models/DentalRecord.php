@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\InvoiceStatus;
+use App\Models\Concerns\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,7 +13,7 @@ use RuntimeException;
 
 class DentalRecord extends Model
 {
-    use HasFactory, SoftDeletes;
+    use Auditable, HasFactory, SoftDeletes;
 
     protected $fillable = [
         'patient_id', 'dentist_id', 'appointment_id', 'visit_date',
@@ -37,6 +38,18 @@ class DentalRecord extends Model
     public function dentist(): BelongsTo
     {
         return $this->belongsTo(Dentist::class);
+    }
+
+    public function auditableExcluded(): array
+    {
+        return ['tooth_chart'];
+    }
+
+    public function auditableLabel(): string
+    {
+        $visit = $this->visit_date?->format('M d, Y') ?? 'undated visit';
+
+        return trim(($this->patient?->full_name ?? 'Dental Record') . ' — ' . $visit);
     }
 
     public function appointment(): BelongsTo

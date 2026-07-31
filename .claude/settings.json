@@ -207,7 +207,8 @@
       "Bash(php -l app/Filament/Resources/DentalRecordResource/Pages/ViewDentalRecord.php)",
       "Bash(php -l app/Filament/Pages/Reports.php)",
       "Bash(php -l resources/views/filament/pages/reports-pdf.blade.php)",
-      "Bash(xargs -I{} echo {})"
+      "Bash(xargs -I{} echo {})",
+      "Bash(xargs grep -ln \"function form\\(\\\\|function schema\\(\")"
     ]
   }
 }

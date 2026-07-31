@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Service extends Model
 {
-    use HasFactory;
+    use Auditable, HasFactory;
     protected $fillable = [
         'clinic_id', 'service_category_id', 'name', 'slug', 'description',
         'price', 'duration_minutes', 'requires_xray', 'is_active', 'sort_order',

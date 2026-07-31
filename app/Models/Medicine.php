@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Auditable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Medicine extends Model
 {
+    use Auditable;
+
     protected $fillable = [
         'name', 'generic_name', 'brand', 'medicine_category_id', 'medicine_form_id',
         'strength', 'unit', 'current_stock', 'minimum_stock',
