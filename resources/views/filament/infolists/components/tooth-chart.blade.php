@@ -185,8 +185,8 @@
         .tc-draw-layer { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 
         .tc-row { display: flex; align-items: center; justify-content: center; gap: 0; margin: 6px 0; width: 100%; }
-        .tc-row-primary-top { margin-bottom: 2in; }
-        .tc-row-primary-bottom { margin-top: 2in; }
+        .tc-row-primary-top { margin-bottom: 1in; }
+        .tc-row-primary-bottom { margin-top: 1in; }
         .tc-quad { flex: 1 1 0; min-width: 0; display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 6px; }
         .tc-mid { width: 2px; flex-shrink: 0; align-self: stretch; background: rgba(0, 0, 0, 0.25); margin: 0 16px; }
         .dark .tc-mid { background: rgba(255, 255, 255, 0.25); }
