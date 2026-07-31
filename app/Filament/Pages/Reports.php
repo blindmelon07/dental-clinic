@@ -274,7 +274,7 @@ class Reports extends Page
     }
 
     /**
-     * @return array<int, array{0: string, 1: array<int, string>, 2: array<int, array<int, mixed>>}>
+     * @return array<int, array{0: string, 1: array<int, string>, 2: array<int, array<int, mixed>>, 3: array<int, int>}>
      */
     protected function revenueSections(): array
     {
@@ -282,15 +282,15 @@ class Reports extends Page
 
         return [
             ['Summary', ['Metric', 'Value'], [
-                ['Total Collected', $summary['totalCollected']],
-                ['Total Invoiced', $summary['totalInvoiced']],
+                ['Total Collected', '₱' . number_format($summary['totalCollected'], 2)],
+                ['Total Invoiced', '₱' . number_format($summary['totalInvoiced'], 2)],
                 ['Payments Recorded', $summary['paymentsCount']],
-                ['Outstanding Balance', $summary['outstanding']],
-            ]],
+                ['Outstanding Balance', '₱' . number_format($summary['outstanding'], 2)],
+            ], []],
             ['Revenue by Month', ['Month', 'Payments', 'Total'], $this->getRevenueByMonth()
-                ->map(fn (array $r) => [$r['label'], $r['count'], $r['total']])->all()],
+                ->map(fn (array $r) => [$r['label'], $r['count'], $r['total']])->all(), [2]],
             ['Revenue by Payment Method', ['Method', 'Count', 'Total'], $this->getRevenueByMethod()
-                ->map(fn (array $r) => [$r['label'], $r['count'], $r['total']])->all()],
+                ->map(fn (array $r) => [$r['label'], $r['count'], $r['total']])->all(), [2]],
             ['Invoices', ['Invoice #', 'Patient', 'Date', 'Status', 'Total'], $this->getRecentInvoices(null)
                 ->map(fn (Invoice $invoice) => [
                     $invoice->invoice_number,
@@ -298,7 +298,7 @@ class Reports extends Page
                     $invoice->invoice_date->format('Y-m-d'),
                     $invoice->status->label(),
                     $invoice->total,
-                ])->all()],
+                ])->all(), [4]],
         ];
     }
 
@@ -312,11 +312,11 @@ class Reports extends Page
         return [
             ['Summary', ['Metric', 'Value'], [
                 ['Total Appointments', $summary['total']],
-            ]],
+            ], []],
             ['By Status', ['Status', 'Count'], $summary['byStatus']
-                ->map(fn (array $r) => [$r['label'], $r['count']])->all()],
+                ->map(fn (array $r) => [$r['label'], $r['count']])->all(), []],
             ['By Dentist', ['Dentist', 'Total', 'Completed'], $this->getAppointmentsByDentist()
-                ->map(fn (array $r) => [$r['name'], $r['count'], $r['completed']])->all()],
+                ->map(fn (array $r) => [$r['name'], $r['count'], $r['completed']])->all(), []],
         ];
     }
 
@@ -331,9 +331,9 @@ class Reports extends Page
             ['Summary', ['Metric', 'Value'], [
                 ['New Patients', $summary['newPatients']],
                 ['Dental Visits', $summary['visits']],
-            ]],
+            ], []],
             ['Top Diagnoses', ['Diagnosis', 'Occurrences'], $this->getTopDiagnoses()
-                ->map(fn (array $r) => [$r['name'], $r['count']])->all()],
+                ->map(fn (array $r) => [$r['name'], $r['count']])->all(), []],
         ];
     }
 
@@ -348,14 +348,14 @@ class Reports extends Page
             ['Summary', ['Metric', 'Value'], [
                 ['Low Stock Medicines', $summary['lowStock']],
                 ['Dispensed Quantity', $summary['dispensedQty']],
-                ['Dispensed Cost', $summary['dispensedCost']],
-            ]],
+                ['Dispensed Cost', '₱' . number_format($summary['dispensedCost'], 2)],
+            ], []],
             ['Low Stock Medicines', ['Medicine', 'Stock', 'Unit', 'Minimum'], $this->getLowStockMedicines(null)
                 ->map(fn (Medicine $medicine) => [
                     $medicine->display_name, $medicine->current_stock, $medicine->unit, $medicine->minimum_stock,
-                ])->all()],
+                ])->all(), []],
             ['Top Dispensed Medicines', ['Medicine', 'Quantity', 'Cost'], $this->getTopDispensedMedicines()
-                ->map(fn (array $r) => [$r['name'], $r['qty'], $r['cost']])->all()],
+                ->map(fn (array $r) => [$r['name'], $r['qty'], $r['cost']])->all(), [2]],
         ];
     }
 
