@@ -217,7 +217,9 @@
       "Bash(php -l app/Models/AppointmentType.php)",
       "Bash(grep -rln \"App\\\\\\\\\\\\\\\\Enums\\\\\\\\\\\\\\\\AppointmentType\\\\|Enums\\\\\\\\\\\\\\\\AppointmentType\" --include=*.php app database tests resources)",
       "Bash(sort -t\"'\" -k2)",
-      "Bash(grep -v \"vendor\\\\|App\\\\\\\\\\\\\\\\Models\\\\\\\\\\\\\\\\AppointmentType\\\\b\")"
+      "Bash(grep -v \"vendor\\\\|App\\\\\\\\\\\\\\\\Models\\\\\\\\\\\\\\\\AppointmentType\\\\b\")",
+      "Bash(php -l app/Filament/Resources/PatientResource/RelationManagers/DentalRecordsRelationManager.php)",
+      "Bash(php -l app/Filament/Resources/PatientResource/RelationManagers/InvoicesRelationManager.php)"
     ]
   }
 }

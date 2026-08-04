@@ -2,9 +2,17 @@
 
 namespace Tests\Feature\Filament;
 
+use App\Filament\Resources\PatientResource\Pages\ViewPatient;
+use App\Filament\Resources\PatientResource\RelationManagers\AppointmentsRelationManager;
+use App\Filament\Resources\PatientResource\RelationManagers\DentalRecordsRelationManager;
+use App\Filament\Resources\PatientResource\RelationManagers\InvoicesRelationManager;
+use App\Models\Appointment;
+use App\Models\DentalRecord;
+use App\Models\Invoice;
 use App\Models\Patient;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class PatientResourceTest extends TestCase
@@ -53,5 +61,50 @@ class PatientResourceTest extends TestCase
     {
         $response = $this->get('/admin/patients');
         $response->assertRedirect();
+    }
+
+    public function test_dental_record_row_opens_a_view_modal(): void
+    {
+        $patient = Patient::factory()->create();
+        $record = DentalRecord::factory()->create(['patient_id' => $patient->id]);
+
+        Livewire::actingAs($this->admin)
+            ->test(DentalRecordsRelationManager::class, [
+                'ownerRecord' => $patient,
+                'pageClass'   => ViewPatient::class,
+            ])
+            ->assertTableActionExists('view')
+            ->callTableAction('view', $record)
+            ->assertSuccessful();
+    }
+
+    public function test_appointment_row_opens_a_view_modal(): void
+    {
+        $patient = Patient::factory()->create();
+        $record = Appointment::factory()->create(['patient_id' => $patient->id]);
+
+        Livewire::actingAs($this->admin)
+            ->test(AppointmentsRelationManager::class, [
+                'ownerRecord' => $patient,
+                'pageClass'   => ViewPatient::class,
+            ])
+            ->assertTableActionExists('view')
+            ->callTableAction('view', $record)
+            ->assertSuccessful();
+    }
+
+    public function test_invoice_row_opens_a_view_modal(): void
+    {
+        $patient = Patient::factory()->create();
+        $record = Invoice::factory()->create(['patient_id' => $patient->id]);
+
+        Livewire::actingAs($this->admin)
+            ->test(InvoicesRelationManager::class, [
+                'ownerRecord' => $patient,
+                'pageClass'   => ViewPatient::class,
+            ])
+            ->assertTableActionExists('view')
+            ->callTableAction('view', $record)
+            ->assertSuccessful();
     }
 }
