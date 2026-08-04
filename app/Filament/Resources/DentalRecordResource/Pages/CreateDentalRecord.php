@@ -11,4 +11,11 @@ class CreateDentalRecord extends CreateRecord
     protected static string $resource = DentalRecordResource::class;
 
     protected Width|string|null $maxContentWidth = Width::Full;
+
+    public function createAnother(): void
+    {
+        parent::createAnother();
+
+        $this->dispatch('dental-record-tabs-reset');
+    }
 }

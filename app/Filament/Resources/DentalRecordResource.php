@@ -51,6 +51,12 @@ class DentalRecordResource extends Resource
     {
         return $schema->components([
             Tabs::make()
+                // "Create & create another" resets the form data but Filament's tabs
+                // keep whatever tab was active client-side (Alpine state survives the
+                // Livewire re-render). Jump back to the first tab when that happens.
+                ->extraAlpineAttributes([
+                    'x-on:dental-record-tabs-reset.window' => 'tab = JSON.parse($refs.tabsData.value)[0]',
+                ])
                 ->tabs([
                     Tab::make('Visit & Assessment')
                         ->icon('heroicon-o-clipboard-document-check')

@@ -2,8 +2,12 @@
 
 namespace Tests\Feature\Filament;
 
+use App\Filament\Resources\DentalRecordResource\Pages\CreateDentalRecord;
 use App\Filament\Resources\DentalRecordResource\Pages\EditDentalRecord;
 use App\Models\DentalRecord;
+use App\Models\Dentist;
+use App\Models\Patient;
+use App\Models\Service;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -75,5 +79,25 @@ class DentalRecordResourceTest extends TestCase
             ->call('save');
 
         $this->assertSame('Cavity in tooth 14, needs filling', $record->refresh()->diagnosis);
+    }
+
+    public function test_create_another_dispatches_tabs_reset_event(): void
+    {
+        $patient = Patient::factory()->create();
+        $dentist = Dentist::factory()->create();
+        $service = Service::factory()->create();
+
+        Livewire::actingAs($this->admin)
+            ->test(CreateDentalRecord::class)
+            ->fillForm([
+                'patient_id' => $patient->id,
+                'dentist_id' => $dentist->id,
+                'diagnosis' => [$service->display_name],
+            ])
+            ->call('createAnother')
+            ->assertHasNoFormErrors()
+            ->assertDispatched('dental-record-tabs-reset');
+
+        $this->assertSame(1, DentalRecord::count());
     }
 }
