@@ -262,8 +262,8 @@ class PatientResource extends Resource
                                         ->required()
                                         ->tel()
                                         ->label('Cell / Mobile No.')
-                                        ->mask('9999 999 9999')
-                                        ->placeholder('0917 123 4567'),
+                                        ->placeholder('09171234567')
+                                        ->rule('regex:/^[0-9+\s]{7,20}$/'),
                                     TextInput::make('email')->email()->label('Email Address'),
                                 ])->columns(['default' => 1, 'md' => 2, 'lg' => 3]),
 

@@ -2,9 +2,11 @@
 
 namespace Tests\Feature\Filament;
 
+use App\Filament\Resources\DentalRecordResource\Pages\EditDentalRecord;
 use App\Models\DentalRecord;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class DentalRecordResourceTest extends TestCase
@@ -47,5 +49,31 @@ class DentalRecordResourceTest extends TestCase
 
         $response = $this->actingAs($this->admin)->get("/admin/dental-records/{$record->id}/edit");
         $response->assertStatus(200);
+    }
+
+    public function test_saved_diagnosis_is_preselected_when_editing(): void
+    {
+        $record = DentalRecord::factory()->create([
+            'diagnosis' => 'Cavity in tooth 14, needs filling',
+        ]);
+
+        Livewire::actingAs($this->admin)
+            ->test(EditDentalRecord::class, ['record' => $record->getRouteKey()])
+            ->assertFormSet([
+                'diagnosis' => ['Cavity in tooth 14', 'needs filling'],
+            ]);
+    }
+
+    public function test_diagnosis_survives_a_resave(): void
+    {
+        $record = DentalRecord::factory()->create([
+            'diagnosis' => 'Cavity in tooth 14, needs filling',
+        ]);
+
+        Livewire::actingAs($this->admin)
+            ->test(EditDentalRecord::class, ['record' => $record->getRouteKey()])
+            ->call('save');
+
+        $this->assertSame('Cavity in tooth 14, needs filling', $record->refresh()->diagnosis);
     }
 }

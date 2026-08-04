@@ -693,6 +693,13 @@
             if (!phone) return;
 
             phone.addEventListener('input', function () {
+                // Setting .value always moves the caret to the end, which makes
+                // mid-string edits on mobile keyboards jump around. Count digits
+                // before the caret first and restore the equivalent position
+                // after reformatting.
+                var caret = phone.selectionStart;
+                var digitsBeforeCaret = phone.value.slice(0, caret).replace(/\D/g, '').length;
+
                 var digits = phone.value.replace(/\D/g, '').slice(0, 11);
                 var formatted = digits;
 
@@ -703,6 +710,14 @@
                 }
 
                 phone.value = formatted;
+
+                var pos = 0;
+                var seen = 0;
+                while (pos < formatted.length && seen < digitsBeforeCaret) {
+                    if (/\d/.test(formatted[pos])) seen++;
+                    pos++;
+                }
+                phone.setSelectionRange(pos, pos);
             });
         })();
 

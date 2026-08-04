@@ -24,6 +24,7 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\ViewEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\StateCasts\Contracts\StateCast;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Components\Utilities\Get;
@@ -128,12 +129,33 @@ class DentalRecordResource extends Resource
         return Select::make('diagnosis')
             ->label('Diagnosis')
             ->multiple()
-            ->options(fn () => static::diagnosisOptions())
+            ->options(function (?DentalRecord $record) {
+                $options = static::diagnosisOptions();
+
+                // Keep previously saved diagnosis entries selectable even if the
+                // matching service was since renamed, deactivated, or deleted
+                // (or the diagnosis was free text from before this field became
+                // service-linked) — otherwise they silently disappear on edit.
+                foreach ($record?->diagnosisNames() ?? [] as $name) {
+                    $options[$name] ??= $name;
+                }
+
+                return $options;
+            })
             ->searchable()
             ->preload()
             ->required()
             ->live()
             ->columnSpanFull()
+            // multiple() defaults to a JSON-array state cast, which json_decode()s the
+            // stored comma-separated string into null (invalid JSON) and wipes the
+            // selection before afterStateHydrated ever runs. Disable it so the raw
+            // string reaches our own hydrate/dehydrate logic below untouched.
+            ->stateCast(new class implements StateCast
+            {
+                public function get(mixed $state): mixed { return $state; }
+                public function set(mixed $state): mixed { return $state; }
+            })
             ->afterStateHydrated(function (Select $component, $state) {
                 $component->state(filled($state) ? array_map('trim', explode(',', $state)) : []);
             })
