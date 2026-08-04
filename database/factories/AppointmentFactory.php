@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Enums\AppointmentStatus;
-use App\Enums\AppointmentType;
 use App\Models\Clinic;
 use App\Models\Dentist;
 use App\Models\Patient;
@@ -32,7 +31,7 @@ class AppointmentFactory extends Factory
             'start_time'         => $startTime,
             'end_time'           => $endTime,
             'status'             => AppointmentStatus::Pending->value,
-            'type'               => AppointmentType::Consultation->value,
+            'type'               => 'Consultation',
         ];
     }
 

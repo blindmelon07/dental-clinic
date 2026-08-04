@@ -3,11 +3,11 @@
 namespace App\Observers;
 
 use App\Enums\AppointmentStatus;
-use App\Enums\AppointmentType;
 use App\Mail\AppointmentBookedMail;
 use App\Mail\AppointmentCancelledMail;
 use App\Mail\AppointmentConfirmedMail;
 use App\Models\Appointment;
+use App\Models\AppointmentType;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -39,7 +39,8 @@ class AppointmentObserver
 
         // Update next cleaning due when a cleaning appointment is completed
         if ($appointment->status === AppointmentStatus::Completed) {
-            $isCleaning = $appointment->type === AppointmentType::Cleaning
+            $cleaningTypeNames = AppointmentType::where('is_cleaning', true)->pluck('name');
+            $isCleaning = $cleaningTypeNames->contains($appointment->type)
                 || str_contains(strtolower($appointment->service?->name ?? ''), 'cleaning');
 
             if ($isCleaning && $appointment->patient) {

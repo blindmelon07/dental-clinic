@@ -210,7 +210,14 @@
       "Bash(xargs -I{} echo {})",
       "Bash(xargs grep -ln \"function form\\(\\\\|function schema\\(\")",
       "Bash(grep -n '^use\\\\|DentalRecord::class\\\\|function.*Record $record' app/Filament/Resources/DentalRecordResource.php)",
-      "Bash(php -l app/Models/OldTreatmentImage.php)"
+      "Bash(php -l app/Models/OldTreatmentImage.php)",
+      "Bash(grep -n 'xray_type\\\\|resources\\\\s*=\\\\|\\\\$resources' database/seeders/PermissionSeeder.php)",
+      "Bash(php -l app/Console/Commands/SendCleaningReminders.php)",
+      "Bash(php -l app/Models/Appointment.php)",
+      "Bash(php -l app/Models/AppointmentType.php)",
+      "Bash(grep -rln \"App\\\\\\\\\\\\\\\\Enums\\\\\\\\\\\\\\\\AppointmentType\\\\|Enums\\\\\\\\\\\\\\\\AppointmentType\" --include=*.php app database tests resources)",
+      "Bash(sort -t\"'\" -k2)",
+      "Bash(grep -v \"vendor\\\\|App\\\\\\\\\\\\\\\\Models\\\\\\\\\\\\\\\\AppointmentType\\\\b\")"
     ]
   }
 }

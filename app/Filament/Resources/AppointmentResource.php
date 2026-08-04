@@ -3,9 +3,9 @@
 namespace App\Filament\Resources;
 
 use App\Enums\AppointmentStatus;
-use App\Enums\AppointmentType;
 use App\Filament\Resources\AppointmentResource\Pages;
 use App\Models\Appointment;
+use App\Models\AppointmentType;
 use App\Models\Dentist;
 use App\Models\Patient;
 use App\Models\Service;
@@ -83,8 +83,8 @@ class AppointmentResource extends Resource
                         }),
 
                     Select::make('type')
-                        ->options(AppointmentType::class)
-                        ->default(AppointmentType::Consultation->value)
+                        ->options(fn () => AppointmentType::where('is_active', true)->orderBy('sort_order')->pluck('name', 'name'))
+                        ->default('Consultation')
                         ->required(),
 
                     DatePicker::make('appointment_date')
@@ -168,7 +168,7 @@ class AppointmentResource extends Resource
             ])
             ->filters([
                 SelectFilter::make('status')->options(AppointmentStatus::class),
-                SelectFilter::make('type')->options(AppointmentType::class),
+                SelectFilter::make('type')->options(fn () => AppointmentType::orderBy('sort_order')->pluck('name', 'name')),
                 SelectFilter::make('dentist_id')
                     ->label('Dentist')
                     ->relationship('dentist.user', 'name'),

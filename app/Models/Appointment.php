@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Enums\AppointmentStatus;
-use App\Enums\AppointmentType;
 use App\Models\Concerns\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -28,7 +27,6 @@ class Appointment extends Model
         return [
             'appointment_date' => 'date',
             'status'           => AppointmentStatus::class,
-            'type'             => AppointmentType::class,
             'confirmed_at'     => 'datetime',
             'cancelled_at'     => 'datetime',
             'completed_at'     => 'datetime',

@@ -3,7 +3,6 @@
 namespace App\Livewire\Patient;
 
 use App\Enums\AppointmentStatus;
-use App\Enums\AppointmentType;
 use App\Models\Appointment;
 use App\Models\Clinic;
 use App\Models\Dentist;
@@ -22,7 +21,7 @@ class BookAppointment extends Component
     public ?string $selectedDate = null;
     public ?string $selectedTime = null;
     public string $chiefComplaint = '';
-    public string $appointmentType = 'consultation';
+    public string $appointmentType = 'Consultation';
     public bool $bookingComplete = false;
     public ?string $appointmentNumber = null;
 

@@ -3,9 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Enums\AppointmentStatus;
-use App\Enums\AppointmentType;
 use App\Mail\CleaningReminderDentistMail;
 use App\Mail\CleaningReminderPatientMail;
+use App\Models\AppointmentType;
 use App\Models\Patient;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
@@ -32,6 +32,7 @@ class SendCleaningReminders extends Command
 
         $sent   = 0;
         $failed = 0;
+        $cleaningTypeNames = AppointmentType::where('is_cleaning', true)->pluck('name');
 
         foreach ($patients as $patient) {
             // Patient email
@@ -52,8 +53,8 @@ class SendCleaningReminders extends Command
             $lastCleaning = $patient->appointments()
                 ->with('dentist.user')
                 ->where('status', AppointmentStatus::Completed)
-                ->where(function ($q) {
-                    $q->where('type', AppointmentType::Cleaning)
+                ->where(function ($q) use ($cleaningTypeNames) {
+                    $q->whereIn('type', $cleaningTypeNames)
                       ->orWhereHas('service', fn ($s) =>
                           $s->whereRaw('LOWER(name) LIKE ?', ['%cleaning%'])
                       );
