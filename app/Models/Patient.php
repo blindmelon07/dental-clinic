@@ -18,7 +18,7 @@ class Patient extends Model
         'user_id', 'clinic_id', 'patient_number', 'first_name', 'last_name',
         'middle_name', 'nickname', 'date_of_birth', 'gender', 'blood_type',
         'religion', 'nationality', 'occupation',
-        'phone', 'home_no', 'office_no', 'email', 'address', 'city',
+        'phone', 'home_no', 'office_no', 'email', 'address', 'city', 'province',
         'dental_insurance', 'insurance_effective_date', 'referring_person', 'reason_for_consultation',
         'emergency_contact_name', 'emergency_contact_phone', 'emergency_contact_relation',
         'guardian_name', 'guardian_occupation',

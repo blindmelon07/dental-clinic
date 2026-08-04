@@ -153,6 +153,29 @@ class PatientResource extends Resource
         return array_combine($cities, $cities);
     }
 
+    public static function provinceOptions(): array
+    {
+        $provinces = [
+            'Metro Manila (NCR)', 'Abra', 'Agusan del Norte', 'Agusan del Sur', 'Aklan', 'Albay',
+            'Antique', 'Apayao', 'Aurora', 'Basilan', 'Bataan', 'Batanes', 'Batangas', 'Benguet',
+            'Biliran', 'Bohol', 'Bukidnon', 'Bulacan', 'Cagayan', 'Camarines Norte', 'Camarines Sur',
+            'Camiguin', 'Capiz', 'Catanduanes', 'Cavite', 'Cebu', 'Cotabato', 'Davao de Oro',
+            'Davao del Norte', 'Davao del Sur', 'Davao Occidental', 'Davao Oriental', 'Dinagat Islands',
+            'Eastern Samar', 'Guimaras', 'Ifugao', 'Ilocos Norte', 'Ilocos Sur', 'Iloilo', 'Isabela',
+            'Kalinga', 'La Union', 'Laguna', 'Lanao del Norte', 'Lanao del Sur', 'Leyte',
+            'Maguindanao del Norte', 'Maguindanao del Sur', 'Marinduque', 'Masbate', 'Misamis Occidental',
+            'Misamis Oriental', 'Mountain Province', 'Negros Occidental', 'Negros Oriental',
+            'Northern Samar', 'Nueva Ecija', 'Nueva Vizcaya', 'Occidental Mindoro', 'Oriental Mindoro',
+            'Palawan', 'Pampanga', 'Pangasinan', 'Quezon', 'Quirino', 'Rizal', 'Romblon',
+            'Samar (Western Samar)', 'Sarangani', 'Siquijor', 'Sorsogon', 'South Cotabato',
+            'Southern Leyte', 'Sultan Kudarat', 'Sulu', 'Surigao del Norte', 'Surigao del Sur',
+            'Tarlac', 'Tawi-Tawi', 'Zambales', 'Zamboanga del Norte', 'Zamboanga del Sur',
+            'Zamboanga Sibugay', 'Other',
+        ];
+
+        return array_combine($provinces, $provinces);
+    }
+
     public static function medicalConditionOptions(): array
     {
         return [
@@ -254,8 +277,11 @@ class PatientResource extends Resource
                                     Select::make('city')
                                         ->options(self::cityOptions())
                                         ->searchable()
-                                        ->native(false)
-                                        ->required(),
+                                        ->native(false),
+                                    Select::make('province')
+                                        ->options(self::provinceOptions())
+                                        ->searchable()
+                                        ->native(false),
                                     TextInput::make('home_no')->tel()->label('Home No.'),
                                     TextInput::make('office_no')->tel()->label('Office No.'),
                                     TextInput::make('phone')
@@ -523,6 +549,7 @@ class PatientResource extends Resource
                     TextEntry::make('email')->placeholder('—'),
                     TextEntry::make('address')->placeholder('—'),
                     TextEntry::make('city')->placeholder('—'),
+                    TextEntry::make('province')->placeholder('—'),
                 ])->columns(['default' => 1, 'md' => 2, 'lg' => 3]),
 
             Section::make('Insurance & Referral')
