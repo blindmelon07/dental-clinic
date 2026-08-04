@@ -62,6 +62,11 @@ class DentalRecord extends Model
         return $this->hasMany(DentalXray::class);
     }
 
+    public function oldTreatmentImages(): HasMany
+    {
+        return $this->hasMany(OldTreatmentImage::class);
+    }
+
     public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class);

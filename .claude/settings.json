@@ -209,7 +209,8 @@
       "Bash(php -l resources/views/filament/pages/reports-pdf.blade.php)",
       "Bash(xargs -I{} echo {})",
       "Bash(xargs grep -ln \"function form\\(\\\\|function schema\\(\")",
-      "Bash(grep -n '^use\\\\|DentalRecord::class\\\\|function.*Record $record' app/Filament/Resources/DentalRecordResource.php)"
+      "Bash(grep -n '^use\\\\|DentalRecord::class\\\\|function.*Record $record' app/Filament/Resources/DentalRecordResource.php)",
+      "Bash(php -l app/Models/OldTreatmentImage.php)"
     ]
   }
 }

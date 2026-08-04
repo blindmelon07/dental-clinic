@@ -77,6 +77,11 @@ class DentalRecordResource extends Resource
                             static::prescriptionSection(),
                             static::xraySection(),
                         ]),
+                    Tab::make('Old Treatment Record')
+                        ->icon('heroicon-o-archive-box')
+                        ->schema([
+                            static::oldTreatmentImagesSection(),
+                        ]),
                 ])
                 ->columnSpanFull(),
         ]);
@@ -247,6 +252,30 @@ class DentalRecordResource extends Resource
             ->columnSpanFull();
     }
 
+    protected static function oldTreatmentImagesSection(): Section
+    {
+        return Section::make('Old Treatment Record')
+            ->icon('heroicon-o-archive-box')
+            ->schema([
+                Repeater::make('oldTreatmentImages')
+                    ->relationship()
+                    ->label('')
+                    ->schema([
+                        FileUpload::make('file_path')
+                            ->label('Image')
+                            ->image()
+                            ->directory('old-treatment-records'),
+                        Textarea::make('note')
+                            ->rows(2)
+                            ->columnSpanFull(),
+                    ])
+                    ->itemLabel(fn (array $state): ?string => $state['note'] ?? 'New Image')
+                    ->collapsible()
+                    ->addActionLabel('Add Image'),
+            ])
+            ->columnSpanFull();
+    }
+
     public static function infolist(Schema $schema): Schema
     {
         return $schema->components([
@@ -300,6 +329,19 @@ class DentalRecordResource extends Resource
                 ])
                 ->columnSpanFull()
                 ->visible(fn (DentalRecord $record) => $record->xrays->isNotEmpty()),
+
+            Section::make('Old Treatment Record')
+                ->icon('heroicon-o-archive-box')
+                ->schema([
+                    RepeatableEntry::make('oldTreatmentImages')
+                        ->label('')
+                        ->schema([
+                            ImageEntry::make('file_path')->label('Image'),
+                            TextEntry::make('note')->placeholder('—'),
+                        ])->columns(2),
+                ])
+                ->columnSpanFull()
+                ->visible(fn (DentalRecord $record) => $record->oldTreatmentImages->isNotEmpty()),
         ]);
     }
 
