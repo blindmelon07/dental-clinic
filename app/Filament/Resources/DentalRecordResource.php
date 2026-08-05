@@ -29,6 +29,7 @@ use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
@@ -349,6 +350,15 @@ class DentalRecordResource extends Resource
     {
         return $table
             ->columns([
+                IconColumn::make('has_invoice')
+                    ->label('Invoice')
+                    ->boolean()
+                    ->getStateUsing(fn (DentalRecord $record): bool => $record->invoices()->exists())
+                    ->trueIcon('heroicon-s-check-circle')
+                    ->falseIcon('heroicon-s-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('danger')
+                    ->tooltip(fn (bool $state): string => $state ? 'Invoice generated' : 'No invoice generated yet'),
                 TextColumn::make('visit_date')->date()->sortable(),
                 TextColumn::make('patient.full_name')->label('Patient')->searchable(),
                 TextColumn::make('dentist.user.name')->label('Dentist')->searchable(),
