@@ -46,7 +46,21 @@ class CreatePatient extends CreateRecord
             ->cancelAction($this->getCancelFormAction())
             ->submitAction(new HtmlString($submitButtons))
             ->alpineSubmitHandler("\$wire.{$this->getSubmitFormLivewireMethodName()}()")
-            ->contained(false);
+            ->contained(false)
+            // "Create & create another" resets the form data but the wizard's Alpine
+            // step state survives the Livewire re-render, so it stays parked on
+            // whatever step was active. Jump back to the first step when that happens
+            // (mirrors DentalRecordResource's tabs-reset fix for the same root cause).
+            ->extraAlpineAttributes([
+                'x-on:patient-wizard-reset.window' => 'step = JSON.parse($refs.stepsData.value)[0]',
+            ]);
+    }
+
+    public function createAnother(): void
+    {
+        parent::createAnother();
+
+        $this->dispatch('patient-wizard-reset');
     }
 
     protected function mutateFormDataBeforeCreate(array $data): array

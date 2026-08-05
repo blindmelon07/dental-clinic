@@ -44,6 +44,15 @@ class InventoryStatsWidget extends BaseWidget
             ->get()
             ->sum(fn (MedicineDispensing $d) => $d->quantity * $d->unit_price);
 
+        $weeklyIncome = MedicineDispensing::whereBetween('dispensed_at', [now()->startOfWeek(), now()])
+            ->get()
+            ->sum(fn (MedicineDispensing $d) => $d->quantity * $d->unit_price);
+
+        $monthlyIncome = MedicineDispensing::whereMonth('dispensed_at', now()->month)
+            ->whereYear('dispensed_at', now()->year)
+            ->get()
+            ->sum(fn (MedicineDispensing $d) => $d->quantity * $d->unit_price);
+
         return [
             Stat::make('Total Medicines', $total)
                 ->description('Active items in inventory')
@@ -79,6 +88,16 @@ class InventoryStatsWidget extends BaseWidget
                 ->description('Medicine dispensed today')
                 ->icon('heroicon-o-currency-dollar')
                 ->color($dailyIncome > 0 ? 'success' : 'gray'),
+
+            Stat::make('Weekly Income', '₱' . number_format($weeklyIncome, 2))
+                ->description('Medicine dispensed this week')
+                ->icon('heroicon-o-currency-dollar')
+                ->color($weeklyIncome > 0 ? 'success' : 'gray'),
+
+            Stat::make('Monthly Income', '₱' . number_format($monthlyIncome, 2))
+                ->description('Medicine dispensed in ' . now()->format('F'))
+                ->icon('heroicon-o-banknotes')
+                ->color($monthlyIncome > 0 ? 'success' : 'gray'),
         ];
     }
 }

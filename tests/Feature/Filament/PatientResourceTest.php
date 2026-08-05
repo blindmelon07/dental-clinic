@@ -2,11 +2,13 @@
 
 namespace Tests\Feature\Filament;
 
+use App\Filament\Resources\PatientResource\Pages\CreatePatient;
 use App\Filament\Resources\PatientResource\Pages\ViewPatient;
 use App\Filament\Resources\PatientResource\RelationManagers\AppointmentsRelationManager;
 use App\Filament\Resources\PatientResource\RelationManagers\DentalRecordsRelationManager;
 use App\Filament\Resources\PatientResource\RelationManagers\InvoicesRelationManager;
 use App\Models\Appointment;
+use App\Models\Clinic;
 use App\Models\DentalRecord;
 use App\Models\Invoice;
 use App\Models\Patient;
@@ -106,5 +108,27 @@ class PatientResourceTest extends TestCase
             ->assertTableActionExists('view')
             ->callTableAction('view', $record)
             ->assertSuccessful();
+    }
+
+    public function test_create_another_dispatches_wizard_reset_event(): void
+    {
+        Clinic::factory()->create();
+
+        Livewire::actingAs($this->admin)
+            ->test(CreatePatient::class)
+            ->fillForm([
+                'last_name'     => 'Doe',
+                'first_name'    => 'Jane',
+                'date_of_birth' => '1995-05-05',
+                'gender'        => 'female',
+                'address'       => '123 Main St',
+                'phone'         => '09171234567',
+                'consent_agreed' => true,
+            ])
+            ->call('createAnother')
+            ->assertHasNoFormErrors()
+            ->assertDispatched('patient-wizard-reset');
+
+        $this->assertSame(1, Patient::count());
     }
 }
