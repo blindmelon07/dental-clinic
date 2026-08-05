@@ -18,6 +18,29 @@ class InvoiceTest extends TestCase
         $this->assertMatchesRegularExpression('/^INV-\d{8}-\d{4}$/', $number);
     }
 
+    public function test_generate_number_skips_numbers_used_by_soft_deleted_invoices(): void
+    {
+        $prefix = 'INV-' . date('Ymd') . '-';
+
+        $invoice = Invoice::factory()->create(['invoice_number' => $prefix . '0001']);
+        $invoice->delete();
+
+        // Counting non-trashed rows would see zero invoices today and reissue 0001,
+        // colliding with the soft-deleted row's still-unique invoice_number.
+        $this->assertSame($prefix . '0002', Invoice::generateNumber());
+    }
+
+    public function test_create_unique_assigns_a_fresh_generated_number(): void
+    {
+        $attributes = Invoice::factory()->raw();
+        unset($attributes['invoice_number']);
+
+        $invoice = Invoice::createUnique($attributes);
+
+        $this->assertMatchesRegularExpression('/^INV-\d{8}-\d{4}$/', $invoice->invoice_number);
+        $this->assertTrue($invoice->exists);
+    }
+
     public function test_recalculate_updates_totals_from_items(): void
     {
         $invoice = Invoice::factory()->create([

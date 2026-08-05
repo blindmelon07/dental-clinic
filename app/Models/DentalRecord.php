@@ -105,8 +105,7 @@ class DentalRecord extends Model
             throw new RuntimeException('No active services match this diagnosis — cannot generate an invoice.');
         }
 
-        $invoice = Invoice::create([
-            'invoice_number'   => Invoice::generateNumber(),
+        $invoice = Invoice::createUnique([
             'clinic_id'        => $this->patient->clinic_id,
             'patient_id'       => $this->patient_id,
             'appointment_id'   => $this->appointment_id,
