@@ -105,7 +105,7 @@ class DentalRecord extends Model
             throw new RuntimeException('No active services match this diagnosis — cannot generate an invoice.');
         }
 
-        $invoice = Invoice::createUnique([
+        $attributes = [
             'clinic_id'        => $this->patient->clinic_id,
             'patient_id'       => $this->patient_id,
             'appointment_id'   => $this->appointment_id,
@@ -115,7 +115,24 @@ class DentalRecord extends Model
             'due_date'         => today()->addDays(7),
             'discount_amount'  => $this->discount ?? 0,
             'notes'            => 'Generated from dental record visit on ' . $this->visit_date->format('M d, Y') . '.',
-        ]);
+        ];
+
+        // dental_record_id is unique on invoices even across soft-deleted rows, so a
+        // previously-deleted invoice for this record still occupies the slot. Restore
+        // and reuse it instead of inserting a new row, which would violate that
+        // constraint.
+        $existing = Invoice::withTrashed()->where('dental_record_id', $this->id)->first();
+
+        if ($existing?->trashed()) {
+            $existing->restore();
+            $existing->items()->delete();
+            $existing->update(array_merge($attributes, ['invoice_number' => Invoice::generateNumber()]));
+            $invoice = $existing;
+        } elseif ($existing) {
+            throw new RuntimeException('An invoice already exists for this dental record.');
+        } else {
+            $invoice = Invoice::createUnique($attributes);
+        }
 
         foreach ($services as $service) {
             $invoice->items()->create([
