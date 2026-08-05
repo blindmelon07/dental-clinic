@@ -219,7 +219,8 @@
       "Bash(sort -t\"'\" -k2)",
       "Bash(grep -v \"vendor\\\\|App\\\\\\\\\\\\\\\\Models\\\\\\\\\\\\\\\\AppointmentType\\\\b\")",
       "Bash(php -l app/Filament/Resources/PatientResource/RelationManagers/DentalRecordsRelationManager.php)",
-      "Bash(php -l app/Filament/Resources/PatientResource/RelationManagers/InvoicesRelationManager.php)"
+      "Bash(php -l app/Filament/Resources/PatientResource/RelationManagers/InvoicesRelationManager.php)",
+      "Bash(xargs grep -l \"imask\\\\|IMask\")"
     ]
   }
 }

@@ -288,7 +288,9 @@ class PatientResource extends Resource
                                         ->required()
                                         ->tel()
                                         ->label('Cell / Mobile No.')
-                                        ->placeholder('09171234567')
+                                        ->placeholder('0917 123 4567')
+                                        ->mask('9999 999 9999')
+                                        ->stripCharacters(' ')
                                         ->rule('regex:/^[0-9+\s]{7,20}$/'),
                                     TextInput::make('email')->email()->label('Email Address'),
                                 ])->columns(['default' => 1, 'md' => 2, 'lg' => 3]),
@@ -662,7 +664,7 @@ class PatientResource extends Resource
             ->columns([
                 TextColumn::make('patient_number')->searchable()->sortable()->copyable(),
                 TextColumn::make('full_name')->searchable(['first_name', 'last_name'])->sortable(),
-                TextColumn::make('phone')->searchable(),
+                TextColumn::make('formatted_phone')->label('Phone')->searchable(query: fn (Builder $query, string $search): Builder => $query->where('phone', 'like', "%{$search}%")),
                 TextColumn::make('gender')->badge(),
                 TextColumn::make('date_of_birth')->date()->sortable(),
                 TextColumn::make('age')

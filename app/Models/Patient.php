@@ -115,4 +115,24 @@ class Patient extends Model
     {
         return $this->date_of_birth->age;
     }
+
+    /**
+     * Mobile number grouped for readability, e.g. "09673880454" -> "0967 388 0454".
+     * Falls back to the raw value for numbers that aren't the standard 11-digit
+     * PH mobile format (landlines, partial entries, etc).
+     */
+    public function getFormattedPhoneAttribute(): ?string
+    {
+        if (blank($this->phone)) {
+            return $this->phone;
+        }
+
+        $digits = preg_replace('/\D/', '', $this->phone);
+
+        if (strlen($digits) !== 11) {
+            return $this->phone;
+        }
+
+        return substr($digits, 0, 4) . ' ' . substr($digits, 4, 3) . ' ' . substr($digits, 7);
+    }
 }
