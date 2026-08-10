@@ -11,6 +11,8 @@
         'RF' => ['label' => 'Root Fragment', 'color' => '#92400e', 'group' => 'Condition'],
         'MO' => ['label' => 'Missing due to Other Causes', 'color' => '#78716c', 'group' => 'Condition'],
         'Im' => ['label' => 'Impacted Tooth', 'color' => '#a855f7', 'group' => 'Condition'],
+        'AN' => ['label' => 'Anodontia', 'color' => '#57534e', 'group' => 'Condition'],
+        'PT' => ['label' => 'Peg Tooth', 'color' => '#ca8a04', 'group' => 'Condition'],
 
         'J'  => ['label' => 'Jacket Crown', 'color' => '#f59e0b', 'group' => 'Restoration & Prosthetics'],
         'A'  => ['label' => 'Amalgam Filling', 'color' => '#64748b', 'group' => 'Restoration & Prosthetics'],
@@ -19,6 +21,7 @@
         'In' => ['label' => 'Inlay', 'color' => '#6366f1', 'group' => 'Restoration & Prosthetics'],
         'FX' => ['label' => 'Fixed Cure Composite', 'color' => '#ec4899', 'group' => 'Restoration & Prosthetics'],
         'Rm' => ['label' => 'Removable Denture', 'color' => '#84cc16', 'group' => 'Restoration & Prosthetics'],
+        'RCT' => ['label' => 'Root Canal Treatment (RCT)', 'color' => '#0ea5e9', 'group' => 'Restoration & Prosthetics'],
 
         'X'  => ['label' => 'Extraction due to Caries', 'color' => '#dc2626', 'group' => 'Surgery'],
         'XO' => ['label' => 'Extraction due to Other Causes', 'color' => '#7f1d1d', 'group' => 'Surgery'],
