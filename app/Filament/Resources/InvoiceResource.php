@@ -22,8 +22,10 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class InvoiceResource extends Resource
 {
@@ -220,7 +222,16 @@ class InvoiceResource extends Resource
                 TextColumn::make('status')->badge()->sortable()
                     ->color(fn (InvoiceStatus $state): string => $state->color()),
             ])
-            ->filters([SelectFilter::make('status')->options(InvoiceStatus::class)])
+            ->filters([
+                SelectFilter::make('status')->options(InvoiceStatus::class),
+
+                Filter::make('outstanding')
+                    ->label('Outstanding Balance')
+                    ->toggle()
+                    ->query(fn (Builder $query): Builder => $query
+                        ->whereNotIn('status', [InvoiceStatus::Paid, InvoiceStatus::Cancelled])
+                        ->where('balance_due', '>', 0)),
+            ])
             ->recordActions([ViewAction::make(), EditAction::make()])
             ->defaultSort('invoice_date', 'desc');
     }

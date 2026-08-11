@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Enums\InvoiceStatus;
+use App\Filament\Resources\InvoiceResource;
 use App\Models\Invoice;
 use App\Models\Payment;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
@@ -20,6 +21,9 @@ class BillingStatsWidget extends BaseWidget
 
         $yesterdayIncome = Payment::whereDate('paid_at', today()->subDay())->sum('amount');
 
+        $weekIncome = Payment::whereBetween('paid_at', [now()->startOfWeek(), now()->endOfWeek()])
+            ->sum('amount');
+
         $monthRevenue = Payment::whereMonth('paid_at', now()->month)
             ->whereYear('paid_at', now()->year)
             ->sum('amount');
@@ -33,6 +37,14 @@ class BillingStatsWidget extends BaseWidget
                 InvoiceStatus::Cancelled,
             ])
             ->sum('balance_due');
+
+        $outstandingPatients = Invoice::whereNotIn('status', [
+                InvoiceStatus::Paid,
+                InvoiceStatus::Cancelled,
+            ])
+            ->where('balance_due', '>', 0)
+            ->distinct('patient_id')
+            ->count('patient_id');
 
         $paidThisMonth = Invoice::where('status', InvoiceStatus::Paid)
             ->whereMonth('paid_at', now()->month)
@@ -61,6 +73,16 @@ class BillingStatsWidget extends BaseWidget
                 ->icon('heroicon-o-currency-dollar')
                 ->color($todayIncome > 0 ? 'success' : 'gray'),
 
+            Stat::make('Yesterday Income', '₱' . number_format($yesterdayIncome, 2))
+                ->description('Collected ' . today()->subDay()->format('M d, Y'))
+                ->icon('heroicon-o-currency-dollar')
+                ->color($yesterdayIncome > 0 ? 'success' : 'gray'),
+
+            Stat::make('Weekly Income', '₱' . number_format($weekIncome, 2))
+                ->description(now()->startOfWeek()->format('M d') . ' – ' . now()->endOfWeek()->format('M d'))
+                ->icon('heroicon-o-currency-dollar')
+                ->color($weekIncome > 0 ? 'success' : 'gray'),
+
             Stat::make('Monthly Revenue', '₱' . number_format($monthRevenue, 2))
                 ->description($trendDesc)
                 ->icon('heroicon-o-banknotes')
@@ -70,6 +92,14 @@ class BillingStatsWidget extends BaseWidget
                 ->description('Unpaid & partially paid invoices')
                 ->icon('heroicon-o-exclamation-circle')
                 ->color($outstanding > 0 ? 'warning' : 'success'),
+
+            Stat::make('Patients with Outstanding Balance', $outstandingPatients)
+                ->description('Distinct patients owing a balance')
+                ->icon('heroicon-o-user-group')
+                ->color($outstandingPatients > 0 ? 'warning' : 'success')
+                ->url(InvoiceResource::getUrl('index', [
+                    'tableFilters' => ['outstanding' => ['isActive' => true]],
+                ])),
 
             Stat::make('Fully Paid This Month', $paidThisMonth)
                 ->description('Invoices settled in ' . now()->format('F'))
