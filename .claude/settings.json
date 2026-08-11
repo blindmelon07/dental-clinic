@@ -221,7 +221,8 @@
       "Bash(php -l app/Filament/Resources/PatientResource/RelationManagers/DentalRecordsRelationManager.php)",
       "Bash(php -l app/Filament/Resources/PatientResource/RelationManagers/InvoicesRelationManager.php)",
       "Bash(xargs grep -l \"imask\\\\|IMask\")",
-      "Bash(xargs grep -l \"Service\")"
+      "Bash(xargs grep -l \"Service\")",
+      "Bash(grep -i 'url\\\\|public $tableFilters\\\\|protected $tableFilters')"
     ]
   }
 }

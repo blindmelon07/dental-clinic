@@ -4,6 +4,7 @@ namespace App\Filament\Widgets;
 
 use App\Enums\InvoiceStatus;
 use App\Filament\Resources\InvoiceResource;
+use App\Filament\Resources\PaymentResource;
 use App\Models\Invoice;
 use App\Models\Payment;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
@@ -71,29 +72,33 @@ class BillingStatsWidget extends BaseWidget
             Stat::make('Daily Income', '₱' . number_format($todayIncome, 2))
                 ->description($dailyTrendDesc)
                 ->icon('heroicon-o-currency-dollar')
-                ->color($todayIncome > 0 ? 'success' : 'gray'),
+                ->color($todayIncome > 0 ? 'success' : 'gray')
+                ->url(self::paymentsUrl(today(), today())),
 
             Stat::make('Yesterday Income', '₱' . number_format($yesterdayIncome, 2))
                 ->description('Collected ' . today()->subDay()->format('M d, Y'))
                 ->icon('heroicon-o-currency-dollar')
-                ->color($yesterdayIncome > 0 ? 'success' : 'gray'),
+                ->color($yesterdayIncome > 0 ? 'success' : 'gray')
+                ->url(self::paymentsUrl(today()->subDay(), today()->subDay())),
 
             Stat::make('Weekly Income', '₱' . number_format($weekIncome, 2))
                 ->description(now()->startOfWeek()->format('M d') . ' – ' . now()->endOfWeek()->format('M d'))
                 ->icon('heroicon-o-currency-dollar')
-                ->color($weekIncome > 0 ? 'success' : 'gray'),
+                ->color($weekIncome > 0 ? 'success' : 'gray')
+                ->url(self::paymentsUrl(now()->startOfWeek(), now()->endOfWeek())),
 
             Stat::make('Monthly Revenue', '₱' . number_format($monthRevenue, 2))
                 ->description($trendDesc)
                 ->icon('heroicon-o-banknotes')
-                ->color($trend >= 0 ? 'success' : 'danger'),
+                ->color($trend >= 0 ? 'success' : 'danger')
+                ->url(self::paymentsUrl(now()->startOfMonth(), now()->endOfMonth())),
 
             Stat::make('Outstanding Balance', '₱' . number_format($outstanding, 2))
                 ->description('Unpaid & partially paid invoices')
                 ->icon('heroicon-o-exclamation-circle')
                 ->color($outstanding > 0 ? 'warning' : 'success')
                 ->url(InvoiceResource::getUrl('index', [
-                    'tableFilters' => ['outstanding' => ['isActive' => true]],
+                    'filters' => ['outstanding' => ['isActive' => true]],
                 ])),
 
             Stat::make('Patients with Outstanding Balance', $outstandingPatients)
@@ -101,26 +106,44 @@ class BillingStatsWidget extends BaseWidget
                 ->icon('heroicon-o-user-group')
                 ->color($outstandingPatients > 0 ? 'warning' : 'success')
                 ->url(InvoiceResource::getUrl('index', [
-                    'tableFilters' => ['outstanding' => ['isActive' => true]],
+                    'filters' => ['outstanding' => ['isActive' => true]],
                 ])),
 
             Stat::make('Fully Paid This Month', $paidThisMonth)
                 ->description('Invoices settled in ' . now()->format('F'))
                 ->icon('heroicon-o-check-badge')
-                ->color('success'),
+                ->color('success')
+                ->url(InvoiceResource::getUrl('index', [
+                    'filters' => ['status' => ['value' => InvoiceStatus::Paid->value]],
+                ])),
 
             Stat::make('Overdue Invoices', $overdueCount)
                 ->description('Past due date with balance')
                 ->icon('heroicon-o-clock')
-                ->color($overdueCount > 0 ? 'danger' : 'success'),
+                ->color($overdueCount > 0 ? 'danger' : 'success')
+                ->url(InvoiceResource::getUrl('index', [
+                    'filters' => ['status' => ['value' => InvoiceStatus::Overdue->value]],
+                ])),
 
             Stat::make('Partial Payments', $partialCount)
                 ->description('Invoices with remaining balance')
                 ->icon('heroicon-o-currency-dollar')
                 ->color($partialCount > 0 ? 'warning' : 'success')
                 ->url(InvoiceResource::getUrl('index', [
-                    'tableFilters' => ['status' => ['value' => InvoiceStatus::PartiallyPaid->value]],
+                    'filters' => ['status' => ['value' => InvoiceStatus::PartiallyPaid->value]],
                 ])),
         ];
+    }
+
+    protected static function paymentsUrl(\Carbon\Carbon $from, \Carbon\Carbon $until): string
+    {
+        return PaymentResource::getUrl('index', [
+            'filters' => [
+                'paid_at' => [
+                    'from'  => $from->toDateString(),
+                    'until' => $until->toDateString(),
+                ],
+            ],
+        ]);
     }
 }

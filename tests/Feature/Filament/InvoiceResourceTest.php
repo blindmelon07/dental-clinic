@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\Filament;
 
+use App\Enums\InvoiceStatus;
 use App\Enums\PaymentMethod;
+use App\Filament\Resources\InvoiceResource;
 use App\Filament\Resources\InvoiceResource\Pages\CreateInvoice;
 use App\Filament\Resources\InvoiceResource\Pages\EditInvoice;
 use App\Models\Invoice;
@@ -115,5 +117,23 @@ class InvoiceResourceTest extends TestCase
 
         // Invoice uses SoftDeletes: the row still exists with deleted_at set.
         $this->assertSoftDeleted($invoice);
+    }
+
+    public function test_the_outstanding_stat_card_url_actually_filters_the_list(): void
+    {
+        // Regression test: Filament's ListRecords page binds $tableFilters to the URL
+        // query key "filters" (#[Url(as: 'filters')]), not "tableFilters" — using the
+        // wrong key silently opened the list unfiltered. Visit the exact URL the
+        // BillingStatsWidget "Outstanding Balance" card links to and check it narrows.
+        $outstanding = Invoice::factory()->create(['status' => InvoiceStatus::PartiallyPaid, 'balance_due' => 500]);
+        $paid = Invoice::factory()->create(['status' => InvoiceStatus::Paid, 'balance_due' => 0]);
+
+        $url = InvoiceResource::getUrl('index', ['filters' => ['outstanding' => ['isActive' => true]]]);
+
+        $response = $this->actingAs($this->admin)->get($url);
+
+        $response->assertStatus(200);
+        $response->assertSee($outstanding->invoice_number);
+        $response->assertDontSee($paid->invoice_number);
     }
 }
