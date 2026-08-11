@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\Gender;
+use App\Filament\Resources\PatientResource;
 use App\Models\Clinic;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -27,8 +28,12 @@ class PatientFactory extends Factory
             'phone'          => fake()->phoneNumber(),
             'email'          => fake()->optional(0.7)->safeEmail(),
             'address'        => fake()->streetAddress(),
-            'city'           => fake()->city(),
+            // Must come from the resource's closed dropdown list, not an arbitrary
+            // fake city — the Edit form's city Select rejects any value outside it,
+            // which otherwise silently blocks re-saving a factory-made patient.
+            'city'           => fake()->randomElement(array_keys(PatientResource::cityOptions())),
             'is_active'      => true,
+            'consent_agreed' => true,
         ];
     }
 }

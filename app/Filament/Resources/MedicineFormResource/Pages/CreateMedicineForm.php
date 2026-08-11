@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\MedicineFormResource\Pages;
 
 use App\Filament\Resources\MedicineFormResource;
+use App\Models\MedicineForm;
 use Filament\Resources\Pages\CreateRecord;
-use Illuminate\Support\Str;
 
 class CreateMedicineForm extends CreateRecord
 {
@@ -12,7 +12,7 @@ class CreateMedicineForm extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $data['slug'] = Str::slug($data['name']);
+        $data['slug'] = MedicineForm::uniqueSlug($data['name']);
         return $data;
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\InvoiceStatus;
+use App\Enums\PaymentMethod;
 use App\Models\Concerns\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -17,7 +18,7 @@ class DentalRecord extends Model
 
     protected $fillable = [
         'patient_id', 'dentist_id', 'appointment_id', 'visit_date',
-        'chief_complaint', 'diagnosis', 'discount', 'treatment_plan', 'treatment_done',
+        'chief_complaint', 'diagnosis', 'discount', 'partial_payment', 'treatment_plan', 'treatment_done',
         'tooth_chart', 'prescription', 'notes', 'next_visit_recommendation',
     ];
 
@@ -26,6 +27,7 @@ class DentalRecord extends Model
         return [
             'visit_date' => 'date',
             'discount' => 'decimal:2',
+            'partial_payment' => 'decimal:2',
             'tooth_chart' => 'array',
         ];
     }
@@ -80,6 +82,11 @@ class DentalRecord extends Model
     public function getTotalAttribute(): float
     {
         return max(0, $this->subtotal - (float) ($this->discount ?? 0));
+    }
+
+    public function getBalanceDueAttribute(): float
+    {
+        return max(0, $this->total - (float) ($this->partial_payment ?? 0));
     }
 
     public function diagnosisNames(): array
@@ -145,6 +152,24 @@ class DentalRecord extends Model
         }
 
         $invoice->recalculate();
+
+        if ($this->partial_payment > 0 && $invoice->payments()->doesntExist()) {
+            $invoice->payments()->create([
+                'payment_number' => Payment::generateNumber(),
+                'patient_id'     => $this->patient_id,
+                'amount'         => min((float) $this->partial_payment, (float) $invoice->total),
+                'payment_method' => PaymentMethod::Cash,
+                'notes'          => 'Partial payment recorded at the time of the dental visit.',
+                'paid_at'        => now(),
+            ]);
+
+            $invoice->recalculate();
+
+            $invoice->update([
+                'status'  => $invoice->fresh()->balance_due <= 0 ? InvoiceStatus::Paid : InvoiceStatus::PartiallyPaid,
+                'paid_at' => $invoice->fresh()->balance_due <= 0 ? now() : null,
+            ]);
+        }
 
         return $invoice;
     }

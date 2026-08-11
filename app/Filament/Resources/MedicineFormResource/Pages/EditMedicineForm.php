@@ -3,9 +3,9 @@
 namespace App\Filament\Resources\MedicineFormResource\Pages;
 
 use App\Filament\Resources\MedicineFormResource;
+use App\Models\MedicineForm;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
-use Illuminate\Support\Str;
 
 class EditMedicineForm extends EditRecord
 {
@@ -18,7 +18,7 @@ class EditMedicineForm extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        $data['slug'] = Str::slug($data['name']);
+        $data['slug'] = MedicineForm::uniqueSlug($data['name'], $this->record->id);
         return $data;
     }
 }

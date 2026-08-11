@@ -15,6 +15,8 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -49,12 +51,27 @@ class RoleResource extends Resource
             ...collect($groups)->map(function (array $permissions, string $group) {
                 return Section::make($group)
                     ->schema([
-                        CheckboxList::make('permissions')
-                            ->relationship('permissions', 'name')
+                        // Every group used to share the single 'permissions' statePath, so only
+                        // the last-rendered group's option list was recognized as valid by
+                        // server-side validation — checking a box from any earlier group failed
+                        // with "The selected permissions is invalid." Each group now gets its
+                        // own field; CreateRole/EditRole merge them back into one list on save.
+                        CheckboxList::make(self::permissionFieldName($group))
+                            ->label('')
                             ->options(
                                 collect($permissions)
                                     ->mapWithKeys(fn ($p) => [$p->id => self::formatPermissionLabel($p->name)])
                             )
+                            ->afterStateHydrated(function (CheckboxList $component, ?Model $record) use ($permissions) {
+                                if (! $record) {
+                                    return;
+                                }
+
+                                $groupIds = collect($permissions)->pluck('id');
+                                $assignedIds = $record->permissions->pluck('id');
+
+                                $component->state($groupIds->intersect($assignedIds)->values()->all());
+                            })
                             ->columns(2)
                             ->gridDirection('row'),
                     ])
@@ -62,6 +79,36 @@ class RoleResource extends Resource
                     ->collapsed(false);
             })->values()->all(),
         ]);
+    }
+
+    /**
+     * Deterministic, unique form field name for a permission group's checkbox list.
+     */
+    public static function permissionFieldName(string $group): string
+    {
+        return 'permission_ids_' . Str::slug($group, '_');
+    }
+
+    /**
+     * Pull the selected permission ids out of every per-group checkbox list field
+     * in $data (see permissionFieldName()), removing those temp keys from $data
+     * along the way — Spatie's Role model has $guarded = [], so leaving them in
+     * would make Eloquent try to insert/update columns that don't exist.
+     */
+    public static function extractPermissionIds(array &$data): array
+    {
+        return collect(self::groupedPermissions())
+            ->keys()
+            ->flatMap(function (string $group) use (&$data) {
+                $field = self::permissionFieldName($group);
+                $ids = $data[$field] ?? [];
+                unset($data[$field]);
+
+                return $ids;
+            })
+            ->unique()
+            ->values()
+            ->all();
     }
 
     public static function infolist(Schema $schema): Schema

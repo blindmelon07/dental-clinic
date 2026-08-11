@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Filament;
 
+use App\Enums\InvoiceStatus;
 use App\Filament\Resources\DentalRecordResource\Pages\CreateDentalRecord;
 use App\Filament\Resources\DentalRecordResource\Pages\EditDentalRecord;
 use App\Models\DentalRecord;
@@ -99,5 +100,87 @@ class DentalRecordResourceTest extends TestCase
             ->assertDispatched('dental-record-tabs-reset');
 
         $this->assertSame(1, DentalRecord::count());
+    }
+
+    public function test_can_delete_a_dental_record(): void
+    {
+        $record = DentalRecord::factory()->create();
+
+        Livewire::actingAs($this->admin)
+            ->test(EditDentalRecord::class, ['record' => $record->getRouteKey()])
+            ->callAction('delete');
+
+        // DentalRecord uses SoftDeletes: the row still exists with deleted_at set.
+        $this->assertSoftDeleted($record);
+    }
+
+    public function test_can_set_a_partial_payment_when_creating(): void
+    {
+        $patient = Patient::factory()->create();
+        $dentist = Dentist::factory()->create();
+        $service = Service::factory()->create(['price' => 1000]);
+
+        Livewire::actingAs($this->admin)
+            ->test(CreateDentalRecord::class)
+            ->fillForm([
+                'patient_id'      => $patient->id,
+                'dentist_id'      => $dentist->id,
+                'diagnosis'       => [$service->display_name],
+                'partial_payment' => 400,
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertEquals(400, DentalRecord::first()->partial_payment);
+        $this->assertEquals(600, DentalRecord::first()->balance_due);
+    }
+
+    public function test_partial_payment_cannot_exceed_the_total(): void
+    {
+        $patient = Patient::factory()->create();
+        $dentist = Dentist::factory()->create();
+        $service = Service::factory()->create(['price' => 1000]);
+
+        Livewire::actingAs($this->admin)
+            ->test(CreateDentalRecord::class)
+            ->fillForm([
+                'patient_id'      => $patient->id,
+                'dentist_id'      => $dentist->id,
+                'diagnosis'       => [$service->display_name],
+                'partial_payment' => 1500,
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['partial_payment']);
+    }
+
+    public function test_generating_an_invoice_carries_the_partial_payment_over_as_a_recorded_payment(): void
+    {
+        $service = Service::factory()->create(['price' => 1000]);
+        $record = DentalRecord::factory()->create([
+            'diagnosis'       => $service->display_name,
+            'partial_payment' => 400,
+        ]);
+
+        $invoice = $record->createInvoice();
+
+        $this->assertEquals(400, $invoice->amount_paid);
+        $this->assertEquals(600, $invoice->balance_due);
+        $this->assertEquals(InvoiceStatus::PartiallyPaid, $invoice->status);
+        $this->assertDatabaseHas('payments', ['invoice_id' => $invoice->id, 'amount' => 400]);
+    }
+
+    public function test_generating_an_invoice_with_a_full_partial_payment_marks_it_paid(): void
+    {
+        $service = Service::factory()->create(['price' => 1000]);
+        $record = DentalRecord::factory()->create([
+            'diagnosis'       => $service->display_name,
+            'partial_payment' => 1000,
+        ]);
+
+        $invoice = $record->createInvoice();
+
+        $this->assertEquals(0, $invoice->balance_due);
+        $this->assertEquals(InvoiceStatus::Paid, $invoice->status);
+        $this->assertNotNull($invoice->paid_at);
     }
 }

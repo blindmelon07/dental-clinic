@@ -3,9 +3,15 @@
 namespace Tests\Feature\Filament;
 
 use App\Enums\AppointmentStatus;
+use App\Filament\Resources\AppointmentResource\Pages\CreateAppointment;
+use App\Filament\Resources\AppointmentResource\Pages\EditAppointment;
 use App\Models\Appointment;
+use App\Models\Dentist;
+use App\Models\Patient;
+use App\Models\Service;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class AppointmentResourceTest extends TestCase
@@ -75,5 +81,54 @@ class AppointmentResourceTest extends TestCase
             'cancellation_reason' => 'Patient request',
         ]);
         $this->assertNotNull($appointment->fresh()->cancelled_at);
+    }
+
+    public function test_can_create_an_appointment(): void
+    {
+        $patient = Patient::factory()->create();
+        $dentist = Dentist::factory()->create();
+        $service = Service::factory()->create();
+
+        Livewire::actingAs($this->admin)
+            ->test(CreateAppointment::class)
+            ->fillForm([
+                'patient_id'       => $patient->id,
+                'dentist_id'       => $dentist->id,
+                'service_id'       => $service->id,
+                'type'             => 'Consultation',
+                'appointment_date' => today()->addDay()->format('Y-m-d'),
+                'start_time'       => '09:00',
+                'end_time'         => '09:30',
+                'status'           => AppointmentStatus::Pending->value,
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('appointments', ['patient_id' => $patient->id, 'dentist_id' => $dentist->id]);
+    }
+
+    public function test_can_edit_an_appointment(): void
+    {
+        $appointment = Appointment::factory()->create(['chief_complaint' => 'Toothache']);
+
+        Livewire::actingAs($this->admin)
+            ->test(EditAppointment::class, ['record' => $appointment->getRouteKey()])
+            ->fillForm(['chief_complaint' => 'Follow-up checkup'])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame('Follow-up checkup', $appointment->fresh()->chief_complaint);
+    }
+
+    public function test_can_delete_an_appointment(): void
+    {
+        $appointment = Appointment::factory()->create();
+
+        Livewire::actingAs($this->admin)
+            ->test(EditAppointment::class, ['record' => $appointment->getRouteKey()])
+            ->callAction('delete');
+
+        // Appointment uses SoftDeletes: the row still exists with deleted_at set.
+        $this->assertSoftDeleted($appointment);
     }
 }

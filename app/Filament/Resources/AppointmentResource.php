@@ -89,7 +89,11 @@ class AppointmentResource extends Resource
 
                     DatePicker::make('appointment_date')
                         ->required()
-                        ->minDate(today()),
+                        // Only block past dates when booking a *new* appointment. Applying this
+                        // unconditionally also ran on edit, which meant any appointment whose date
+                        // had already passed (i.e. almost every completed/cancelled one) could never
+                        // be saved again — even just to fix a typo in the notes.
+                        ->minDate(fn (string $operation) => $operation === 'create' ? today() : null),
 
                     TimePicker::make('start_time')
                         ->required()

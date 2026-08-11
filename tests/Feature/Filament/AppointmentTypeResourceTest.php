@@ -3,11 +3,14 @@
 namespace Tests\Feature\Filament;
 
 use App\Enums\AppointmentStatus;
+use App\Filament\Resources\AppointmentTypeResource\Pages\CreateAppointmentType;
+use App\Filament\Resources\AppointmentTypeResource\Pages\EditAppointmentType;
 use App\Models\Appointment;
 use App\Models\AppointmentType;
 use App\Models\Patient;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class AppointmentTypeResourceTest extends TestCase
@@ -69,5 +72,40 @@ class AppointmentTypeResourceTest extends TestCase
         $appointment->update(['status' => AppointmentStatus::Completed->value]);
 
         $this->assertNotNull($patient->refresh()->next_cleaning_due);
+    }
+
+    public function test_can_create_an_appointment_type(): void
+    {
+        Livewire::actingAs($this->admin)
+            ->test(CreateAppointmentType::class)
+            ->fillForm(['name' => 'Whitening'])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('appointment_types', ['name' => 'Whitening']);
+    }
+
+    public function test_can_edit_an_appointment_type(): void
+    {
+        $type = AppointmentType::where('name', 'Procedure')->first();
+
+        Livewire::actingAs($this->admin)
+            ->test(EditAppointmentType::class, ['record' => $type->getRouteKey()])
+            ->fillForm(['is_active' => false])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertFalse($type->fresh()->is_active);
+    }
+
+    public function test_can_delete_an_appointment_type(): void
+    {
+        $type = AppointmentType::create(['name' => 'Throwaway']);
+
+        Livewire::actingAs($this->admin)
+            ->test(EditAppointmentType::class, ['record' => $type->getRouteKey()])
+            ->callAction('delete');
+
+        $this->assertModelMissing($type);
     }
 }

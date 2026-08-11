@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\MedicineCategoryResource\Pages;
 
 use App\Filament\Resources\MedicineCategoryResource;
+use App\Models\MedicineCategory;
 use Filament\Resources\Pages\CreateRecord;
-use Illuminate\Support\Str;
 
 class CreateMedicineCategory extends CreateRecord
 {
@@ -12,7 +12,7 @@ class CreateMedicineCategory extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $data['slug'] = Str::slug($data['name']);
+        $data['slug'] = MedicineCategory::uniqueSlug($data['name']);
         return $data;
     }
 }

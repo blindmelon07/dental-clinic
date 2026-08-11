@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\ServiceCategoryResource\Pages;
 
 use App\Filament\Resources\ServiceCategoryResource;
+use App\Models\ServiceCategory;
 use Filament\Resources\Pages\CreateRecord;
-use Illuminate\Support\Str;
 
 class CreateServiceCategory extends CreateRecord
 {
@@ -12,7 +12,7 @@ class CreateServiceCategory extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $data['slug'] = Str::slug($data['name']);
+        $data['slug'] = ServiceCategory::uniqueSlug($data['name']);
         return $data;
     }
 }

@@ -2,10 +2,13 @@
 
 namespace Tests\Feature\Filament;
 
+use App\Filament\Resources\MedicineCategoryResource\Pages\CreateMedicineCategory;
+use App\Filament\Resources\MedicineCategoryResource\Pages\EditMedicineCategory;
 use App\Models\Medicine;
 use App\Models\MedicineCategory;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class MedicineCategoryResourceTest extends TestCase
@@ -52,5 +55,52 @@ class MedicineCategoryResourceTest extends TestCase
         $response = $this->actingAs($this->admin)->get('/admin/medicines');
         $response->assertStatus(200);
         $response->assertSee('Antibiotic', false);
+    }
+
+    public function test_can_create_a_medicine_category(): void
+    {
+        Livewire::actingAs($this->admin)
+            ->test(CreateMedicineCategory::class)
+            ->fillForm(['name' => 'Decongestant'])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('medicine_categories', ['name' => 'Decongestant', 'slug' => 'decongestant']);
+    }
+
+    public function test_creating_a_category_matching_a_seeded_slug_does_not_error(): void
+    {
+        // The migration pre-seeds an 'Other' row with slug 'other'.
+        Livewire::actingAs($this->admin)
+            ->test(CreateMedicineCategory::class)
+            ->fillForm(['name' => 'Other'])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('medicine_categories', ['name' => 'Other', 'slug' => 'other-2']);
+    }
+
+    public function test_can_edit_a_medicine_category(): void
+    {
+        $category = MedicineCategory::factory()->create(['name' => 'Old Name']);
+
+        Livewire::actingAs($this->admin)
+            ->test(EditMedicineCategory::class, ['record' => $category->getRouteKey()])
+            ->fillForm(['name' => 'New Name'])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame('new-name', $category->fresh()->slug);
+    }
+
+    public function test_can_delete_a_medicine_category(): void
+    {
+        $category = MedicineCategory::factory()->create();
+
+        Livewire::actingAs($this->admin)
+            ->test(EditMedicineCategory::class, ['record' => $category->getRouteKey()])
+            ->callAction('delete');
+
+        $this->assertModelMissing($category);
     }
 }

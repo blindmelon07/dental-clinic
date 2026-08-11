@@ -129,6 +129,8 @@ class DentalRecordResource extends Resource
                 static::diagnosisSelect(),
                 static::discountInput(),
                 static::diagnosisTotalPlaceholder(),
+                static::partialPaymentInput(),
+                static::balanceDuePlaceholder(),
                 Textarea::make('treatment_plan')->rows(4),
                 Textarea::make('treatment_done')->rows(4),
             ])
@@ -207,6 +209,38 @@ class DentalRecordResource extends Resource
                 $total = max(0, $subtotal - (float) ($get('discount') ?? 0));
 
                 return '₱' . number_format($total, 2);
+            });
+    }
+
+    protected static function partialPaymentInput(): TextInput
+    {
+        return TextInput::make('partial_payment')
+            ->label('Partial Payment')
+            ->helperText('Amount already collected from the patient for this visit, if any.')
+            ->numeric()
+            ->minValue(0)
+            ->default(0)
+            ->prefix('₱')
+            ->live()
+            ->rule(fn (Get $get) => "max:" . max(0, Service::totalForDisplayNames(
+                is_array($get('diagnosis')) ? $get('diagnosis') : []
+            ) - (float) ($get('discount') ?? 0)))
+            ->validationMessages([
+                'max' => 'Partial payment cannot exceed the total.',
+            ]);
+    }
+
+    protected static function balanceDuePlaceholder(): Placeholder
+    {
+        return Placeholder::make('balance_due')
+            ->label('Balance Due')
+            ->content(function (Get $get) {
+                $selected = $get('diagnosis');
+                $subtotal = Service::totalForDisplayNames(is_array($selected) ? $selected : []);
+                $total = max(0, $subtotal - (float) ($get('discount') ?? 0));
+                $balance = max(0, $total - (float) ($get('partial_payment') ?? 0));
+
+                return '₱' . number_format($balance, 2);
             });
     }
 
@@ -296,7 +330,11 @@ class DentalRecordResource extends Resource
                     TextEntry::make('diagnosis')->columnSpanFull(),
                     TextEntry::make('subtotal')->label('Subtotal')->money('PHP'),
                     TextEntry::make('discount')->label('Discount')->money('PHP'),
-                    TextEntry::make('total')->label('Total')->money('PHP')->weight('bold')->columnSpanFull(),
+                    TextEntry::make('total')->label('Total')->money('PHP')->weight('bold'),
+                    TextEntry::make('partial_payment')->label('Partial Payment')->money('PHP')->placeholder('—'),
+                    TextEntry::make('balance_due')->label('Balance Due')->money('PHP')->weight('bold')
+                        ->color(fn (DentalRecord $record) => $record->balance_due > 0 ? 'danger' : 'success')
+                        ->columnSpanFull(),
                     TextEntry::make('treatment_plan')->label('Treatment Plan')->placeholder('—'),
                     TextEntry::make('treatment_done')->label('Treatment Done')->placeholder('—'),
                 ])->columns(2)->columnSpanFull(),

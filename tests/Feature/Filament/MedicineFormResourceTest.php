@@ -2,9 +2,12 @@
 
 namespace Tests\Feature\Filament;
 
+use App\Filament\Resources\MedicineFormResource\Pages\CreateMedicineForm;
+use App\Filament\Resources\MedicineFormResource\Pages\EditMedicineForm;
 use App\Models\MedicineForm;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class MedicineFormResourceTest extends TestCase
@@ -46,5 +49,52 @@ class MedicineFormResourceTest extends TestCase
         $response = $this->actingAs($this->admin)->get('/admin/medicines/create');
         $response->assertStatus(200);
         $response->assertDontSee('createOption', false);
+    }
+
+    public function test_can_create_a_medicine_form(): void
+    {
+        Livewire::actingAs($this->admin)
+            ->test(CreateMedicineForm::class)
+            ->fillForm(['name' => 'Lozenge'])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('medicine_forms', ['name' => 'Lozenge', 'slug' => 'lozenge']);
+    }
+
+    public function test_creating_a_form_matching_a_seeded_slug_does_not_error(): void
+    {
+        // The migration pre-seeds a 'Tablet' row with slug 'tablet'.
+        Livewire::actingAs($this->admin)
+            ->test(CreateMedicineForm::class)
+            ->fillForm(['name' => 'Tablet'])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('medicine_forms', ['name' => 'Tablet', 'slug' => 'tablet-2']);
+    }
+
+    public function test_can_edit_a_medicine_form(): void
+    {
+        $form = MedicineForm::where('slug', 'other')->first();
+
+        Livewire::actingAs($this->admin)
+            ->test(EditMedicineForm::class, ['record' => $form->getRouteKey()])
+            ->fillForm(['name' => 'Miscellaneous'])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame('miscellaneous', $form->fresh()->slug);
+    }
+
+    public function test_can_delete_a_medicine_form(): void
+    {
+        $form = MedicineForm::create(['name' => 'Throwaway', 'slug' => 'throwaway']);
+
+        Livewire::actingAs($this->admin)
+            ->test(EditMedicineForm::class, ['record' => $form->getRouteKey()])
+            ->callAction('delete');
+
+        $this->assertModelMissing($form);
     }
 }

@@ -3,6 +3,7 @@
 namespace Tests\Feature\Filament;
 
 use App\Filament\Resources\PatientResource\Pages\CreatePatient;
+use App\Filament\Resources\PatientResource\Pages\EditPatient;
 use App\Filament\Resources\PatientResource\Pages\ViewPatient;
 use App\Filament\Resources\PatientResource\RelationManagers\AppointmentsRelationManager;
 use App\Filament\Resources\PatientResource\RelationManagers\DentalRecordsRelationManager;
@@ -130,5 +131,30 @@ class PatientResourceTest extends TestCase
             ->assertDispatched('patient-wizard-reset');
 
         $this->assertSame(1, Patient::count());
+    }
+
+    public function test_can_edit_a_patient(): void
+    {
+        $patient = Patient::factory()->create(['phone' => '09170000000']);
+
+        Livewire::actingAs($this->admin)
+            ->test(EditPatient::class, ['record' => $patient->getRouteKey()])
+            ->fillForm(['phone' => '09171111111'])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame('09171111111', $patient->fresh()->phone);
+    }
+
+    public function test_can_delete_a_patient(): void
+    {
+        $patient = Patient::factory()->create();
+
+        Livewire::actingAs($this->admin)
+            ->test(EditPatient::class, ['record' => $patient->getRouteKey()])
+            ->callAction('delete');
+
+        // Patient uses SoftDeletes: the row still exists with deleted_at set.
+        $this->assertSoftDeleted($patient);
     }
 }
