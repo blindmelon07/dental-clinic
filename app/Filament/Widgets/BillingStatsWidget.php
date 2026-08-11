@@ -91,7 +91,10 @@ class BillingStatsWidget extends BaseWidget
             Stat::make('Outstanding Balance', '₱' . number_format($outstanding, 2))
                 ->description('Unpaid & partially paid invoices')
                 ->icon('heroicon-o-exclamation-circle')
-                ->color($outstanding > 0 ? 'warning' : 'success'),
+                ->color($outstanding > 0 ? 'warning' : 'success')
+                ->url(InvoiceResource::getUrl('index', [
+                    'tableFilters' => ['outstanding' => ['isActive' => true]],
+                ])),
 
             Stat::make('Patients with Outstanding Balance', $outstandingPatients)
                 ->description('Distinct patients owing a balance')
@@ -114,7 +117,10 @@ class BillingStatsWidget extends BaseWidget
             Stat::make('Partial Payments', $partialCount)
                 ->description('Invoices with remaining balance')
                 ->icon('heroicon-o-currency-dollar')
-                ->color($partialCount > 0 ? 'warning' : 'success'),
+                ->color($partialCount > 0 ? 'warning' : 'success')
+                ->url(InvoiceResource::getUrl('index', [
+                    'tableFilters' => ['status' => ['value' => InvoiceStatus::PartiallyPaid->value]],
+                ])),
         ];
     }
 }
