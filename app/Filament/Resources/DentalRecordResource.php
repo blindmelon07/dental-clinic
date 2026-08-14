@@ -3,9 +3,11 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\DentalRecordResource\Pages;
+use App\Filament\Resources\DentalRecordResource\RelationManagers;
 use App\Models\DentalRecord;
 use App\Models\Dentist;
 use App\Models\Patient;
+use App\Models\PaymentPlan;
 use App\Models\Service;
 use App\Models\XrayType;
 use Filament\Actions\EditAction;
@@ -17,6 +19,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\ViewField;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\RepeatableEntry;
@@ -131,11 +134,92 @@ class DentalRecordResource extends Resource
                 static::diagnosisTotalPlaceholder(),
                 static::partialPaymentInput(),
                 static::balanceDuePlaceholder(),
+                static::installmentToggle(),
+                static::paymentPlanSection(),
                 Textarea::make('treatment_plan')->rows(4),
                 Textarea::make('treatment_done')->rows(4),
             ])
             ->columns(2)
             ->columnSpanFull();
+    }
+
+    protected static function installmentToggle(): Toggle
+    {
+        return Toggle::make('is_installment')
+            ->label('Installment Basis')
+            ->helperText('Split the balance due into a payment plan instead of collecting it in full.')
+            ->live()
+            ->dehydrated(false)
+            ->afterStateHydrated(function (Toggle $component, ?DentalRecord $record) {
+                $component->state((bool) $record?->paymentPlan()->exists());
+            })
+            ->columnSpanFull();
+    }
+
+    protected static function paymentPlanSection(): Section
+    {
+        return Section::make('Payment Plan')
+            ->icon('heroicon-o-calendar-date-range')
+            ->description('Turning this off after a plan exists deletes it and its unpaid installments.')
+            ->relationship('paymentPlan', condition: fn (Get $get) => (bool) $get('is_installment'))
+            ->visible(fn (Get $get) => (bool) $get('is_installment'))
+            ->schema([
+                TextInput::make('installment_count')
+                    ->label('Number of Installments')
+                    ->helperText(fn (Get $get) => 'Up to ' . PaymentPlan::maxInstallmentCount($get('frequency') ?? 'monthly') . ' — capped at ' . PaymentPlan::MAX_YEARS . ' years from the start date.')
+                    ->numeric()
+                    ->minValue(2)
+                    ->maxValue(fn (Get $get) => PaymentPlan::maxInstallmentCount($get('frequency') ?? 'monthly'))
+                    ->default(2)
+                    ->required()
+                    ->live()
+                    ->disabled(fn (?DentalRecord $record) => static::installmentScheduleLocked($record)),
+                Select::make('frequency')
+                    ->options(PaymentPlan::FREQUENCIES)
+                    ->default('monthly')
+                    ->required()
+                    ->live()
+                    ->disabled(fn (?DentalRecord $record) => static::installmentScheduleLocked($record)),
+                DatePicker::make('start_date')
+                    ->default(now()->addWeek()->toDateString())
+                    ->minDate(now())
+                    ->required()
+                    ->live()
+                    ->disabled(fn (?DentalRecord $record) => static::installmentScheduleLocked($record)),
+                Placeholder::make('schedule_preview')
+                    ->label('Schedule Preview')
+                    ->content(function (Get $get) {
+                        $subtotal = Service::totalForDisplayNames(
+                            is_array($get('diagnosis', isAbsolute: true)) ? $get('diagnosis', isAbsolute: true) : []
+                        );
+                        $total = max(0, $subtotal - (float) ($get('discount', isAbsolute: true) ?? 0));
+                        $balance = max(0, $total - (float) ($get('partial_payment', isAbsolute: true) ?? 0));
+
+                        $startDate = $get('start_date');
+
+                        $plan = new PaymentPlan([
+                            'installment_count' => max(1, (int) ($get('installment_count') ?? 1)),
+                            'frequency'          => $get('frequency') ?? 'monthly',
+                            'start_date'         => $startDate ? \Illuminate\Support\Carbon::parse($startDate) : now(),
+                            'total_amount'       => $balance,
+                        ]);
+
+                        $rows = collect($plan->buildInstallments())
+                            ->map(fn (array $row) => '#' . $row['installment_number'] . ' — '
+                                . $row['due_date']->format('M d, Y') . ': ₱' . number_format($row['amount'], 2))
+                            ->implode("\n");
+
+                        return new \Illuminate\Support\HtmlString(nl2br(e($rows)));
+                    })
+                    ->columnSpanFull(),
+            ])
+            ->columns(3)
+            ->columnSpanFull();
+    }
+
+    protected static function installmentScheduleLocked(?DentalRecord $record): bool
+    {
+        return $record?->paymentPlan?->installments()->whereNotNull('payment_id')->exists() ?? false;
     }
 
     protected static function diagnosisSelect(): Select
@@ -406,6 +490,13 @@ class DentalRecordResource extends Resource
             ])
             ->recordActions([ViewAction::make(), EditAction::make()])
             ->defaultSort('visit_date', 'desc');
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            RelationManagers\InstallmentsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

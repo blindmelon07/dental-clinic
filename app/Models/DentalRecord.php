@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use RuntimeException;
 
@@ -72,6 +74,21 @@ class DentalRecord extends Model
     public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class);
+    }
+
+    public function paymentPlan(): HasOne
+    {
+        return $this->hasOne(PaymentPlan::class);
+    }
+
+    public function installments(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            PaymentPlanInstallment::class,
+            PaymentPlan::class,
+            'dental_record_id',
+            'payment_plan_id',
+        );
     }
 
     public function getSubtotalAttribute(): float
@@ -172,5 +189,15 @@ class DentalRecord extends Model
         }
 
         return $invoice;
+    }
+
+    /**
+     * The active invoice for this visit, generating one from the diagnosis if it
+     * doesn't exist yet. Used when collecting an installment payment, which needs
+     * an invoice to attach the Payment record to.
+     */
+    public function getOrCreateInvoice(): Invoice
+    {
+        return $this->invoices()->first() ?? $this->createInvoice();
     }
 }
