@@ -224,7 +224,11 @@
       "Bash(xargs grep -l \"Service\")",
       "Bash(grep -i 'url\\\\|public $tableFilters\\\\|protected $tableFilters')",
       "Bash(xargs grep -l \"function relationship\\(\")",
-      "Bash(php -l app/Models/PaymentPlan.php)"
+      "Bash(php -l app/Models/PaymentPlan.php)",
+      "Bash(php -l app/Filament/Widgets/PaymentPlanStatsWidget.php)",
+      "Bash(php -l app/Filament/Pages/Dashboard.php)",
+      "Bash(php -l app/Providers/Filament/AdminPanelProvider.php)",
+      "Bash(php -l tests/Feature/Filament/PaymentPlanSmokeTest.php)"
     ]
   }
 }

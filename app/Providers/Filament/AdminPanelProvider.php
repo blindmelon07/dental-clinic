@@ -8,6 +8,7 @@ use App\Filament\Widgets\BillingStatsWidget;
 use App\Filament\Widgets\CleaningRemindersWidget;
 use App\Filament\Widgets\InventoryStatsWidget;
 use App\Filament\Widgets\LowStockMedicinesWidget;
+use App\Filament\Widgets\PaymentPlanStatsWidget;
 use App\Filament\Widgets\RecentAppointmentsWidget;
 use App\Filament\Widgets\RevenueChartWidget;
 use Filament\Http\Middleware\Authenticate;
@@ -95,6 +96,7 @@ class AdminPanelProvider extends PanelProvider
                 AccountWidget::class,
                 AppointmentStatsWidget::class,
                 BillingStatsWidget::class,
+                PaymentPlanStatsWidget::class,
                 RecentAppointmentsWidget::class,
                 RevenueChartWidget::class,
                 InventoryStatsWidget::class,

@@ -34,7 +34,9 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class DentalRecordResource extends Resource
@@ -163,6 +165,9 @@ class DentalRecordResource extends Resource
             ->description('Turning this off after a plan exists deletes it and its unpaid installments.')
             ->relationship('paymentPlan', condition: fn (Get $get) => (bool) $get('is_installment'))
             ->visible(fn (Get $get) => (bool) $get('is_installment'))
+            // Stay hidden when the toggle is off, but keep saving the relationship —
+            // that's what actually deletes the PaymentPlan when it's switched off.
+            ->saveRelationshipsWhenHidden()
             ->schema([
                 TextInput::make('installment_count')
                     ->label('Number of Installments')
@@ -173,19 +178,19 @@ class DentalRecordResource extends Resource
                     ->default(2)
                     ->required()
                     ->live()
-                    ->disabled(fn (?DentalRecord $record) => static::installmentScheduleLocked($record)),
+                    ->disabled(fn (?PaymentPlan $record) => static::installmentScheduleLocked($record)),
                 Select::make('frequency')
                     ->options(PaymentPlan::FREQUENCIES)
                     ->default('monthly')
                     ->required()
                     ->live()
-                    ->disabled(fn (?DentalRecord $record) => static::installmentScheduleLocked($record)),
+                    ->disabled(fn (?PaymentPlan $record) => static::installmentScheduleLocked($record)),
                 DatePicker::make('start_date')
                     ->default(now()->addWeek()->toDateString())
                     ->minDate(now())
                     ->required()
                     ->live()
-                    ->disabled(fn (?DentalRecord $record) => static::installmentScheduleLocked($record)),
+                    ->disabled(fn (?PaymentPlan $record) => static::installmentScheduleLocked($record)),
                 Placeholder::make('schedule_preview')
                     ->label('Schedule Preview')
                     ->content(function (Get $get) {
@@ -217,9 +222,9 @@ class DentalRecordResource extends Resource
             ->columnSpanFull();
     }
 
-    protected static function installmentScheduleLocked(?DentalRecord $record): bool
+    protected static function installmentScheduleLocked(?PaymentPlan $record): bool
     {
-        return $record?->paymentPlan?->installments()->whereNotNull('payment_id')->exists() ?? false;
+        return $record?->installments()->whereNotNull('payment_id')->exists() ?? false;
     }
 
     protected static function diagnosisSelect(): Select
@@ -480,6 +485,15 @@ class DentalRecordResource extends Resource
                     ->trueColor('success')
                     ->falseColor('danger')
                     ->tooltip(fn (bool $state): string => $state ? 'Invoice generated' : 'No invoice generated yet'),
+                IconColumn::make('has_payment_plan')
+                    ->label('Plan')
+                    ->boolean()
+                    ->getStateUsing(fn (DentalRecord $record): bool => $record->paymentPlan()->exists())
+                    ->trueIcon('heroicon-s-calendar-date-range')
+                    ->falseIcon('heroicon-o-minus')
+                    ->trueColor('primary')
+                    ->falseColor('gray')
+                    ->tooltip(fn (bool $state): string => $state ? 'On an installment plan' : 'No installment plan'),
                 TextColumn::make('visit_date')->date()->sortable(),
                 TextColumn::make('patient.full_name')->label('Patient')->searchable(),
                 TextColumn::make('dentist.user.name')->label('Dentist')->searchable(),
@@ -487,6 +501,45 @@ class DentalRecordResource extends Resource
                 TextColumn::make('total')->label('Total')->money('PHP'),
                 TextColumn::make('treatment_done')->limit(60),
                 TextColumn::make('next_visit_recommendation')->limit(40),
+            ])
+            ->filters([
+                TernaryFilter::make('has_payment_plan')
+                    ->label('Installment Plan')
+                    ->queries(
+                        true:  fn (Builder $q) => $q->whereHas('paymentPlan'),
+                        false: fn (Builder $q) => $q->whereDoesntHave('paymentPlan'),
+                    ),
+
+                TernaryFilter::make('installments_overdue')
+                    ->label('Has Overdue Installments')
+                    ->queries(
+                        true: fn (Builder $q) => $q->whereHas('installments', fn (Builder $q) => $q
+                            ->whereNull('payment_id')
+                            ->where('due_date', '<', today())),
+                        false: fn (Builder $q) => $q->whereDoesntHave('installments', fn (Builder $q) => $q
+                            ->whereNull('payment_id')
+                            ->where('due_date', '<', today())),
+                    ),
+
+                TernaryFilter::make('installments_due_this_month')
+                    ->label('Has Installments Due This Month')
+                    ->queries(
+                        true: fn (Builder $q) => $q->whereHas('installments', fn (Builder $q) => $q
+                            ->whereNull('payment_id')
+                            ->whereMonth('due_date', now()->month)
+                            ->whereYear('due_date', now()->year)),
+                        false: fn (Builder $q) => $q->whereDoesntHave('installments', fn (Builder $q) => $q
+                            ->whereNull('payment_id')
+                            ->whereMonth('due_date', now()->month)
+                            ->whereYear('due_date', now()->year)),
+                    ),
+
+                TernaryFilter::make('installments_unpaid')
+                    ->label('Has Unpaid Installments')
+                    ->queries(
+                        true:  fn (Builder $q) => $q->whereHas('installments', fn (Builder $q) => $q->whereNull('payment_id')),
+                        false: fn (Builder $q) => $q->whereDoesntHave('installments', fn (Builder $q) => $q->whereNull('payment_id')),
+                    ),
             ])
             ->recordActions([ViewAction::make(), EditAction::make()])
             ->defaultSort('visit_date', 'desc');

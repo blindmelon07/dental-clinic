@@ -7,6 +7,7 @@ use App\Filament\Widgets\BillingStatsWidget;
 use App\Filament\Widgets\CleaningRemindersWidget;
 use App\Filament\Widgets\InventoryStatsWidget;
 use App\Filament\Widgets\LowStockMedicinesWidget;
+use App\Filament\Widgets\PaymentPlanStatsWidget;
 use App\Filament\Widgets\RecentAppointmentsWidget;
 
 use Filament\Pages\Dashboard as BaseDashboard;
@@ -22,6 +23,7 @@ class Dashboard extends BaseDashboard
         return [
             AppointmentStatsWidget::class,
             BillingStatsWidget::class,
+            PaymentPlanStatsWidget::class,
             InventoryStatsWidget::class,
 
             RecentAppointmentsWidget::class,
