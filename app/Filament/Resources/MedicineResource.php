@@ -230,6 +230,33 @@ class MedicineResource extends Resource
                         false: fn (Builder $q) => $q->whereColumn('current_stock', '>', 'minimum_stock'),
                     ),
 
+                TernaryFilter::make('out_of_stock')
+                    ->label('Out of Stock Only')
+                    ->queries(
+                        true:  fn (Builder $q) => $q->where('current_stock', 0),
+                        false: fn (Builder $q) => $q->where('current_stock', '>', 0),
+                    ),
+
+                TernaryFilter::make('expiring_soon')
+                    ->label('Expiring Soon Only')
+                    ->queries(
+                        true: fn (Builder $q) => $q->whereNotNull('expiry_date')
+                            ->whereBetween('expiry_date', [now(), now()->addDays(30)]),
+                        false: fn (Builder $q) => $q->where(function (Builder $q) {
+                            $q->whereNull('expiry_date')
+                                ->orWhereNotBetween('expiry_date', [now(), now()->addDays(30)]);
+                        }),
+                    ),
+
+                TernaryFilter::make('expired')
+                    ->label('Expired Only')
+                    ->queries(
+                        true:  fn (Builder $q) => $q->whereNotNull('expiry_date')->where('expiry_date', '<', now()),
+                        false: fn (Builder $q) => $q->where(function (Builder $q) {
+                            $q->whereNull('expiry_date')->orWhere('expiry_date', '>=', now());
+                        }),
+                    ),
+
                 TernaryFilter::make('is_active')->label('Active'),
             ])
             ->recordActions([

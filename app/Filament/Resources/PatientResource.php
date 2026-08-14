@@ -29,6 +29,7 @@ use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use App\Forms\Components\SignaturePad;
 use Illuminate\Database\Eloquent\Builder;
@@ -689,6 +690,19 @@ class PatientResource extends Resource
             ])
             ->filters([
                 SelectFilter::make('gender')->options(Gender::class),
+
+                TernaryFilter::make('is_active')->label('Active'),
+
+                TernaryFilter::make('cleaning_due')
+                    ->label('Cleaning Due Within 30 Days')
+                    ->queries(
+                        true: fn (Builder $q) => $q->whereNotNull('next_cleaning_due')
+                            ->where('next_cleaning_due', '<=', now()->addDays(30)),
+                        false: fn (Builder $q) => $q->where(function (Builder $q) {
+                            $q->whereNull('next_cleaning_due')
+                                ->orWhere('next_cleaning_due', '>', now()->addDays(30));
+                        }),
+                    ),
             ])
             ->recordActions([
                 ViewAction::make(),

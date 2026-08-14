@@ -25,6 +25,7 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -176,6 +177,18 @@ class AppointmentResource extends Resource
                 SelectFilter::make('dentist_id')
                     ->label('Dentist')
                     ->relationship('dentist.user', 'name'),
+
+                Filter::make('appointment_date')
+                    ->label('Appointment Date Between')
+                    ->schema([
+                        DatePicker::make('from'),
+                        DatePicker::make('until'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when($data['from'] ?? null, fn (Builder $q, $date) => $q->whereDate('appointment_date', '>=', $date))
+                            ->when($data['until'] ?? null, fn (Builder $q, $date) => $q->whereDate('appointment_date', '<=', $date));
+                    }),
             ])
             ->recordActions([
                 Action::make('confirm')

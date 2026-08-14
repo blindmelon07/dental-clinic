@@ -3,6 +3,8 @@
 namespace App\Filament\Widgets;
 
 use App\Enums\AppointmentStatus;
+use App\Filament\Resources\AppointmentResource;
+use App\Filament\Resources\PatientResource;
 use App\Models\Appointment;
 use App\Models\Patient;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
@@ -28,22 +30,37 @@ class AppointmentStatsWidget extends BaseWidget
             Stat::make("Today's Appointments", $todayAppointments)
                 ->description('Scheduled for today')
                 ->icon('heroicon-o-calendar-days')
-                ->color('primary'),
+                ->color('primary')
+                ->url(AppointmentResource::getUrl('index', [
+                    'filters' => ['appointment_date' => [
+                        'from'  => today()->toDateString(),
+                        'until' => today()->toDateString(),
+                    ]],
+                ])),
 
             Stat::make('Pending Appointments', $pendingAppointments)
                 ->description('Awaiting confirmation')
                 ->icon('heroicon-o-clock')
-                ->color('warning'),
+                ->color('warning')
+                ->url(AppointmentResource::getUrl('index', [
+                    'filters' => ['status' => ['value' => AppointmentStatus::Pending->value]],
+                ])),
 
             Stat::make('Total Active Patients', $totalPatients)
                 ->description('Registered patients')
                 ->icon('heroicon-o-users')
-                ->color('success'),
+                ->color('success')
+                ->url(PatientResource::getUrl('index', [
+                    'filters' => ['is_active' => ['value' => '1']],
+                ])),
 
             Stat::make('Cleaning Reminders', $cleaningsDue)
                 ->description('Due or overdue within 30 days')
                 ->icon('heroicon-o-sparkles')
-                ->color($cleaningsDue > 0 ? 'danger' : 'success'),
+                ->color($cleaningsDue > 0 ? 'danger' : 'success')
+                ->url(PatientResource::getUrl('index', [
+                    'filters' => ['cleaning_due' => ['value' => '1']],
+                ])),
         ];
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Resources\MedicineDispensingResource;
+use App\Filament\Resources\MedicineResource;
 use App\Models\Medicine;
 use App\Models\MedicineDispensing;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
@@ -57,47 +59,78 @@ class InventoryStatsWidget extends BaseWidget
             Stat::make('Total Medicines', $total)
                 ->description('Active items in inventory')
                 ->icon('heroicon-o-beaker')
-                ->color('primary'),
+                ->color('primary')
+                ->url(MedicineResource::getUrl('index', [
+                    'filters' => ['is_active' => ['value' => '1']],
+                ])),
 
             Stat::make('Low Stock', $lowStock)
                 ->description('At or below minimum level')
                 ->icon('heroicon-o-arrow-trending-down')
-                ->color($lowStock > 0 ? 'warning' : 'success'),
+                ->color($lowStock > 0 ? 'warning' : 'success')
+                ->url(MedicineResource::getUrl('index', [
+                    'filters' => ['low_stock' => ['value' => '1']],
+                ])),
 
             Stat::make('Out of Stock', $outOfStock)
                 ->description('Zero units remaining')
                 ->icon('heroicon-o-x-circle')
-                ->color($outOfStock > 0 ? 'danger' : 'success'),
+                ->color($outOfStock > 0 ? 'danger' : 'success')
+                ->url(MedicineResource::getUrl('index', [
+                    'filters' => ['out_of_stock' => ['value' => '1']],
+                ])),
 
             Stat::make('Expiring Soon', $expiringSoon)
                 ->description('Expires within 30 days')
                 ->icon('heroicon-o-clock')
-                ->color($expiringSoon > 0 ? 'warning' : 'success'),
+                ->color($expiringSoon > 0 ? 'warning' : 'success')
+                ->url(MedicineResource::getUrl('index', [
+                    'filters' => ['expiring_soon' => ['value' => '1']],
+                ])),
 
             Stat::make('Expired', $expired)
                 ->description('Past expiry date')
                 ->icon('heroicon-o-exclamation-triangle')
-                ->color($expired > 0 ? 'danger' : 'success'),
+                ->color($expired > 0 ? 'danger' : 'success')
+                ->url(MedicineResource::getUrl('index', [
+                    'filters' => ['expired' => ['value' => '1']],
+                ])),
 
             Stat::make('Dispensed This Month', $dispensedThisMonth)
                 ->description('Transactions in ' . now()->format('F'))
                 ->icon('heroicon-o-clipboard-document-check')
-                ->color('info'),
+                ->color('info')
+                ->url(self::dispensingUrl(now()->startOfMonth(), now()->endOfMonth())),
 
             Stat::make('Daily Income', '₱' . number_format($dailyIncome, 2))
                 ->description('Medicine dispensed today')
                 ->icon('heroicon-o-currency-dollar')
-                ->color($dailyIncome > 0 ? 'success' : 'gray'),
+                ->color($dailyIncome > 0 ? 'success' : 'gray')
+                ->url(self::dispensingUrl(today(), today())),
 
             Stat::make('Weekly Income', '₱' . number_format($weeklyIncome, 2))
                 ->description('Medicine dispensed this week')
                 ->icon('heroicon-o-currency-dollar')
-                ->color($weeklyIncome > 0 ? 'success' : 'gray'),
+                ->color($weeklyIncome > 0 ? 'success' : 'gray')
+                ->url(self::dispensingUrl(now()->startOfWeek(), now())),
 
             Stat::make('Monthly Income', '₱' . number_format($monthlyIncome, 2))
                 ->description('Medicine dispensed in ' . now()->format('F'))
                 ->icon('heroicon-o-banknotes')
-                ->color($monthlyIncome > 0 ? 'success' : 'gray'),
+                ->color($monthlyIncome > 0 ? 'success' : 'gray')
+                ->url(self::dispensingUrl(now()->startOfMonth(), now()->endOfMonth())),
         ];
+    }
+
+    protected static function dispensingUrl(\Carbon\Carbon $from, \Carbon\Carbon $until): string
+    {
+        return MedicineDispensingResource::getUrl('index', [
+            'filters' => [
+                'dispensed_at' => [
+                    'from'  => $from->toDateString(),
+                    'until' => $until->toDateString(),
+                ],
+            ],
+        ]);
     }
 }
