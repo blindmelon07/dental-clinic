@@ -158,7 +158,6 @@ class DentalRecordResource extends Resource
             })
             ->searchable()
             ->preload()
-            ->required()
             ->live()
             ->columnSpanFull()
             // multiple() defaults to a JSON-array state cast, which json_decode()s the
