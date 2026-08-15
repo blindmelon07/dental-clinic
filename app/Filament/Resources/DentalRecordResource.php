@@ -131,7 +131,7 @@ class DentalRecordResource extends Resource
                 Textarea::make('chief_complaint')
                     ->rows(2)
                     ->columnSpanFull(),
-                static::diagnosisSelect(),
+                static::diagnosisRepeater(),
                 static::discountInput(),
                 static::diagnosisTotalPlaceholder(),
                 static::partialPaymentInput(),
@@ -195,7 +195,7 @@ class DentalRecordResource extends Resource
                     ->label('Schedule Preview')
                     ->content(function (Get $get) {
                         $subtotal = Service::totalForDisplayNames(
-                            is_array($get('diagnosis', isAbsolute: true)) ? $get('diagnosis', isAbsolute: true) : []
+                            static::diagnosisNamesFromState($get('diagnosis', isAbsolute: true))
                         );
                         $total = max(0, $subtotal - (float) ($get('discount', isAbsolute: true) ?? 0));
                         $balance = max(0, $total - (float) ($get('partial_payment', isAbsolute: true) ?? 0));
@@ -227,41 +227,58 @@ class DentalRecordResource extends Resource
         return $record?->installments()->whereNotNull('payment_id')->exists() ?? false;
     }
 
-    protected static function diagnosisSelect(): Select
+    protected static function diagnosisRepeater(): Repeater
     {
-        return Select::make('diagnosis')
+        return Repeater::make('diagnosis')
             ->label('Diagnosis')
-            ->multiple()
-            ->options(function (?DentalRecord $record) {
-                $options = static::diagnosisOptions();
+            ->schema([
+                Select::make('service')
+                    ->label('Service')
+                    ->options(function (?DentalRecord $record) {
+                        $options = static::diagnosisOptions();
 
-                // Keep previously saved diagnosis entries selectable even if the
-                // matching service was since renamed, deactivated, or deleted
-                // (or the diagnosis was free text from before this field became
-                // service-linked) — otherwise they silently disappear on edit.
-                foreach ($record?->diagnosisNames() ?? [] as $name) {
-                    $options[$name] ??= $name;
-                }
+                        // Keep previously saved diagnosis entries selectable even if the
+                        // matching service was since renamed, deactivated, or deleted
+                        // (or the diagnosis was free text from before this field became
+                        // service-linked) — otherwise they silently disappear on edit.
+                        foreach ($record?->diagnosisNames() ?? [] as $name) {
+                            $options[$name] ??= $name;
+                        }
 
-                return $options;
-            })
-            ->searchable()
-            ->preload()
+                        return $options;
+                    })
+                    ->searchable()
+                    ->preload()
+                    ->live()
+                    ->required()
+                    ->columnSpanFull(),
+            ])
+            ->addActionLabel('Add Diagnosis')
+            ->itemLabel(fn (array $state): ?string => $state['service'] ?? 'New Diagnosis')
+            ->collapsible()
+            ->reorderableWithButtons()
             ->live()
             ->columnSpanFull()
-            // multiple() defaults to a JSON-array state cast, which json_decode()s the
-            // stored comma-separated string into null (invalid JSON) and wipes the
-            // selection before afterStateHydrated ever runs. Disable it so the raw
-            // string reaches our own hydrate/dehydrate logic below untouched.
+            // The diagnosis column stores a plain comma-separated string of service
+            // names (not JSON), so the Repeater's default array state cast would mangle
+            // it. Disable it so the raw string reaches our own hydrate/dehydrate logic.
             ->stateCast(new class implements StateCast
             {
                 public function get(mixed $state): mixed { return $state; }
                 public function set(mixed $state): mixed { return $state; }
             })
-            ->afterStateHydrated(function (Select $component, $state) {
-                $component->state(filled($state) ? array_map('trim', explode(',', $state)) : []);
+            ->afterStateHydrated(function (Repeater $component, $state) {
+                // On create (no record), the Repeater seeds its own default array
+                // state (e.g. a blank row) instead of the raw column value — only
+                // the string coming from a saved `diagnosis` column needs splitting.
+                if (! is_string($state)) {
+                    return;
+                }
+
+                $names = filled($state) ? array_map('trim', explode(',', $state)) : [];
+                $component->state(array_map(fn (string $name) => ['service' => $name], $names));
             })
-            ->dehydrateStateUsing(fn ($state) => is_array($state) ? implode(', ', $state) : $state);
+            ->dehydrateStateUsing(fn ($state) => implode(', ', static::diagnosisNamesFromState($state)));
     }
 
     protected static function diagnosisOptions(): array
@@ -274,6 +291,22 @@ class DentalRecordResource extends Resource
                 $service->display_name => $service->display_name . ' — ₱' . number_format($service->price, 2),
             ])
             ->all();
+    }
+
+    /**
+     * Pulls the flat list of selected diagnosis (service) names out of the
+     * diagnosis repeater's row state (an array of ['service' => name] rows).
+     */
+    protected static function diagnosisNamesFromState(mixed $state): array
+    {
+        if (! is_array($state)) {
+            return [];
+        }
+
+        return array_values(array_filter(array_map(
+            fn ($row) => is_array($row) ? ($row['service'] ?? null) : null,
+            $state
+        )));
     }
 
     protected static function discountInput(): TextInput
@@ -292,8 +325,7 @@ class DentalRecordResource extends Resource
         return Placeholder::make('diagnosis_total')
             ->label('Total')
             ->content(function (Get $get) {
-                $selected = $get('diagnosis');
-                $subtotal = Service::totalForDisplayNames(is_array($selected) ? $selected : []);
+                $subtotal = Service::totalForDisplayNames(static::diagnosisNamesFromState($get('diagnosis')));
                 $total = max(0, $subtotal - (float) ($get('discount') ?? 0));
 
                 return '₱' . number_format($total, 2);
@@ -311,7 +343,7 @@ class DentalRecordResource extends Resource
             ->prefix('₱')
             ->live()
             ->rule(fn (Get $get) => "max:" . max(0, Service::totalForDisplayNames(
-                is_array($get('diagnosis')) ? $get('diagnosis') : []
+                static::diagnosisNamesFromState($get('diagnosis'))
             ) - (float) ($get('discount') ?? 0)))
             ->validationMessages([
                 'max' => 'Partial payment cannot exceed the total.',
@@ -323,8 +355,7 @@ class DentalRecordResource extends Resource
         return Placeholder::make('balance_due')
             ->label('Balance Due')
             ->content(function (Get $get) {
-                $selected = $get('diagnosis');
-                $subtotal = Service::totalForDisplayNames(is_array($selected) ? $selected : []);
+                $subtotal = Service::totalForDisplayNames(static::diagnosisNamesFromState($get('diagnosis')));
                 $total = max(0, $subtotal - (float) ($get('discount') ?? 0));
                 $balance = max(0, $total - (float) ($get('partial_payment') ?? 0));
 

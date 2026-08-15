@@ -16,6 +16,15 @@ class EditDentalRecord extends EditRecord
 
     protected Width|string|null $maxContentWidth = Width::Full;
 
+    protected function afterSave(): void
+    {
+        // If an invoice already exists for this visit, an increased partial_payment
+        // on this edit wouldn't otherwise reach it — createInvoice() only records
+        // the first payment, so later edits used to leave the invoice's balance
+        // stale. Reconcile it here every time the record is saved.
+        $this->record->syncPartialPaymentToInvoice();
+    }
+
     protected function getHeaderActions(): array
     {
         return [

@@ -13,8 +13,16 @@ class Payment extends Model
 
     protected $fillable = [
         'payment_number', 'invoice_id', 'patient_id', 'amount',
-        'payment_method', 'reference_number', 'notes', 'paid_at',
+        'payment_method', 'reference_number', 'notes', 'paid_at', 'source',
     ];
+
+    /**
+     * Payments auto-recorded by DentalRecord::syncPartialPaymentToInvoice(). These
+     * are the only payments that method is allowed to adjust or delete when a later
+     * edit lowers partial_payment — manually recorded payments (installments, the
+     * invoice's "Record Payment" action) are never touched.
+     */
+    public const SOURCE_DENTAL_RECORD_SYNC = 'dental_record_sync';
 
     protected function casts(): array
     {

@@ -170,23 +170,7 @@ class DentalRecord extends Model
 
         $invoice->recalculate();
 
-        if ($this->partial_payment > 0 && $invoice->payments()->doesntExist()) {
-            $invoice->payments()->create([
-                'payment_number' => Payment::generateNumber(),
-                'patient_id'     => $this->patient_id,
-                'amount'         => min((float) $this->partial_payment, (float) $invoice->total),
-                'payment_method' => PaymentMethod::Cash,
-                'notes'          => 'Partial payment recorded at the time of the dental visit.',
-                'paid_at'        => now(),
-            ]);
-
-            $invoice->recalculate();
-
-            $invoice->update([
-                'status'  => $invoice->fresh()->balance_due <= 0 ? InvoiceStatus::Paid : InvoiceStatus::PartiallyPaid,
-                'paid_at' => $invoice->fresh()->balance_due <= 0 ? now() : null,
-            ]);
-        }
+        $this->syncPartialPaymentToInvoice($invoice);
 
         return $invoice;
     }
@@ -199,5 +183,81 @@ class DentalRecord extends Model
     public function getOrCreateInvoice(): Invoice
     {
         return $this->invoices()->first() ?? $this->createInvoice();
+    }
+
+    /**
+     * Reconciles this record's `partial_payment` figure against the given invoice
+     * (or its existing invoice, if any). Used both when an invoice is first
+     * generated and whenever the dental record is edited afterward, so changing
+     * `partial_payment` on a later visit edit actually shows up on the invoice
+     * instead of silently going stale.
+     *
+     * Only payments this method itself created (source = dental_record_sync) are
+     * ever adjusted or removed here — manually recorded payments (installments,
+     * the invoice's "Record Payment" action) are a ledger of what was actually
+     * collected and are never rewritten automatically.
+     */
+    public function syncPartialPaymentToInvoice(?Invoice $invoice = null): void
+    {
+        $invoice ??= $this->invoices()->first();
+
+        if (! $invoice) {
+            return;
+        }
+
+        $autoPayments = $invoice->payments()
+            ->where('source', Payment::SOURCE_DENTAL_RECORD_SYNC)
+            ->orderBy('paid_at')
+            ->get();
+
+        $manualPaid = (float) $invoice->payments()
+            ->where('source', '!=', Payment::SOURCE_DENTAL_RECORD_SYNC)
+            ->sum('amount');
+        $autoPaid = (float) $autoPayments->sum('amount');
+
+        $target = min((float) ($this->partial_payment ?? 0), (float) $invoice->total);
+        $targetAuto = round(max(0, $target - $manualPaid), 2);
+        $difference = round($targetAuto - $autoPaid, 2);
+
+        if ($difference > 0) {
+            $invoice->payments()->create([
+                'payment_number' => Payment::generateNumber(),
+                'patient_id'     => $this->patient_id,
+                'amount'         => $difference,
+                'payment_method' => PaymentMethod::Cash,
+                'source'         => Payment::SOURCE_DENTAL_RECORD_SYNC,
+                'notes'          => $autoPaid > 0
+                    ? 'Additional partial payment recorded from a dental record update.'
+                    : 'Partial payment recorded at the time of the dental visit.',
+                'paid_at'        => now(),
+            ]);
+        } elseif ($difference < 0) {
+            $toRemove = abs($difference);
+
+            // Walk the auto-synced payments newest-first, deleting or shrinking
+            // them until the reduction is fully absorbed.
+            foreach ($autoPayments->sortByDesc('paid_at') as $payment) {
+                if ($toRemove <= 0) {
+                    break;
+                }
+
+                if ((float) $payment->amount <= $toRemove) {
+                    $toRemove = round($toRemove - (float) $payment->amount, 2);
+                    $payment->delete();
+                } else {
+                    $payment->update(['amount' => round((float) $payment->amount - $toRemove, 2)]);
+                    $toRemove = 0;
+                }
+            }
+        } else {
+            return;
+        }
+
+        $invoice->recalculate();
+
+        $invoice->update([
+            'status'  => $invoice->fresh()->balance_due <= 0 ? InvoiceStatus::Paid : InvoiceStatus::PartiallyPaid,
+            'paid_at' => $invoice->fresh()->balance_due <= 0 ? now() : null,
+        ]);
     }
 }
