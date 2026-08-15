@@ -12,6 +12,11 @@ class CreateDentalRecord extends CreateRecord
 
     protected Width|string|null $maxContentWidth = Width::Full;
 
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        return DentalRecordResource::diagnosisRowsToData($data);
+    }
+
     public function createAnother(): void
     {
         parent::createAnother();

@@ -16,6 +16,16 @@ class EditDentalRecord extends EditRecord
 
     protected Width|string|null $maxContentWidth = Width::Full;
 
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        return DentalRecordResource::diagnosisDataToRows($data);
+    }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        return DentalRecordResource::diagnosisRowsToData($data);
+    }
+
     protected function afterSave(): void
     {
         // If an invoice already exists for this visit, an increased partial_payment

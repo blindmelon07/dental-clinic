@@ -27,7 +27,6 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\ViewEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\StateCasts\Contracts\StateCast;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Components\Utilities\Get;
@@ -258,27 +257,42 @@ class DentalRecordResource extends Resource
             ->collapsible()
             ->reorderableWithButtons()
             ->live()
-            ->columnSpanFull()
-            // The diagnosis column stores a plain comma-separated string of service
-            // names (not JSON), so the Repeater's default array state cast would mangle
-            // it. Disable it so the raw string reaches our own hydrate/dehydrate logic.
-            ->stateCast(new class implements StateCast
-            {
-                public function get(mixed $state): mixed { return $state; }
-                public function set(mixed $state): mixed { return $state; }
-            })
-            ->afterStateHydrated(function (Repeater $component, $state) {
-                // On create (no record), the Repeater seeds its own default array
-                // state (e.g. a blank row) instead of the raw column value — only
-                // the string coming from a saved `diagnosis` column needs splitting.
-                if (! is_string($state)) {
-                    return;
-                }
+            ->columnSpanFull();
+        // The diagnosis column stores a plain comma-separated string of service
+        // names (not JSON/array), while the Repeater always works with an array of
+        // ['service' => name] rows internally — including reading the raw Livewire
+        // property directly in places (e.g. building item schemas on page load),
+        // which bypasses per-field state casts/hydration hooks. So the string<->array
+        // conversion is done at the page level instead, in mutateFormDataBeforeFill()
+        // / mutateFormDataBeforeSave() (see DentalRecordResource::diagnosisDataToRows()
+        // and diagnosisRowsToData() below), before the data ever reaches this field.
+    }
 
-                $names = filled($state) ? array_map('trim', explode(',', $state)) : [];
-                $component->state(array_map(fn (string $name) => ['service' => $name], $names));
-            })
-            ->dehydrateStateUsing(fn ($state) => implode(', ', static::diagnosisNamesFromState($state)));
+    /**
+     * Converts a freshly loaded record's `diagnosis` column (a comma-separated
+     * string) into the Repeater's row shape. Call from mutateFormDataBeforeFill().
+     */
+    public static function diagnosisDataToRows(array $data): array
+    {
+        $names = is_string($data['diagnosis'] ?? null) && filled($data['diagnosis'])
+            ? array_map('trim', explode(',', $data['diagnosis']))
+            : [];
+
+        $data['diagnosis'] = array_map(fn (string $name) => ['service' => $name], $names);
+
+        return $data;
+    }
+
+    /**
+     * Converts the diagnosis Repeater's submitted row state back into the
+     * comma-separated string the `diagnosis` column stores. Call from
+     * mutateFormDataBeforeCreate() / mutateFormDataBeforeSave().
+     */
+    public static function diagnosisRowsToData(array $data): array
+    {
+        $data['diagnosis'] = implode(', ', static::diagnosisNamesFromState($data['diagnosis'] ?? []));
+
+        return $data;
     }
 
     protected static function diagnosisOptions(): array
