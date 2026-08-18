@@ -49,11 +49,14 @@ class Service extends Model
             return 0;
         }
 
-        return static::where('is_active', true)
+        $prices = static::where('is_active', true)
             ->with('category')
             ->get()
-            ->filter(fn (Service $service) => in_array($service->display_name, $displayNames, true))
-            ->sum(fn (Service $service) => (float) $service->price);
+            ->mapWithKeys(fn (Service $service) => [$service->display_name => (float) $service->price]);
+
+        // Sum per selected row (not per unique service) so picking the same
+        // service more than once adds its price each time.
+        return collect($displayNames)->sum(fn (string $name) => $prices->get($name, 0.0));
     }
 
     public function appointments(): HasMany
