@@ -12,6 +12,16 @@
 
         return $position <= 5 ? (($quadrant + 4) * 10 + $position) : null;
     };
+
+    $conditionGroups = \App\Models\ToothCondition::GROUPS;
+    $conditions = \App\Models\ToothCondition::active()->ordered()->get()
+        ->mapWithKeys(fn ($condition) => [
+            $condition->code => [
+                'label' => $condition->label,
+                'color' => $condition->color,
+                'group' => $condition->group,
+            ],
+        ])->all();
 @endphp
 
 <x-dynamic-component :component="$getFieldWrapperView()" :field="$field">
@@ -26,33 +36,8 @@
             paintValue: null,
             drawing: false,
             currentStroke: null,
-            conditionGroups: ['Condition', 'Restoration & Prosthetics', 'Surgery'],
-            conditions: {
-                D:  { label: 'Decayed (Caries Indicated for Filling)', color: '#ef4444', group: 'Condition' },
-                M:  { label: 'Missing due to Caries', color: '#6b7280', group: 'Condition' },
-                F:  { label: 'Filled', color: '#3b82f6', group: 'Condition' },
-                I:  { label: 'Caries Indicated for Extraction', color: '#f97316', group: 'Condition' },
-                RF: { label: 'Root Fragment', color: '#92400e', group: 'Condition' },
-                MO: { label: 'Missing due to Other Causes', color: '#78716c', group: 'Condition' },
-                Im: { label: 'Impacted Tooth', color: '#a855f7', group: 'Condition' },
-                AN: { label: 'Anodontia', color: '#57534e', group: 'Condition' },
-                PT: { label: 'Peg Tooth', color: '#ca8a04', group: 'Condition' },
-
-                J:  { label: 'Jacket Crown', color: '#f59e0b', group: 'Restoration & Prosthetics' },
-                A:  { label: 'Amalgam Filling', color: '#64748b', group: 'Restoration & Prosthetics' },
-                AB: { label: 'Abutment', color: '#14b8a6', group: 'Restoration & Prosthetics' },
-                P:  { label: 'Pontic', color: '#06b6d4', group: 'Restoration & Prosthetics' },
-                In: { label: 'Inlay', color: '#6366f1', group: 'Restoration & Prosthetics' },
-                FX: { label: 'Fixed Cure Composite', color: '#ec4899', group: 'Restoration & Prosthetics' },
-                Rm: { label: 'Removable Denture', color: '#84cc16', group: 'Restoration & Prosthetics' },
-                RCT: { label: 'Root Canal Treatment (RCT)', color: '#0ea5e9', group: 'Restoration & Prosthetics' },
-
-                X:  { label: 'Extraction due to Caries', color: '#dc2626', group: 'Surgery' },
-                XO: { label: 'Extraction due to Other Causes', color: '#7f1d1d', group: 'Surgery' },
-                '✓': { label: 'Present Teeth', color: '#22c55e', group: 'Surgery' },
-                Cm: { label: 'Congenitally Missing', color: '#8b5cf6', group: 'Surgery' },
-                Sp: { label: 'Supernumerary', color: '#d946ef', group: 'Surgery' },
-            },
+            conditionGroups: @js($conditionGroups),
+            conditions: @js($conditions),
             conditionsIn(group) {
                 return Object.entries(this.conditions).filter(([key, condition]) => condition.group === group);
             },
@@ -64,14 +49,14 @@
             },
             colorFor(n) {
                 const code = this.ensureState().teeth[n];
-                return code ? this.conditions[code].color : '';
+                return code ? (this.conditions[code]?.color ?? '') : '';
             },
             codeFor(n) {
                 return this.ensureState().teeth[n] ?? '';
             },
             labelFor(n) {
                 const code = this.ensureState().teeth[n];
-                return code ? this.conditions[code].label : 'Healthy';
+                return code ? (this.conditions[code]?.label ?? code) : 'Healthy';
             },
             startPaint(n) {
                 if (this.isDisabled || this.mode !== 'stamp') return;

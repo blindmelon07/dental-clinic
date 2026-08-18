@@ -3,32 +3,22 @@
     $teeth = $data['teeth'] ?? [];
     $strokes = $data['strokes'] ?? [];
 
-    $conditions = [
-        'D'  => ['label' => 'Decayed (Caries Indicated for Filling)', 'color' => '#ef4444', 'group' => 'Condition'],
-        'M'  => ['label' => 'Missing due to Caries', 'color' => '#6b7280', 'group' => 'Condition'],
-        'F'  => ['label' => 'Filled', 'color' => '#3b82f6', 'group' => 'Condition'],
-        'I'  => ['label' => 'Caries Indicated for Extraction', 'color' => '#f97316', 'group' => 'Condition'],
-        'RF' => ['label' => 'Root Fragment', 'color' => '#92400e', 'group' => 'Condition'],
-        'MO' => ['label' => 'Missing due to Other Causes', 'color' => '#78716c', 'group' => 'Condition'],
-        'Im' => ['label' => 'Impacted Tooth', 'color' => '#a855f7', 'group' => 'Condition'],
-        'AN' => ['label' => 'Anodontia', 'color' => '#57534e', 'group' => 'Condition'],
-        'PT' => ['label' => 'Peg Tooth', 'color' => '#ca8a04', 'group' => 'Condition'],
+    $conditions = \App\Models\ToothCondition::active()->ordered()->get()
+        ->mapWithKeys(fn ($condition) => [
+            $condition->code => [
+                'label' => $condition->label,
+                'color' => $condition->color,
+                'group' => $condition->group,
+            ],
+        ])->all();
 
-        'J'  => ['label' => 'Jacket Crown', 'color' => '#f59e0b', 'group' => 'Restoration & Prosthetics'],
-        'A'  => ['label' => 'Amalgam Filling', 'color' => '#64748b', 'group' => 'Restoration & Prosthetics'],
-        'AB' => ['label' => 'Abutment', 'color' => '#14b8a6', 'group' => 'Restoration & Prosthetics'],
-        'P'  => ['label' => 'Pontic', 'color' => '#06b6d4', 'group' => 'Restoration & Prosthetics'],
-        'In' => ['label' => 'Inlay', 'color' => '#6366f1', 'group' => 'Restoration & Prosthetics'],
-        'FX' => ['label' => 'Fixed Cure Composite', 'color' => '#ec4899', 'group' => 'Restoration & Prosthetics'],
-        'Rm' => ['label' => 'Removable Denture', 'color' => '#84cc16', 'group' => 'Restoration & Prosthetics'],
-        'RCT' => ['label' => 'Root Canal Treatment (RCT)', 'color' => '#0ea5e9', 'group' => 'Restoration & Prosthetics'],
-
-        'X'  => ['label' => 'Extraction due to Caries', 'color' => '#dc2626', 'group' => 'Surgery'],
-        'XO' => ['label' => 'Extraction due to Other Causes', 'color' => '#7f1d1d', 'group' => 'Surgery'],
-        '✓'  => ['label' => 'Present Teeth', 'color' => '#22c55e', 'group' => 'Surgery'],
-        'Cm' => ['label' => 'Congenitally Missing', 'color' => '#8b5cf6', 'group' => 'Surgery'],
-        'Sp' => ['label' => 'Supernumerary', 'color' => '#d946ef', 'group' => 'Surgery'],
-    ];
+    // Codes that were stamped while a condition was active but have since
+    // been deactivated/deleted still need a readable fallback here.
+    foreach ($teeth as $code) {
+        if (! isset($conditions[$code])) {
+            $conditions[$code] = ['label' => $code, 'color' => '#9ca3af', 'group' => null];
+        }
+    }
 
     $permQuads = [
         'ur' => [18, 17, 16, 15, 14, 13, 12, 11],
@@ -58,7 +48,7 @@
 <x-dynamic-component :component="$getEntryWrapperView()" :entry="$entry">
     <div class="tooth-chart">
         <div class="tooth-chart-palette-groups">
-            @foreach (['Condition', 'Restoration & Prosthetics', 'Surgery'] as $group)
+            @foreach (\App\Models\ToothCondition::GROUPS as $group)
                 <div class="tooth-chart-palette-group">
                     <div class="tooth-chart-group-label">{{ $group }}</div>
                     <div class="tooth-chart-palette">

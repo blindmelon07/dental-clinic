@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(PermissionSeeder::class);
+        $this->call(ToothConditionSeeder::class);
 
         // ── Clinic ────────────────────────────────────────────────────────────
         $clinic = Clinic::firstOrCreate(
