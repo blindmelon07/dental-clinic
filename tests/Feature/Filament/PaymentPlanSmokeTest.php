@@ -41,7 +41,7 @@ class PaymentPlanSmokeTest extends TestCase
             ->fillForm([
                 'patient_id' => $patient->id,
                 'dentist_id' => $dentist->id,
-                'diagnosis'  => [$service->display_name],
+                'diagnosis'  => [['service' => $service->display_name]],
                 'is_installment' => true,
                 'paymentPlan' => [
                     'installment_count' => 4,
@@ -70,7 +70,7 @@ class PaymentPlanSmokeTest extends TestCase
             ->fillForm([
                 'patient_id' => $patient->id,
                 'dentist_id' => $dentist->id,
-                'diagnosis'  => [$service->display_name],
+                'diagnosis'  => [['service' => $service->display_name]],
                 'is_installment' => true,
                 'paymentPlan' => [
                     'installment_count' => 3,
@@ -105,7 +105,7 @@ class PaymentPlanSmokeTest extends TestCase
             ->fillForm([
                 'patient_id' => $patient->id,
                 'dentist_id' => $dentist->id,
-                'diagnosis'  => [$service->display_name],
+                'diagnosis'  => [['service' => $service->display_name]],
                 'is_installment' => true,
                 'paymentPlan' => [
                     'installment_count' => 2,
@@ -146,7 +146,7 @@ class PaymentPlanSmokeTest extends TestCase
             ->fillForm([
                 'patient_id' => $patient->id,
                 'dentist_id' => $dentist->id,
-                'diagnosis'  => [$service->display_name],
+                'diagnosis'  => [['service' => $service->display_name]],
                 'is_installment' => true,
                 'paymentPlan' => [
                     'installment_count' => 2,

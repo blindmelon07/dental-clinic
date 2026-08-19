@@ -64,9 +64,19 @@ class DentalRecordResourceTest extends TestCase
 
         Livewire::actingAs($this->admin)
             ->test(EditDentalRecord::class, ['record' => $record->getRouteKey()])
-            ->assertFormSet([
-                'diagnosis' => ['Cavity in tooth 14', 'needs filling'],
-            ]);
+            // The diagnosis Repeater keys its rows by a runtime-generated UUID, so
+            // compare row values only rather than asserting on the whole keyed array.
+            ->assertFormSet(function (array $state): array {
+                $this->assertEquals(
+                    [
+                        ['service' => 'Cavity in tooth 14'],
+                        ['service' => 'needs filling'],
+                    ],
+                    array_values($state['diagnosis'] ?? [])
+                );
+
+                return [];
+            });
     }
 
     public function test_diagnosis_survives_a_resave(): void
@@ -93,7 +103,7 @@ class DentalRecordResourceTest extends TestCase
             ->fillForm([
                 'patient_id' => $patient->id,
                 'dentist_id' => $dentist->id,
-                'diagnosis' => [$service->display_name],
+                'diagnosis' => [['service' => $service->display_name]],
             ])
             ->call('createAnother')
             ->assertHasNoFormErrors()
@@ -125,7 +135,7 @@ class DentalRecordResourceTest extends TestCase
             ->fillForm([
                 'patient_id'      => $patient->id,
                 'dentist_id'      => $dentist->id,
-                'diagnosis'       => [$service->display_name],
+                'diagnosis'       => [['service' => $service->display_name]],
                 'partial_payment' => 400,
             ])
             ->call('create')
@@ -146,7 +156,7 @@ class DentalRecordResourceTest extends TestCase
             ->fillForm([
                 'patient_id'      => $patient->id,
                 'dentist_id'      => $dentist->id,
-                'diagnosis'       => [$service->display_name],
+                'diagnosis'       => [['service' => $service->display_name]],
                 'partial_payment' => 1500,
             ])
             ->call('create')

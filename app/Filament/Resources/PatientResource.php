@@ -279,6 +279,8 @@ class PatientResource extends Resource
                                         ->options(self::cityOptions())
                                         ->searchable()
                                         ->native(false),
+                                    TextInput::make('municipality')
+                                        ->maxLength(150),
                                     Select::make('province')
                                         ->options(self::provinceOptions())
                                         ->searchable()
@@ -552,6 +554,7 @@ class PatientResource extends Resource
                     TextEntry::make('email')->placeholder('—'),
                     TextEntry::make('address')->placeholder('—'),
                     TextEntry::make('city')->placeholder('—'),
+                    TextEntry::make('municipality')->placeholder('—'),
                     TextEntry::make('province')->placeholder('—'),
                 ])->columns(['default' => 1, 'md' => 2, 'lg' => 3]),
 
