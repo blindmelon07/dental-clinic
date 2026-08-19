@@ -99,6 +99,20 @@ class PermissionSeeder extends Seeder
         'create_user',
         'update_user',
         'delete_user',
+
+        // Equipment
+        'view_any_equipment',
+        'view_equipment',
+        'create_equipment',
+        'update_equipment',
+        'delete_equipment',
+
+        // Equipment Categories
+        'view_any_equipment_category',
+        'view_equipment_category',
+        'create_equipment_category',
+        'update_equipment_category',
+        'delete_equipment_category',
     ];
 
     private array $rolePermissions = [
@@ -117,6 +131,8 @@ class PermissionSeeder extends Seeder
             'view_any_appointment_type', 'view_appointment_type', 'create_appointment_type', 'update_appointment_type', 'delete_appointment_type',
             'view_any_dentist', 'view_dentist', 'create_dentist', 'update_dentist', 'delete_dentist',
             'view_any_user', 'view_user', 'create_user', 'update_user',
+            'view_any_equipment', 'view_equipment', 'create_equipment', 'update_equipment', 'delete_equipment',
+            'view_any_equipment_category', 'view_equipment_category', 'create_equipment_category', 'update_equipment_category', 'delete_equipment_category',
         ],
 
         'receptionist' => [
@@ -128,6 +144,8 @@ class PermissionSeeder extends Seeder
             'view_any_service', 'view_service',
             'view_any_appointment_type', 'view_appointment_type',
             'view_any_dentist', 'view_dentist',
+            'view_any_equipment', 'view_equipment',
+            'view_any_equipment_category', 'view_equipment_category',
         ],
 
         'dentist' => [
@@ -141,6 +159,8 @@ class PermissionSeeder extends Seeder
             'view_any_tooth_condition', 'view_tooth_condition', 'create_tooth_condition', 'update_tooth_condition',
             'view_any_appointment_type', 'view_appointment_type',
             'view_any_dentist', 'view_dentist',
+            'view_any_equipment', 'view_equipment',
+            'view_any_equipment_category', 'view_equipment_category',
         ],
 
         'patient' => [],
