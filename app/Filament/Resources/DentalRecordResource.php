@@ -197,7 +197,8 @@ class DentalRecordResource extends Resource
                             static::diagnosisNamesFromState($get('diagnosis', isAbsolute: true))
                         );
                         $total = max(0, $subtotal - (float) ($get('discount', isAbsolute: true) ?? 0));
-                        $balance = max(0, $total - (float) ($get('partial_payment', isAbsolute: true) ?? 0));
+                        $partial = array_sum(static::diagnosisPartialPaymentsFromState($get('diagnosis', isAbsolute: true)));
+                        $balance = max(0, $total - $partial);
 
                         $startDate = $get('start_date');
 
@@ -251,6 +252,21 @@ class DentalRecordResource extends Resource
                     ->live()
                     ->required()
                     ->columnSpanFull(),
+                TextInput::make('partial_payment')
+                    ->label('Partial Payment')
+                    ->helperText('Amount already collected toward this service, if any.')
+                    ->numeric()
+                    ->minValue(0)
+                    ->default(0)
+                    ->prefix('₱')
+                    ->live()
+                    ->rule(
+                        fn (Get $get) => 'max:' . Service::totalForDisplayNames([(string) ($get('service') ?? '')]),
+                        fn (Get $get) => Service::totalForDisplayNames([(string) ($get('service') ?? '')]) > 0,
+                    )
+                    ->validationMessages([
+                        'max' => 'Partial payment cannot exceed this service\'s price.',
+                    ]),
             ])
             ->addActionLabel('Add Diagnosis')
             ->itemLabel(fn (array $state): ?string => $state['service'] ?? 'New Diagnosis')
@@ -278,19 +294,33 @@ class DentalRecordResource extends Resource
             ? array_map('trim', explode(',', $data['diagnosis']))
             : [];
 
-        $data['diagnosis'] = array_map(fn (string $name) => ['service' => $name], $names);
+        $partials = is_array($data['diagnosis_partial_payments'] ?? null) ? array_values($data['diagnosis_partial_payments']) : [];
+
+        $data['diagnosis'] = array_map(
+            fn (string $name, int $i) => ['service' => $name, 'partial_payment' => (float) ($partials[$i] ?? 0)],
+            $names,
+            array_keys($names),
+        );
 
         return $data;
     }
 
     /**
      * Converts the diagnosis Repeater's submitted row state back into the
-     * comma-separated string the `diagnosis` column stores. Call from
+     * comma-separated string the `diagnosis` column stores, plus the parallel
+     * per-row `diagnosis_partial_payments` array. The record's overall
+     * `partial_payment` column — what balance/invoice math actually reads — is
+     * kept as the sum of those per-row amounts, since the row-level fields are
+     * now the only place a partial payment is entered. Call from
      * mutateFormDataBeforeCreate() / mutateFormDataBeforeSave().
      */
     public static function diagnosisRowsToData(array $data): array
     {
-        $data['diagnosis'] = implode(', ', static::diagnosisNamesFromState($data['diagnosis'] ?? []));
+        $rows = $data['diagnosis'] ?? [];
+
+        $data['diagnosis'] = implode(', ', static::diagnosisNamesFromState($rows));
+        $data['diagnosis_partial_payments'] = static::diagnosisPartialPaymentsFromState($rows);
+        $data['partial_payment'] = array_sum($data['diagnosis_partial_payments']);
 
         return $data;
     }
@@ -323,6 +353,23 @@ class DentalRecordResource extends Resource
         )));
     }
 
+    /**
+     * Pulls the flat list of per-row partial payments out of the diagnosis
+     * repeater's row state, in the same order as diagnosisNamesFromState() —
+     * so the two lists line up index-for-index.
+     */
+    protected static function diagnosisPartialPaymentsFromState(mixed $state): array
+    {
+        if (! is_array($state)) {
+            return [];
+        }
+
+        return array_values(array_map(
+            fn ($row) => is_array($row) ? (float) ($row['partial_payment'] ?? 0) : 0.0,
+            $state
+        ));
+    }
+
     protected static function discountInput(): TextInput
     {
         return TextInput::make('discount')
@@ -346,22 +393,16 @@ class DentalRecordResource extends Resource
             });
     }
 
-    protected static function partialPaymentInput(): TextInput
+    protected static function partialPaymentInput(): Placeholder
     {
-        return TextInput::make('partial_payment')
+        return Placeholder::make('partial_payment_total')
             ->label('Partial Payment')
-            ->helperText('Amount already collected from the patient for this visit, if any.')
-            ->numeric()
-            ->minValue(0)
-            ->default(0)
-            ->prefix('₱')
-            ->live()
-            ->rule(fn (Get $get) => "max:" . max(0, Service::totalForDisplayNames(
-                static::diagnosisNamesFromState($get('diagnosis'))
-            ) - (float) ($get('discount') ?? 0)))
-            ->validationMessages([
-                'max' => 'Partial payment cannot exceed the total.',
-            ]);
+            ->helperText('Sum of the partial payments entered per diagnosis above.')
+            ->content(function (Get $get) {
+                $partial = array_sum(static::diagnosisPartialPaymentsFromState($get('diagnosis')));
+
+                return '₱' . number_format($partial, 2);
+            });
     }
 
     protected static function balanceDuePlaceholder(): Placeholder
@@ -371,7 +412,8 @@ class DentalRecordResource extends Resource
             ->content(function (Get $get) {
                 $subtotal = Service::totalForDisplayNames(static::diagnosisNamesFromState($get('diagnosis')));
                 $total = max(0, $subtotal - (float) ($get('discount') ?? 0));
-                $balance = max(0, $total - (float) ($get('partial_payment') ?? 0));
+                $partial = array_sum(static::diagnosisPartialPaymentsFromState($get('diagnosis')));
+                $balance = max(0, $total - $partial);
 
                 return '₱' . number_format($balance, 2);
             });

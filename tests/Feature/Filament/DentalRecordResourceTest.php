@@ -69,8 +69,8 @@ class DentalRecordResourceTest extends TestCase
             ->assertFormSet(function (array $state): array {
                 $this->assertEquals(
                     [
-                        ['service' => 'Cavity in tooth 14'],
-                        ['service' => 'needs filling'],
+                        ['service' => 'Cavity in tooth 14', 'partial_payment' => 0.0],
+                        ['service' => 'needs filling', 'partial_payment' => 0.0],
                     ],
                     array_values($state['diagnosis'] ?? [])
                 );
@@ -133,10 +133,9 @@ class DentalRecordResourceTest extends TestCase
         Livewire::actingAs($this->admin)
             ->test(CreateDentalRecord::class)
             ->fillForm([
-                'patient_id'      => $patient->id,
-                'dentist_id'      => $dentist->id,
-                'diagnosis'       => [['service' => $service->display_name]],
-                'partial_payment' => 400,
+                'patient_id' => $patient->id,
+                'dentist_id' => $dentist->id,
+                'diagnosis'  => [['service' => $service->display_name, 'partial_payment' => 400]],
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -145,7 +144,7 @@ class DentalRecordResourceTest extends TestCase
         $this->assertEquals(600, DentalRecord::first()->balance_due);
     }
 
-    public function test_partial_payment_cannot_exceed_the_total(): void
+    public function test_partial_payment_cannot_exceed_its_services_price(): void
     {
         $patient = Patient::factory()->create();
         $dentist = Dentist::factory()->create();
@@ -154,13 +153,39 @@ class DentalRecordResourceTest extends TestCase
         Livewire::actingAs($this->admin)
             ->test(CreateDentalRecord::class)
             ->fillForm([
-                'patient_id'      => $patient->id,
-                'dentist_id'      => $dentist->id,
-                'diagnosis'       => [['service' => $service->display_name]],
-                'partial_payment' => 1500,
+                'patient_id' => $patient->id,
+                'dentist_id' => $dentist->id,
+                'diagnosis'  => [['service' => $service->display_name, 'partial_payment' => 1500]],
             ])
             ->call('create')
-            ->assertHasFormErrors(['partial_payment']);
+            ->assertHasFormErrors(['diagnosis.0.partial_payment']);
+    }
+
+    public function test_partial_payments_are_entered_per_diagnosis_and_summed(): void
+    {
+        $patient = Patient::factory()->create();
+        $dentist = Dentist::factory()->create();
+        $filling = Service::factory()->create(['price' => 1000]);
+        $cleaning = Service::factory()->create(['price' => 500]);
+
+        Livewire::actingAs($this->admin)
+            ->test(CreateDentalRecord::class)
+            ->fillForm([
+                'patient_id' => $patient->id,
+                'dentist_id' => $dentist->id,
+                'diagnosis'  => [
+                    ['service' => $filling->display_name, 'partial_payment' => 400],
+                    ['service' => $cleaning->display_name, 'partial_payment' => 500],
+                ],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $record = DentalRecord::first();
+
+        $this->assertEquals(900, $record->partial_payment);
+        $this->assertEquals(600, $record->balance_due);
+        $this->assertEquals([400.0, 500.0], $record->diagnosis_partial_payments);
     }
 
     public function test_generating_an_invoice_carries_the_partial_payment_over_as_a_recorded_payment(): void

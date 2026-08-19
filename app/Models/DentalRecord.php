@@ -20,7 +20,7 @@ class DentalRecord extends Model
 
     protected $fillable = [
         'patient_id', 'dentist_id', 'appointment_id', 'visit_date',
-        'chief_complaint', 'diagnosis', 'discount', 'partial_payment', 'treatment_plan', 'treatment_done',
+        'chief_complaint', 'diagnosis', 'diagnosis_partial_payments', 'discount', 'partial_payment', 'treatment_plan', 'treatment_done',
         'tooth_chart', 'prescription', 'notes', 'next_visit_recommendation',
     ];
 
@@ -30,6 +30,7 @@ class DentalRecord extends Model
             'visit_date' => 'date',
             'discount' => 'decimal:2',
             'partial_payment' => 'decimal:2',
+            'diagnosis_partial_payments' => 'array',
             'tooth_chart' => 'array',
         ];
     }
