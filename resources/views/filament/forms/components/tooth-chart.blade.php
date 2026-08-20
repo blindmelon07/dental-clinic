@@ -35,7 +35,7 @@
             // production, unlike localhost) a flood of those overlapping requests
             // can race or silently fail, leaving marks visible on screen that
             // never actually reached the saved form state — the tooth chart
-            // "data loss" bug.
+            // 'data loss' bug.
             state: $wire.$entangle('{{ $getStatePath() }}').defer,
             isDisabled: @js($isDisabled()),
             mode: 'stamp',
