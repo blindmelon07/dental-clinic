@@ -280,7 +280,7 @@
                     srObserver.unobserve(entry.target);
                 }
             });
-        }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+        }, { threshold: 0, rootMargin: '0px 0px -30px 0px' });
 
         function initScrollReveal() {
             var targets = document.querySelectorAll('#main-content section, #main-content > div');

@@ -62,13 +62,8 @@
                                         <p class="mt-2 text-sm text-slate-400 leading-relaxed flex-1 italic">Professional dental care performed by our experienced team.</p>
                                     @endif
 
-                                    {{-- Price & duration --}}
+                                    {{-- Duration --}}
                                     <div class="mt-5 pt-4 border-t border-slate-100">
-                                        @if($service->price > 0)
-                                            <p class="font-heading font-bold text-slate-800 text-base">
-                                                Starting at ₱{{ number_format((float) $service->price, 0) }}
-                                            </p>
-                                        @endif
                                         @if($service->duration_minutes)
                                             <p class="mt-0.5 text-xs text-slate-400 flex items-center gap-1">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
