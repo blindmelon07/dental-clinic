@@ -27,16 +27,19 @@
 <x-dynamic-component :component="$getFieldWrapperView()" :field="$field">
     <div
         x-data="{
-            // .defer keeps every paint stroke / drawn line purely client-side in
-            // Alpine — it only syncs to the Livewire component (and from there,
-            // the database) on the next real request, i.e. when the record is
-            // actually saved. Without .defer, each tooth painted fires its own
-            // immediate Livewire round-trip; under real network latency (as on
-            // production, unlike localhost) a flood of those overlapping requests
-            // can race or silently fail, leaving marks visible on screen that
-            // never actually reached the saved form state — the tooth chart
-            // 'data loss' bug.
-            state: $wire.$entangle('{{ $getStatePath() }}').defer,
+            // Not calling .live() here keeps every paint stroke / drawn line
+            // purely client-side in Alpine — it only syncs to the Livewire
+            // component (and from there, the database) on the next real
+            // request, i.e. when the record is actually saved. (Livewire 4's
+            // $wire.$entangle() only recognizes a .live() modifier to opt IN
+            // to immediate syncing; there is no .defer — leaving it plain is
+            // already deferred by default. An earlier version of this code
+            // chained a nonexistent `.defer` onto the entangle call, which
+            // silently evaluated to `undefined` and detached `state` from
+            // Livewire entirely: teeth painted fine on screen but never
+            // reached the saved form data, so Save appeared to work while
+            // the chart quietly reverted on reload.)
+            state: $wire.$entangle('{{ $getStatePath() }}'),
             isDisabled: @js($isDisabled()),
             mode: 'stamp',
             selected: 'D',
