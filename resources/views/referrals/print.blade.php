@@ -14,28 +14,47 @@
             margin: 0;
         }
 
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: 'Noto Sans', sans-serif;
             font-size: 13pt;
             color: #1e293b;
             background: #fff;
             width: 210mm;
-            min-height: 297mm;
             margin: 0 auto;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
 
         .page {
             width: 210mm;
-            min-height: 297mm;
-            padding: 6mm 11mm 6mm;
+            height: 297mm;
+            padding: 0;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            border: 1px solid #cbd5e1;
+        }
+
+        /* Inner content gets the breathing room; header stays full-bleed */
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 3mm 9mm 4mm;
+            min-height: 0;
+            /* spread leftover height evenly so the form fills the sheet
+               instead of leaving one big gap at the bottom */
+            justify-content: space-between;
         }
 
         /* ── Header ── */
         .header {
-            margin-bottom: 3mm;
+            margin-bottom: 0;
+            flex-shrink: 0;
         }
 
         .header-banner {
@@ -257,10 +276,29 @@
             z-index: 999;
         }
 
+        /* ── Location (sits on the bottom edge) ── */
+        .location {
+            flex-shrink: 0;
+        }
+
         @media print {
             .print-btn { display: none; }
-            body { margin: 0; }
-            .page { border: none; }
+
+            html, body {
+                width: 210mm;
+                height: 297mm;
+                margin: 0;
+                padding: 0;
+            }
+
+            .page {
+                width: 210mm;
+                height: 297mm;
+                margin: 0;
+                border: none;
+                page-break-after: avoid;
+                break-after: avoid;
+            }
         }
     </style>
 </head>
@@ -293,6 +331,7 @@
         </div>
     </div>
 
+    <div class="content">
 
     {{-- Patient Fields --}}
     <div class="patient-fields">
@@ -384,7 +423,7 @@
     </div>
 
     {{-- Location Map --}}
-    <div style="margin-top:4mm;">
+    <div class="location">
         <div style="font-size:11pt; font-weight:700; letter-spacing:3px; text-transform:uppercase; margin-bottom:2mm;">Our Location</div>
         <svg viewBox="0 0 520 165" xmlns="http://www.w3.org/2000/svg" style="width:100%; display:block; border:1px solid #6b7280;">
 
@@ -461,6 +500,8 @@
 
         </svg>
     </div>
+
+    </div>{{-- /content --}}
 
 </div>
 
