@@ -138,6 +138,9 @@
             white-space: nowrap;
         }
         .contact .ico { width: 4.1mm; flex-shrink: 0; display: flex; justify-content: center; padding-top: 1.2mm; }
+        /* address can be long — bound it to the page and let it wrap instead of clipping */
+        .contact.addr { right: 8.5mm; white-space: normal; }
+        .contact.addr .txt { flex: 1; min-width: 0; overflow-wrap: break-word; }
 
         .hdr-rule {
             position: absolute;
@@ -300,8 +303,19 @@
         }
         .loc-head .rule-gold { width: 51.5mm; flex: none; }
 
-        .map { position: absolute; left: 11.9mm; top: 248mm; width: 186.4mm; }
+        .map { position: absolute; left: 11.9mm; top: 239mm; width: 186.4mm; }
         .map svg { display: block; width: 100%; }
+
+        /* ══════════════ DISCLAIMER ══════════════ */
+        .disclaimer {
+            position: absolute;
+            left: 11.9mm; top: 287.5mm; width: 186.4mm;
+            font-family: 'EB Garamond', Georgia, serif;
+            font-size: 8.5pt;
+            line-height: 3.9mm;
+            text-align: center;
+            color: var(--ink);
+        }
 
         /* ══════════════ PRINT BUTTON ══════════════ */
         .print-btn {
@@ -354,13 +368,13 @@
 
         <div class="hdr-divider"></div>
 
-        <div class="contact" style="top:10.4mm;">
+        <div class="contact addr" style="top:10.4mm;">
             <span class="ico">
                 <svg width="13" height="16" viewBox="0 0 24 30" fill="#2f7fc4">
                     <path d="M12 0C5.9 0 1 4.9 1 11c0 8.2 11 19 11 19s11-10.8 11-19c0-6.1-4.9-11-11-11zm0 15a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/>
                 </svg>
             </span>
-            <span>@foreach ($addressLines as $l){{ $l }}@if (!$loop->last)<br>@endif@endforeach</span>
+            <span class="txt">@foreach ($addressLines as $l){{ $l }}@if (!$loop->last)<br>@endif@endforeach</span>
         </div>
 
         <div class="contact" style="top:29.2mm;">
@@ -468,7 +482,7 @@
     </div>
 
     {{-- ══════════ E — CBCT ══════════ --}}
-    <div class="frame" style="left:11.9mm; top:196mm; width:186.4mm; height:23mm;">
+    <div class="frame" style="left:11.9mm; top:193mm; width:186.4mm; height:23mm;">
         <div class="ribbon-wrap" style="top:7.2mm;">
             <div class="ribbon">CONE BEAM COMPUTED TOMOGRAPHY</div>
             <div class="badge">E</div>
@@ -480,21 +494,21 @@
     </div>
 
     {{-- ══════════ REFERRED BY ══════════ --}}
-    <div class="ref-row vc" style="left:11.9mm; top:227mm; width:125.2mm;">
+    <div class="ref-row vc" style="left:11.9mm; top:221mm; width:125.2mm;">
         <span style="white-space:nowrap;">Referred by</span>
         <span class="line" style="flex:1; margin-left:3.1mm;"></span>
     </div>
-    <div class="ref-row vc" style="left:11.9mm; top:237mm; width:125.2mm;">
+    <div class="ref-row vc" style="left:11.9mm; top:230mm; width:125.2mm;">
         <span style="white-space:nowrap;">Dr.</span>
         <span class="line" style="flex:1; margin-left:1.8mm;"></span>
     </div>
-    <div class="ref-row vc" style="left:143.5mm; top:237mm; width:54.8mm;">
+    <div class="ref-row vc" style="left:143.5mm; top:230mm; width:54.8mm;">
         <span style="white-space:nowrap;">Date</span>
         <span class="line" style="flex:1; margin-left:2.9mm;"></span>
     </div>
 
     {{-- ══════════ OUR LOCATION ══════════ --}}
-    <div class="loc-head vc" style="top:245mm;">
+    <div class="loc-head vc" style="top:236.5mm;">
         <div class="txt">OUR LOCATION</div>
         <div class="rule-gold"><hr><span class="dia"></span></div>
     </div>
@@ -565,6 +579,12 @@
             <rect class="ln2" x="859" y="196" width="35" height="38"/>
             <text class="rd" transform="translate(945,126) rotate(-90)" text-anchor="middle">ST. AGNES ACADEMY</text>
         </svg>
+    </div>
+
+    {{-- ══════════ DISCLAIMER ══════════ --}}
+    <div class="disclaimer">
+        Gonzales Dental Clinic does not provide an official reading of the X-ray and CBCT requests.<br>
+        Instead, the referring dentist will interpret the results.
     </div>
 
 </div>
