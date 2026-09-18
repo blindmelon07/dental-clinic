@@ -95,6 +95,7 @@ class EquipmentResource extends Resource
                         ->minValue(0),
                     DatePicker::make('purchase_date'),
                     DatePicker::make('warranty_expires_at')->label('Warranty Expires'),
+                    DatePicker::make('expiration_date')->label('Expiration Date'),
                 ])->columns(2),
 
             Section::make('Maintenance')
@@ -128,6 +129,7 @@ class EquipmentResource extends Resource
                     TextEntry::make('purchase_date')->date()->placeholder('—'),
                     TextEntry::make('warranty_expires_at')->label('Warranty Expires')->date()->placeholder('No warranty on record')
                         ->color(fn (Equipment $record): ?string => $record->isUnderWarranty() ? 'success' : null),
+                    TextEntry::make('expiration_date')->label('Expiration Date')->date()->placeholder('—'),
                 ])->columns(2),
 
             Section::make('Maintenance')
@@ -154,6 +156,12 @@ class EquipmentResource extends Resource
                     ->formatStateUsing(fn (EquipmentStatus $state): string => $state->label()),
                 TextColumn::make('quantity')->sortable(),
                 TextColumn::make('location')->placeholder('—')->toggleable(),
+                TextColumn::make('expiration_date')
+                    ->label('Expiration Date')
+                    ->date('M d, Y')
+                    ->sortable()
+                    ->placeholder('—')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('next_maintenance_date')
                     ->label('Next Maintenance')
                     ->date('M d, Y')

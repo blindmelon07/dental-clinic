@@ -15,7 +15,7 @@ class Equipment extends Model
 
     protected $fillable = [
         'name', 'equipment_category_id', 'serial_number', 'status', 'quantity', 'location',
-        'supplier', 'purchase_date', 'purchase_cost', 'warranty_expires_at',
+        'supplier', 'purchase_date', 'purchase_cost', 'warranty_expires_at', 'expiration_date',
         'last_maintenance_date', 'next_maintenance_date', 'notes',
     ];
 
@@ -27,6 +27,7 @@ class Equipment extends Model
             'purchase_date'          => 'date',
             'purchase_cost'          => 'decimal:2',
             'warranty_expires_at'    => 'date',
+            'expiration_date'        => 'date',
             'last_maintenance_date'  => 'date',
             'next_maintenance_date'  => 'date',
         ];
