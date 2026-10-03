@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Enums\Gender;
+use App\Filament\Concerns\ManagesTrashedRecords;
 use App\Filament\Resources\PatientResource\Pages;
 use App\Models\Dentist;
 use App\Models\Patient;
@@ -36,6 +37,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class PatientResource extends Resource
 {
+    use ManagesTrashedRecords;
+
     protected static ?string $model = Patient::class;
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-users';
     protected static string|\UnitEnum|null $navigationGroup = 'Clinic Operations';
@@ -48,6 +51,21 @@ class PatientResource extends Resource
     public static function canEdit(\Illuminate\Database\Eloquent\Model $r): bool { return auth()->user()?->can('update_patient'); }
     public static function canDelete(\Illuminate\Database\Eloquent\Model $r): bool { return auth()->user()?->can('delete_patient'); }
     public static function canDeleteAny(): bool { return auth()->user()?->can('delete_patient'); }
+
+    protected static function trashPermissionKey(): string { return 'patient'; }
+
+    protected static function forceDeleteDependents(): array
+    {
+        return [
+            'appointments'         => 'patient_id',
+            'dental_records'       => 'patient_id',
+            'invoices'             => 'patient_id',
+            'payments'             => 'patient_id',
+            'prescriptions'        => 'patient_id',
+            'patient_certificates' => 'patient_id',
+            'medicine_dispensings' => 'patient_id',
+        ];
+    }
 
     public static function getGloballySearchableAttributes(): array
     {
@@ -706,13 +724,16 @@ class PatientResource extends Resource
                                 ->orWhere('next_cleaning_due', '>', now()->addDays(30));
                         }),
                     ),
+
+                static::trashFilter(),
             ])
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
+                ...static::trashActions(),
             ])
             ->bulkActions([
-                BulkActionGroup::make([DeleteBulkAction::make()]),
+                BulkActionGroup::make([DeleteBulkAction::make(), ...static::trashBulkActions()]),
             ])
             ->defaultSort('created_at', 'desc');
     }

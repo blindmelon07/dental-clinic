@@ -2,11 +2,13 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\ManagesTrashedRecords;
 use App\Filament\Resources\PrescriptionResource\Pages;
 use App\Models\Dentist;
 use App\Models\Patient;
 use App\Models\Prescription;
 use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
@@ -25,6 +27,8 @@ use Filament\Tables\Table;
 
 class PrescriptionResource extends Resource
 {
+    use ManagesTrashedRecords;
+
     protected static ?string $model = Prescription::class;
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
     protected static string|\UnitEnum|null $navigationGroup = 'Medical Records';
@@ -35,6 +39,8 @@ class PrescriptionResource extends Resource
     public static function canCreate(): bool    { return auth()->user()?->can('create_prescription'); }
     public static function canEdit(\Illuminate\Database\Eloquent\Model $r): bool { return auth()->user()?->can('update_prescription'); }
     public static function canDelete(\Illuminate\Database\Eloquent\Model $r): bool { return auth()->user()?->can('delete_prescription'); }
+
+    protected static function trashPermissionKey(): string { return 'prescription'; }
 
     public static function form(Schema $schema): Schema
     {
@@ -167,6 +173,7 @@ class PrescriptionResource extends Resource
                     ->limit(50),
                 IconColumn::make('is_printed')->label('Printed')->boolean()->sortable(),
             ])
+            ->filters([static::trashFilter()])
             ->recordActions([
                 Action::make('print')
                     ->label('Print')
@@ -176,7 +183,9 @@ class PrescriptionResource extends Resource
                     ->openUrlInNewTab(),
                 ViewAction::make(),
                 EditAction::make(),
+                ...static::trashActions(),
             ])
+            ->bulkActions([BulkActionGroup::make(static::trashBulkActions())])
             ->defaultSort('prescribed_date', 'desc');
     }
 

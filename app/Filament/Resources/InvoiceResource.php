@@ -3,9 +3,11 @@
 namespace App\Filament\Resources;
 
 use App\Enums\InvoiceStatus;
+use App\Filament\Concerns\ManagesTrashedRecords;
 use App\Filament\Resources\InvoiceResource\Pages;
 use App\Models\Invoice;
 use App\Models\Patient;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
@@ -29,6 +31,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class InvoiceResource extends Resource
 {
+    use ManagesTrashedRecords;
+
     protected static ?string $model = Invoice::class;
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
     protected static string|\UnitEnum|null $navigationGroup = 'Billing & Payments';
@@ -40,6 +44,13 @@ class InvoiceResource extends Resource
     public static function canEdit(\Illuminate\Database\Eloquent\Model $r): bool { return auth()->user()?->can('update_invoice'); }
     public static function canDelete(\Illuminate\Database\Eloquent\Model $r): bool { return auth()->user()?->can('delete_invoice'); }
     public static function canDeleteAny(): bool { return auth()->user()?->can('delete_invoice'); }
+
+    protected static function trashPermissionKey(): string { return 'invoice'; }
+
+    protected static function forceDeleteDependents(): array
+    {
+        return ['payments' => 'invoice_id'];
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -231,8 +242,11 @@ class InvoiceResource extends Resource
                     ->query(fn (Builder $query): Builder => $query
                         ->whereNotIn('status', [InvoiceStatus::Paid, InvoiceStatus::Cancelled])
                         ->where('balance_due', '>', 0)),
+
+                static::trashFilter(),
             ])
-            ->recordActions([ViewAction::make(), EditAction::make()])
+            ->recordActions([ViewAction::make(), EditAction::make(), ...static::trashActions()])
+            ->bulkActions([BulkActionGroup::make(static::trashBulkActions())])
             ->defaultSort('invoice_date', 'desc');
     }
 

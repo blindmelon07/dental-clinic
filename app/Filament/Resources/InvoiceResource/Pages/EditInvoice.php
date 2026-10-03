@@ -84,6 +84,7 @@ class EditInvoice extends EditRecord
                 }),
 
             DeleteAction::make(),
+            ...static::getResource()::trashActions(),
         ];
     }
 

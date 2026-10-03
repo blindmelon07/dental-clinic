@@ -9,5 +9,5 @@ use Filament\Resources\Pages\EditRecord;
 class EditDentist extends EditRecord
 {
     protected static string $resource = DentistResource::class;
-    protected function getHeaderActions(): array { return [DeleteAction::make()]; }
+    protected function getHeaderActions(): array { return [DeleteAction::make(), ...static::getResource()::trashActions()]; }
 }

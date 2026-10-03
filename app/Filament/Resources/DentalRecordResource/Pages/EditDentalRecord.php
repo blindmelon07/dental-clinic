@@ -69,6 +69,7 @@ class EditDentalRecord extends EditRecord
                 ->url(fn () => InvoiceResource::getUrl('view', ['record' => $this->record->invoices()->latest()->first()])),
 
             DeleteAction::make(),
+            ...static::getResource()::trashActions(),
         ];
     }
 }

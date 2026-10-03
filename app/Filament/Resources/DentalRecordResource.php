@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\ManagesTrashedRecords;
 use App\Filament\Resources\DentalRecordResource\Pages;
 use App\Filament\Resources\DentalRecordResource\RelationManagers;
 use App\Models\DentalRecord;
@@ -10,6 +11,7 @@ use App\Models\Patient;
 use App\Models\PaymentPlan;
 use App\Models\Service;
 use App\Models\XrayType;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
@@ -40,6 +42,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class DentalRecordResource extends Resource
 {
+    use ManagesTrashedRecords;
+
     protected static ?string $model = DentalRecord::class;
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-list';
     protected static string|\UnitEnum|null $navigationGroup = 'Medical Records';
@@ -51,6 +55,14 @@ class DentalRecordResource extends Resource
     public static function canEdit(Model $record): bool { return auth()->user()?->can('update_dental_record'); }
     public static function canDelete(Model $record): bool { return auth()->user()?->can('delete_dental_record'); }
     public static function canDeleteAny(): bool { return auth()->user()?->can('delete_dental_record'); }
+
+    protected static function trashPermissionKey(): string { return 'dental_record'; }
+
+    protected static function forceDeleteDependents(): array
+    {
+        // The plan cascades to its installment schedule.
+        return ['payment_plans' => 'dental_record_id'];
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -627,8 +639,11 @@ class DentalRecordResource extends Resource
                         true:  fn (Builder $q) => $q->whereHas('installments', fn (Builder $q) => $q->whereNull('payment_id')),
                         false: fn (Builder $q) => $q->whereDoesntHave('installments', fn (Builder $q) => $q->whereNull('payment_id')),
                     ),
+
+                static::trashFilter(),
             ])
-            ->recordActions([ViewAction::make(), EditAction::make()])
+            ->recordActions([ViewAction::make(), EditAction::make(), ...static::trashActions()])
+            ->bulkActions([BulkActionGroup::make(static::trashBulkActions())])
             ->defaultSort('visit_date', 'desc');
     }
 

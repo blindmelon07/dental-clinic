@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\ManagesTrashedRecords;
 use App\Filament\Resources\DentistResource\Pages;
+use Filament\Actions\BulkActionGroup;
 use App\Forms\Components\SignaturePad;
 use App\Models\Dentist;
 use Filament\Actions\EditAction;
@@ -22,6 +24,8 @@ use Filament\Tables\Table;
 
 class DentistResource extends Resource
 {
+    use ManagesTrashedRecords;
+
     protected static ?string $model = Dentist::class;
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-user-circle';
     protected static string|\UnitEnum|null $navigationGroup = 'Clinic Operations';
@@ -33,6 +37,17 @@ class DentistResource extends Resource
     public static function canEdit(\Illuminate\Database\Eloquent\Model $r): bool { return auth()->user()?->can('update_dentist'); }
     public static function canDelete(\Illuminate\Database\Eloquent\Model $r): bool { return auth()->user()?->can('delete_dentist'); }
     public static function canDeleteAny(): bool { return auth()->user()?->can('delete_dentist'); }
+
+    protected static function trashPermissionKey(): string { return 'dentist'; }
+
+    protected static function forceDeleteDependents(): array
+    {
+        return [
+            'appointments'   => 'dentist_id',
+            'dental_records' => 'dentist_id',
+            'prescriptions'  => 'dentist_id',
+        ];
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -89,7 +104,9 @@ class DentistResource extends Resource
                 TextColumn::make('appointments_count')->counts('appointments')->label('Total Appts')->sortable(),
                 IconColumn::make('is_active')->boolean()->sortable(),
             ])
-            ->recordActions([ViewAction::make(), EditAction::make()])
+            ->filters([static::trashFilter()])
+            ->recordActions([ViewAction::make(), EditAction::make(), ...static::trashActions()])
+            ->bulkActions([BulkActionGroup::make(static::trashBulkActions())])
             ->defaultSort('created_at', 'desc');
     }
 

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Enums\AppointmentStatus;
+use App\Filament\Concerns\ManagesTrashedRecords;
 use App\Filament\Resources\AppointmentResource\Pages;
 use App\Models\Appointment;
 use App\Models\AppointmentType;
@@ -32,6 +33,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class AppointmentResource extends Resource
 {
+    use ManagesTrashedRecords;
+
     protected static ?string $model = Appointment::class;
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-calendar-days';
     protected static string|\UnitEnum|null $navigationGroup = 'Appointments';
@@ -44,6 +47,8 @@ class AppointmentResource extends Resource
     public static function canEdit(\Illuminate\Database\Eloquent\Model $r): bool { return auth()->user()?->can('update_appointment'); }
     public static function canDelete(\Illuminate\Database\Eloquent\Model $r): bool { return auth()->user()?->can('delete_appointment'); }
     public static function canDeleteAny(): bool { return auth()->user()?->can('delete_appointment'); }
+
+    protected static function trashPermissionKey(): string { return 'appointment'; }
 
     public static function form(Schema $schema): Schema
     {
@@ -189,6 +194,8 @@ class AppointmentResource extends Resource
                             ->when($data['from'] ?? null, fn (Builder $q, $date) => $q->whereDate('appointment_date', '>=', $date))
                             ->when($data['until'] ?? null, fn (Builder $q, $date) => $q->whereDate('appointment_date', '<=', $date));
                     }),
+
+                static::trashFilter(),
             ])
             ->recordActions([
                 Action::make('confirm')
@@ -207,9 +214,10 @@ class AppointmentResource extends Resource
 
                 ViewAction::make(),
                 EditAction::make(),
+                ...static::trashActions(),
             ])
             ->bulkActions([
-                BulkActionGroup::make([DeleteBulkAction::make()]),
+                BulkActionGroup::make([DeleteBulkAction::make(), ...static::trashBulkActions()]),
             ])
             ->defaultSort('appointment_date', 'desc');
     }
