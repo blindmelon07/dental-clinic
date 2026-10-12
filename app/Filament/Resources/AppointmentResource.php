@@ -169,7 +169,7 @@ class AppointmentResource extends Resource
                 TextColumn::make('appointment_number')->searchable()->sortable()->copyable(),
                 TextColumn::make('appointment_date')->date()->sortable(),
                 TextColumn::make('start_time')->time()->sortable(),
-                TextColumn::make('patient.full_name')->searchable(['patient.first_name', 'patient.last_name'])->label('Patient'),
+                TextColumn::make('patient.full_name')->searchable(['first_name', 'last_name'])->label('Patient'),
                 TextColumn::make('dentist.user.name')->label('Dentist')->searchable(),
                 TextColumn::make('service.display_name')->label('Service'),
                 TextColumn::make('type')->badge()->sortable(),

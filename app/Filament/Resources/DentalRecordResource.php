@@ -594,7 +594,7 @@ class DentalRecordResource extends Resource
                     ->falseColor('gray')
                     ->tooltip(fn (bool $state): string => $state ? 'On an installment plan' : 'No installment plan'),
                 TextColumn::make('visit_date')->date()->sortable(),
-                TextColumn::make('patient.full_name')->label('Patient')->searchable(['patient.first_name', 'patient.last_name']),
+                TextColumn::make('patient.full_name')->label('Patient')->searchable(['first_name', 'last_name']),
                 TextColumn::make('dentist.user.name')->label('Dentist')->searchable(),
                 TextColumn::make('diagnosis')->limit(60)->searchable(),
                 TextColumn::make('total')->label('Total')->money('PHP'),

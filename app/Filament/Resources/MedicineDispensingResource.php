@@ -147,7 +147,7 @@ class MedicineDispensingResource extends Resource
 
                 TextColumn::make('patient.full_name')
                     ->label('Patient')
-                    ->searchable(['patient.first_name', 'patient.last_name']),
+                    ->searchable(['first_name', 'last_name']),
 
                 TextColumn::make('medicine.name')
                     ->label('Medicine')

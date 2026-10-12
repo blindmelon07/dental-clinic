@@ -165,7 +165,7 @@ class PrescriptionResource extends Resource
             ->columns([
                 TextColumn::make('prescription_number')->label('Rx #')->searchable()->sortable()->copyable(),
                 TextColumn::make('prescribed_date')->date()->sortable(),
-                TextColumn::make('patient.full_name')->label('Patient')->searchable(['patient.first_name', 'patient.last_name']),
+                TextColumn::make('patient.full_name')->label('Patient')->searchable(['first_name', 'last_name']),
                 TextColumn::make('dentist.user.name')->label('Dentist')->searchable(),
                 TextColumn::make('medications')
                     ->label('Medications')

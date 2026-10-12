@@ -685,7 +685,7 @@ class PatientResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('patient_number')->searchable()->sortable()->copyable(),
-                TextColumn::make('full_name')->searchable(['first_name', 'last_name'])->sortable(),
+                TextColumn::make('full_name')->searchable(['first_name', 'last_name'])->sortable(['last_name', 'first_name']),
                 TextColumn::make('formatted_phone')->label('Phone')->searchable(query: fn (Builder $query, string $search): Builder => $query->where('phone', 'like', "%{$search}%")),
                 TextColumn::make('gender')->badge(),
                 TextColumn::make('date_of_birth')->date()->sortable(),

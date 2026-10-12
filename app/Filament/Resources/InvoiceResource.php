@@ -224,7 +224,7 @@ class InvoiceResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('invoice_number')->searchable()->sortable()->copyable(),
-                TextColumn::make('patient.full_name')->searchable(['patient.first_name', 'patient.last_name'])->label('Patient'),
+                TextColumn::make('patient.full_name')->searchable(['first_name', 'last_name'])->label('Patient'),
                 TextColumn::make('invoice_date')->date()->sortable(),
                 TextColumn::make('total')->money('PHP')->sortable(),
                 TextColumn::make('amount_paid')->money('PHP'),

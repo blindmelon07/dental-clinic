@@ -61,7 +61,7 @@ class PaymentResource extends Resource
                 TextColumn::make('paid_at')->label('Paid At')->dateTime('M d, Y g:i A')->sortable(),
                 TextColumn::make('patient.full_name')
                     ->label('Patient')
-                    ->searchable(['patient.first_name', 'patient.last_name']),
+                    ->searchable(['first_name', 'last_name']),
                 TextColumn::make('invoice.invoice_number')->label('Invoice #')->searchable()->placeholder('—'),
                 TextColumn::make('amount')->money('PHP')->sortable()->color('success')->weight('bold'),
                 TextColumn::make('payment_method')
