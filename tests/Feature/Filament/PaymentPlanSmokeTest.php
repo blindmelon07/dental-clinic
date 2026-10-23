@@ -59,6 +59,39 @@ class PaymentPlanSmokeTest extends TestCase
         $this->assertEquals(1000.0, (float) $record->installments()->sum('amount'));
     }
 
+    public function test_installment_plan_can_start_in_the_past_and_previews_real_amounts(): void
+    {
+        $patient = Patient::factory()->create();
+        $dentist = Dentist::factory()->create();
+        $service = Service::factory()->create(['price' => 90000]);
+
+        Livewire::actingAs($this->admin)
+            ->test(CreateDentalRecord::class)
+            ->fillForm([
+                'patient_id' => $patient->id,
+                'dentist_id' => $dentist->id,
+                'visit_date' => now()->subMonths(4)->toDateString(),
+                'diagnosis'  => [['service' => $service->display_name]],
+                'is_installment' => true,
+                'paymentPlan' => [
+                    'installment_count' => 24,
+                    'frequency'         => 'monthly',
+                    'start_date'        => now()->subMonths(3)->toDateString(),
+                ],
+            ])
+            ->assertSee('₱3,750.00')
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $record = DentalRecord::first();
+        $this->assertEquals(24, $record->installments()->count());
+        $this->assertEquals(90000.0, (float) $record->installments()->sum('amount'));
+        $this->assertEquals(
+            now()->subMonths(3)->toDateString(),
+            $record->installments()->orderBy('installment_number')->first()->due_date->toDateString(),
+        );
+    }
+
     public function test_editing_toggles_installment_plan_off_and_deletes_it(): void
     {
         $patient = Patient::factory()->create();
@@ -157,8 +190,8 @@ class PaymentPlanSmokeTest extends TestCase
             ->call('create')
             ->assertHasNoFormErrors();
 
-        // Backdate the first installment directly (the form won't accept a past
-        // start_date) so there's something overdue for the widget/filter to find.
+        // Backdate the first installment directly so there's something overdue
+        // for the widget/filter to find.
         DentalRecord::first()->installments()->first()->update(['due_date' => today()->subDay()]);
         Livewire::actingAs($this->admin)
             ->test(PaymentPlanStatsWidget::class)

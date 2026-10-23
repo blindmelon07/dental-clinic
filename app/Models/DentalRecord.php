@@ -104,7 +104,31 @@ class DentalRecord extends Model
 
     public function getBalanceDueAttribute(): float
     {
-        return max(0, $this->total - (float) ($this->partial_payment ?? 0));
+        return max(0, $this->total - max((float) ($this->partial_payment ?? 0), $this->invoicePaymentsTotal()));
+    }
+
+    /**
+     * Payments recorded directly on this visit's invoice (its "Record Payment"
+     * action). `partial_payment` is the running total collected for the visit and
+     * already includes these (see syncPartialPaymentToInvoice()), so balance math
+     * takes whichever is higher rather than adding them — otherwise a visit paid
+     * only through the invoice keeps showing its full balance on the record.
+     * Excludes payments this record synced to the invoice (they mirror
+     * `partial_payment`) and payment-plan installments (the plan splits whatever
+     * balance remains, so counting them here would shrink the plan as it's paid).
+     */
+    public function invoicePaymentsTotal(): float
+    {
+        $invoice = $this->invoices()->first();
+
+        if (! $invoice) {
+            return 0;
+        }
+
+        return (float) $invoice->payments()
+            ->where('source', '!=', Payment::SOURCE_DENTAL_RECORD_SYNC)
+            ->whereNotIn('id', PaymentPlanInstallment::whereNotNull('payment_id')->select('payment_id'))
+            ->sum('amount');
     }
 
     public function diagnosisNames(): array

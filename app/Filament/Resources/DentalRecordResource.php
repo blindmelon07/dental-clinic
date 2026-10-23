@@ -198,19 +198,19 @@ class DentalRecordResource extends Resource
                     ->disabled(fn (?PaymentPlan $record) => static::installmentScheduleLocked($record)),
                 DatePicker::make('start_date')
                     ->default(now()->addWeek()->toDateString())
-                    ->minDate(now())
                     ->required()
                     ->live()
                     ->disabled(fn (?PaymentPlan $record) => static::installmentScheduleLocked($record)),
                 Placeholder::make('schedule_preview')
                     ->label('Schedule Preview')
-                    ->content(function (Get $get) {
+                    ->content(function (Get $get, ?PaymentPlan $record) {
                         $subtotal = Service::totalForDisplayNames(
-                            static::diagnosisNamesFromState($get('diagnosis', isAbsolute: true))
+                            static::diagnosisNamesFromState($get('../diagnosis'))
                         );
-                        $total = max(0, $subtotal - (float) ($get('discount', isAbsolute: true) ?? 0));
-                        $partial = array_sum(static::diagnosisPartialPaymentsFromState($get('diagnosis', isAbsolute: true)));
-                        $balance = max(0, $total - $partial);
+                        $total = max(0, $subtotal - (float) ($get('../discount') ?? 0));
+                        $partial = array_sum(static::diagnosisPartialPaymentsFromState($get('../diagnosis')));
+                        $invoicePaid = $record?->dentalRecord?->invoicePaymentsTotal() ?? 0;
+                        $balance = max(0, $total - max($partial, $invoicePaid));
 
                         $startDate = $get('start_date');
 
@@ -409,7 +409,12 @@ class DentalRecordResource extends Resource
     {
         return Placeholder::make('partial_payment_total')
             ->label('Partial Payment')
-            ->helperText('Sum of the partial payments entered per diagnosis above.')
+            ->helperText(function (?DentalRecord $record) {
+                $invoicePaid = $record?->invoicePaymentsTotal() ?? 0;
+
+                return 'Sum of the partial payments entered per diagnosis above.'
+                    . ($invoicePaid > 0 ? ' The invoice already has ₱' . number_format($invoicePaid, 2) . ' recorded — enter the full amount collected so far, including that.' : '');
+            })
             ->content(function (Get $get) {
                 $partial = array_sum(static::diagnosisPartialPaymentsFromState($get('diagnosis')));
 
@@ -421,11 +426,11 @@ class DentalRecordResource extends Resource
     {
         return Placeholder::make('balance_due')
             ->label('Balance Due')
-            ->content(function (Get $get) {
+            ->content(function (Get $get, ?DentalRecord $record) {
                 $subtotal = Service::totalForDisplayNames(static::diagnosisNamesFromState($get('diagnosis')));
                 $total = max(0, $subtotal - (float) ($get('discount') ?? 0));
                 $partial = array_sum(static::diagnosisPartialPaymentsFromState($get('diagnosis')));
-                $balance = max(0, $total - $partial);
+                $balance = max(0, $total - max($partial, $record?->invoicePaymentsTotal() ?? 0));
 
                 return '₱' . number_format($balance, 2);
             });
@@ -519,6 +524,9 @@ class DentalRecordResource extends Resource
                     TextEntry::make('discount')->label('Discount')->money('PHP'),
                     TextEntry::make('total')->label('Total')->money('PHP')->weight('bold'),
                     TextEntry::make('partial_payment')->label('Partial Payment')->money('PHP')->placeholder('—'),
+                    TextEntry::make('invoice_payments')->label('Paid on Invoice')->money('PHP')
+                        ->state(fn (DentalRecord $record) => $record->invoicePaymentsTotal())
+                        ->visible(fn (DentalRecord $record) => $record->invoicePaymentsTotal() > 0),
                     TextEntry::make('balance_due')->label('Balance Due')->money('PHP')->weight('bold')
                         ->color(fn (DentalRecord $record) => $record->balance_due > 0 ? 'danger' : 'success')
                         ->columnSpanFull(),
