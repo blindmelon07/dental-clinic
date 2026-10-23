@@ -32,6 +32,18 @@ class MedicineDispensing extends Model
             $dispensing->medicine()->decrement('current_stock', $dispensing->quantity);
         });
 
+        // Move stock when the quantity or medicine of a dispensing is edited:
+        // return the original amount to the original medicine, then deduct the new one.
+        static::updated(function (MedicineDispensing $dispensing) {
+            if (! $dispensing->wasChanged(['quantity', 'medicine_id'])) {
+                return;
+            }
+
+            Medicine::whereKey($dispensing->getOriginal('medicine_id'))
+                ->increment('current_stock', $dispensing->getOriginal('quantity'));
+            $dispensing->medicine()->decrement('current_stock', $dispensing->quantity);
+        });
+
         // Restore stock when a dispensing is deleted
         static::deleted(function (MedicineDispensing $dispensing) {
             $dispensing->medicine()->increment('current_stock', $dispensing->quantity);

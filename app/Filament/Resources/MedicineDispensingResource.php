@@ -83,6 +83,19 @@ class MedicineDispensingResource extends Resource
                         ->numeric()
                         ->required()
                         ->minValue(1)
+                        // Can't dispense more than is on hand. When editing, the units this
+                        // record already took are counted as available again.
+                        ->maxValue(function (Get $get, ?MedicineDispensing $record) {
+                            $medicine = Medicine::find($get('medicine_id'));
+
+                            if (! $medicine) {
+                                return null;
+                            }
+
+                            $alreadyDispensed = $record?->medicine_id === $medicine->id ? $record->quantity : 0;
+
+                            return max(0, $medicine->current_stock + $alreadyDispensed);
+                        })
                         ->default(1),
 
                     TextInput::make('unit_price')

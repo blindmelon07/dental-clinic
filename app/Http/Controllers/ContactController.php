@@ -27,7 +27,7 @@ class ContactController extends Controller
                 name: $data['name'],
                 email: $data['email'],
                 phone: $data['phone'] ?? null,
-                subject: $data['subject'],
+                contactSubject: $data['subject'],
                 messageBody: $data['message'],
             ));
         }

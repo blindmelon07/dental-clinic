@@ -74,7 +74,7 @@ class CreatePatient extends CreateRecord
     protected function handleRecordCreation(array $data): Model
     {
         for ($attempt = 0; true; $attempt++) {
-            $data['patient_number'] = $this->generatePatientNumber();
+            $data['patient_number'] = Patient::generateNumber();
 
             try {
                 return parent::handleRecordCreation($data);
@@ -84,18 +84,5 @@ class CreatePatient extends CreateRecord
                 }
             }
         }
-    }
-
-    protected function generatePatientNumber(): string
-    {
-        $prefix = 'PT-' . date('Ymd') . '-';
-        $sequence = Patient::withTrashed()->whereDate('created_at', today())->count() + 1;
-
-        do {
-            $number = $prefix . str_pad((string) $sequence, 4, '0', STR_PAD_LEFT);
-            $sequence++;
-        } while (Patient::withTrashed()->where('patient_number', $number)->exists());
-
-        return $number;
     }
 }

@@ -60,7 +60,7 @@ class ServiceResource extends Resource
                     TextInput::make('name')->required()->maxLength(150)->live(onBlur: true),
                     Textarea::make('description')->rows(3),
                     TextInput::make('price')->numeric()->prefix('₱')->required(),
-                    TextInput::make('duration_minutes')->numeric()->suffix('min')->default(30)->required(),
+                    TextInput::make('duration_minutes')->numeric()->minValue(1)->suffix('min')->default(30)->required(),
                     TextInput::make('sort_order')->numeric()->default(0),
                     Toggle::make('requires_xray')->default(false),
                     Toggle::make('is_active')->default(true),

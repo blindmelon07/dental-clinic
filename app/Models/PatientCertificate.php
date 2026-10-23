@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use App\Models\Concerns\Auditable;
+use App\Models\Concerns\HasDailySequenceNumber;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PatientCertificate extends Model
 {
-    use Auditable;
+    use Auditable, HasDailySequenceNumber;
 
     protected $fillable = [
         'patient_id', 'issued_by', 'type', 'certificate_number',
@@ -67,9 +68,6 @@ class PatientCertificate extends Model
 
     public static function generateNumber(): string
     {
-        return 'CERT-' . date('Ymd') . '-' . str_pad(
-            static::whereDate('created_at', today())->count() + 1,
-            4, '0', STR_PAD_LEFT
-        );
+        return static::nextDailyNumber('CERT-', 'certificate_number');
     }
 }

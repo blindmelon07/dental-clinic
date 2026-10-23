@@ -14,6 +14,8 @@
         </a>
     </div>
 
+    @include('livewire.patient.partials.status-message', ['errorKey' => 'cancel'])
+
     {{-- Filters --}}
     <div class="card px-4 py-3 mb-5 flex items-center gap-3">
         <label for="status-filter" class="text-sm font-medium text-slate-600 flex-shrink-0">Filter:</label>

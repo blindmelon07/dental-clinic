@@ -51,4 +51,40 @@ class PatientApprovalsTest extends TestCase
 
         $this->assertTrue($pendingUser->fresh()->is_active);
     }
+
+    public function test_approving_after_a_patient_was_deleted_today_does_not_reuse_a_patient_number(): void
+    {
+        $admin = User::factory()->create(['is_active' => true]);
+        $admin->assignRole('super_admin');
+
+        $clinic = Clinic::factory()->create();
+        $prefix = 'PT-' . date('Ymd') . '-';
+
+        Patient::factory()->create(['patient_number' => $prefix . '0001'])->delete();
+        Patient::factory()->create(['patient_number' => $prefix . '0002']);
+
+        $pendingUser = User::factory()->create([
+            'is_active'  => false,
+            'clinic_id'  => $clinic->id,
+            'pending_patient_data' => [
+                'first_name'    => 'John',
+                'last_name'     => 'Roe',
+                'date_of_birth' => '1990-01-01',
+                'gender'        => 'male',
+                'phone'         => '09171234567',
+                'address'       => '1 Main St',
+            ],
+        ]);
+        $pendingUser->assignRole('patient');
+
+        Livewire::actingAs($admin)
+            ->test(PatientApprovals::class)
+            ->callTableAction('approve', $pendingUser)
+            ->assertSuccessful();
+
+        $this->assertDatabaseHas('patients', [
+            'user_id'        => $pendingUser->id,
+            'patient_number' => $prefix . '0003',
+        ]);
+    }
 }

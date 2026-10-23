@@ -4,12 +4,13 @@ namespace App\Models;
 
 use App\Enums\PaymentMethod;
 use App\Models\Concerns\Auditable;
+use App\Models\Concerns\HasDailySequenceNumber;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Payment extends Model
 {
-    use Auditable;
+    use Auditable, HasDailySequenceNumber;
 
     protected $fillable = [
         'payment_number', 'invoice_id', 'patient_id', 'amount',
@@ -45,11 +46,6 @@ class Payment extends Model
 
     public static function generateNumber(): string
     {
-        return 'PAY-' . date('Ymd') . '-' . str_pad(
-            (static::whereDate('created_at', today())->count() + 1),
-            4,
-            '0',
-            STR_PAD_LEFT
-        );
+        return static::nextDailyNumber('PAY-', 'payment_number');
     }
 }

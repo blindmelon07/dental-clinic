@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\Gender;
 use App\Models\Concerns\Auditable;
+use App\Models\Concerns\HasDailySequenceNumber;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,7 +13,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Patient extends Model
 {
-    use Auditable, HasFactory, SoftDeletes;
+    use Auditable, HasDailySequenceNumber, HasFactory, SoftDeletes;
+
+    public static function generateNumber(): string
+    {
+        return static::nextDailyNumber('PT-', 'patient_number');
+    }
 
     protected $fillable = [
         'user_id', 'clinic_id', 'patient_number', 'first_name', 'last_name',

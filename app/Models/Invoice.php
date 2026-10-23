@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\InvoiceStatus;
 use App\Models\Concerns\Auditable;
+use App\Models\Concerns\HasDailySequenceNumber;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,7 +14,7 @@ use Illuminate\Database\QueryException;
 
 class Invoice extends Model
 {
-    use Auditable, HasFactory, SoftDeletes;
+    use Auditable, HasDailySequenceNumber, HasFactory, SoftDeletes;
 
     protected $fillable = [
         'invoice_number', 'clinic_id', 'patient_id', 'appointment_id', 'dental_record_id', 'status',
@@ -86,18 +87,7 @@ class Invoice extends Model
 
     public static function generateNumber(): string
     {
-        $prefix = 'INV-' . date('Ymd') . '-';
-
-        // Base the next sequence on the highest existing suffix for today (including
-        // soft-deleted invoices, since their invoice_number still occupies the unique
-        // slot). Counting non-deleted rows undercounts and produces collisions.
-        $lastSequence = static::withTrashed()
-            ->where('invoice_number', 'like', $prefix . '%')
-            ->pluck('invoice_number')
-            ->map(fn (string $number) => (int) substr($number, strlen($prefix)))
-            ->max();
-
-        return $prefix . str_pad((int) $lastSequence + 1, 4, '0', STR_PAD_LEFT);
+        return static::nextDailyNumber('INV-', 'invoice_number');
     }
 
     /**

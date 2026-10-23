@@ -5,6 +5,8 @@
         <p class="text-slate-500 mt-1.5">Manage your profile picture and account details.</p>
     </div>
 
+    @include('livewire.patient.partials.status-message')
+
     @if($this->patient)
     <div class="max-w-2xl space-y-6">
 

@@ -115,4 +115,42 @@ class MedicineDispensingResourceTest extends TestCase
         $this->assertModelMissing($dispensing);
         $this->assertEquals(100, $medicine->fresh()->current_stock);
     }
+
+    public function test_editing_a_dispensing_quantity_adjusts_stock(): void
+    {
+        $medicine = Medicine::create(['name' => 'Ibuprofen', 'current_stock' => 100]);
+        $dispensing = MedicineDispensing::create([
+            'patient_id'   => Patient::factory()->create()->id,
+            'medicine_id'  => $medicine->id,
+            'quantity'     => 5,
+            'dispensed_by' => $this->admin->id,
+            'dispensed_at' => now(),
+        ]);
+
+        Livewire::actingAs($this->admin)
+            ->test(EditMedicineDispensing::class, ['record' => $dispensing->getRouteKey()])
+            ->fillForm(['quantity' => 2])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertEquals(98, $medicine->fresh()->current_stock);
+    }
+
+    public function test_cannot_dispense_more_than_is_in_stock(): void
+    {
+        $medicine = Medicine::create(['name' => 'Mefenamic Acid', 'current_stock' => 3]);
+
+        Livewire::actingAs($this->admin)
+            ->test(CreateMedicineDispensing::class)
+            ->fillForm([
+                'patient_id'   => Patient::factory()->create()->id,
+                'medicine_id'  => $medicine->id,
+                'quantity'     => 4,
+                'dispensed_at' => now(),
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['quantity' => 'max']);
+
+        $this->assertEquals(3, $medicine->fresh()->current_stock);
+    }
 }

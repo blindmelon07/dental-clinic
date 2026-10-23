@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\Auditable;
+use App\Models\Concerns\HasDailySequenceNumber;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Prescription extends Model
 {
-    use Auditable, HasFactory, SoftDeletes;
+    use Auditable, HasDailySequenceNumber, HasFactory, SoftDeletes;
 
     protected $fillable = [
         'prescription_number', 'clinic_id', 'patient_id', 'dentist_id',
@@ -36,10 +37,7 @@ class Prescription extends Model
 
     public static function generateNumber(): string
     {
-        return 'RX-' . date('Ymd') . '-' . str_pad(
-            (static::whereDate('created_at', today())->count() + 1),
-            4, '0', STR_PAD_LEFT
-        );
+        return static::nextDailyNumber('RX-', 'prescription_number');
     }
 
     public function markPrinted(): void

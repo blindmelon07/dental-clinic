@@ -16,6 +16,7 @@ class MyAppointments extends Component
 
     public string $statusFilter = '';
     public string $search = '';
+    public ?string $successMessage = null;
 
     public bool $showCancelModal = false;
     public ?int $cancellingId = null;
@@ -80,7 +81,7 @@ class MyAppointments extends Component
         $reason = 'Cancelled by patient' . ($this->cancelReason ? ': ' . $this->cancelReason : '');
         $appointment->cancel($reason);
         $this->closeCancelModal();
-        session()->flash('success', 'Your appointment has been cancelled successfully.');
+        $this->successMessage = 'Your appointment has been cancelled successfully.';
     }
 
     public function closeCancelModal(): void

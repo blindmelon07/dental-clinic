@@ -128,4 +128,39 @@ class PrescriptionResourceTest extends TestCase
 
         $this->assertSoftDeleted($prescription);
     }
+
+    public function test_can_create_a_prescription_after_one_was_deleted_the_same_day(): void
+    {
+        // Regression test: numbering counted non-trashed rows, so with 0001 deleted
+        // and 0002 still active, the next prescription was issued 0002 again and
+        // hit the unique index — blocking new prescriptions for the rest of the day.
+        $clinic = Clinic::factory()->create();
+        $patient = Patient::factory()->create();
+        $dentist = Dentist::factory()->create();
+
+        foreach ([1, 2] as $_) {
+            Prescription::create([
+                'prescription_number' => Prescription::generateNumber(),
+                'clinic_id'           => $clinic->id,
+                'patient_id'          => $patient->id,
+                'dentist_id'          => $dentist->id,
+                'prescribed_date'     => today(),
+                'medications'         => [['name' => 'Amoxicillin']],
+            ]);
+        }
+        Prescription::orderBy('id')->first()->delete();
+
+        Livewire::actingAs($this->admin)
+            ->test(CreatePrescription::class)
+            ->fillForm([
+                'patient_id'      => $patient->id,
+                'dentist_id'      => $dentist->id,
+                'prescribed_date' => today()->format('Y-m-d'),
+                'medications'     => [['name' => 'Ibuprofen']],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('prescriptions', ['prescription_number' => 'RX-' . date('Ymd') . '-0003']);
+    }
 }

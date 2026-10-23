@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\AppointmentStatus;
 use App\Models\Concerns\Auditable;
+use App\Models\Concerns\HasDailySequenceNumber;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,7 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Appointment extends Model
 {
-    use Auditable, HasFactory, SoftDeletes;
+    use Auditable, HasDailySequenceNumber, HasFactory, SoftDeletes;
 
     protected $fillable = [
         'appointment_number', 'clinic_id', 'patient_id', 'dentist_id', 'service_id',
@@ -94,11 +95,6 @@ class Appointment extends Model
 
     public static function generateNumber(): string
     {
-        return 'APT-' . date('Ymd') . '-' . str_pad(
-            (static::withTrashed()->whereDate('created_at', today())->count() + 1),
-            4,
-            '0',
-            STR_PAD_LEFT
-        );
+        return static::nextDailyNumber('APT-', 'appointment_number');
     }
 }

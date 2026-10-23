@@ -9,6 +9,7 @@ use App\Models\Dentist;
 use App\Models\Patient;
 use App\Models\Service;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -60,33 +61,45 @@ class BookAppointment extends Component
 
         if (! $schedule) return [];
 
-        $bookedSlots = Appointment::where('dentist_id', $this->selectedDentistId)
+        // Compare full time ranges, not just start times, so a longer appointment
+        // also blocks the shorter slots it overlaps.
+        $booked = Appointment::where('dentist_id', $this->selectedDentistId)
             ->whereDate('appointment_date', $this->selectedDate)
             ->whereNotIn('status', [
                 AppointmentStatus::Cancelled->value,
                 AppointmentStatus::NoShow->value,
             ])
-            ->pluck('start_time')
-            ->map(fn ($t) => substr($t, 0, 5))
-            ->toArray();
+            ->get(['start_time', 'end_time'])
+            ->map(fn ($a) => [strtotime($a->start_time), strtotime($a->end_time)]);
 
         $slots = [];
-        $duration = $this->selectedServiceId
-            ? Service::find($this->selectedServiceId)?->duration_minutes ?? 30
-            : 30;
+        $duration = $this->slotMinutes();
 
         $current = strtotime($schedule->start_time);
         $end = strtotime($schedule->end_time);
 
         while ($current + $duration * 60 <= $end) {
-            $timeStr = date('H:i', $current);
-            if (! in_array($timeStr, $bookedSlots)) {
-                $slots[] = $timeStr;
+            $slotEnd = $current + $duration * 60;
+            $overlaps = $booked->contains(fn ($b) => $current < $b[1] && $slotEnd > $b[0]);
+            if (! $overlaps) {
+                $slots[] = date('H:i', $current);
             }
             $current += $duration * 60;
         }
 
         return $slots;
+    }
+
+    /**
+     * Length of one booking slot for the selected service. Services saved with a
+     * 0 or empty duration fall back to 30 minutes; a 0-minute step would never
+     * advance the slot loop above.
+     */
+    protected function slotMinutes(): int
+    {
+        return ($this->selectedServiceId
+            ? Service::find($this->selectedServiceId)?->duration_minutes
+            : null) ?: 30;
     }
 
     public function selectService(int $serviceId): void
@@ -119,28 +132,47 @@ class BookAppointment extends Component
         $this->validate([
             'selectedServiceId'  => 'required|exists:services,id',
             'selectedDentistId'  => 'required|exists:dentists,id',
-            'selectedDate'       => 'required|date|after_or_equal:today',
+            // The date picker starts at tomorrow; keep the server rule in step with it.
+            'selectedDate'       => 'required|date|after:today',
             'selectedTime'       => 'required',
         ]);
 
         $patient = Patient::where('user_id', Auth::id())->firstOrFail();
-        $service = Service::findOrFail($this->selectedServiceId);
-        $endTime = date('H:i', strtotime($this->selectedTime) + $service->duration_minutes * 60);
+        $endTime = date('H:i', strtotime($this->selectedTime) + $this->slotMinutes() * 60);
 
-        $appointment = Appointment::create([
-            'appointment_number' => Appointment::generateNumber(),
-            'clinic_id'          => $patient->clinic_id,
-            'patient_id'         => $patient->id,
-            'dentist_id'         => $this->selectedDentistId,
-            'service_id'         => $this->selectedServiceId,
-            'appointment_date'   => $this->selectedDate,
-            'start_time'         => $this->selectedTime,
-            'end_time'           => $endTime,
-            'type'               => $this->appointmentType,
-            'status'             => AppointmentStatus::Pending,
-            'chief_complaint'    => $this->chiefComplaint,
-            'booked_by'          => Auth::id(),
-        ]);
+        // Lock the dentist row so two patients confirming the same slot at once
+        // are serialized, then re-check the slot against the current bookings.
+        $appointment = DB::transaction(function () use ($patient, $endTime) {
+            Dentist::whereKey($this->selectedDentistId)->lockForUpdate()->first();
+
+            unset($this->availableSlots);
+            if (! in_array($this->selectedTime, $this->availableSlots, true)) {
+                return null;
+            }
+
+            return Appointment::create([
+                'appointment_number' => Appointment::generateNumber(),
+                'clinic_id'          => $patient->clinic_id,
+                'patient_id'         => $patient->id,
+                'dentist_id'         => $this->selectedDentistId,
+                'service_id'         => $this->selectedServiceId,
+                'appointment_date'   => $this->selectedDate,
+                'start_time'         => $this->selectedTime,
+                'end_time'           => $endTime,
+                'type'               => $this->appointmentType,
+                'status'             => AppointmentStatus::Pending,
+                'chief_complaint'    => $this->chiefComplaint,
+                'booked_by'          => Auth::id(),
+            ]);
+        });
+
+        if (! $appointment) {
+            $this->addError('booking', 'Sorry, that time slot is no longer available. Please choose another time.');
+            $this->selectedTime = null;
+            $this->step = 3;
+
+            return;
+        }
 
         $this->appointmentNumber = $appointment->appointment_number;
         $this->bookingComplete = true;

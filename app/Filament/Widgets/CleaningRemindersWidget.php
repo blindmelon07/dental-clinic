@@ -45,10 +45,10 @@ class CleaningRemindersWidget extends BaseWidget
                         $record->next_cleaning_due->isPast() ? 'danger' : 'warning'
                     ),
 
-                TextColumn::make('next_cleaning_due')
+                TextColumn::make('cleaning_status')
                     ->label('Status')
                     ->badge()
-                    ->formatStateUsing(fn (Patient $record): string =>
+                    ->state(fn (Patient $record): string =>
                         $record->next_cleaning_due->isPast()
                             ? 'Overdue by ' . $record->next_cleaning_due->diffForHumans(absolute: true)
                             : 'Due in ' . $record->next_cleaning_due->diffForHumans(absolute: true)

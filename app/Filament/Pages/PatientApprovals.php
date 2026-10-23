@@ -82,10 +82,7 @@ class PatientApprovals extends Page implements Tables\Contracts\HasTable
                                     ...$data,
                                     'user_id'        => $record->id,
                                     'clinic_id'      => $record->clinic_id,
-                                    'patient_number' => 'PT-' . date('Ymd') . '-' . str_pad(
-                                        Patient::whereDate('created_at', today())->count() + 1,
-                                        4, '0', STR_PAD_LEFT
-                                    ),
+                                    'patient_number' => Patient::generateNumber(),
                                 ]);
                             }
 

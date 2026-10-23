@@ -14,6 +14,7 @@ class Profile extends Component
     use WithFileUploads;
 
     public $photo;
+    public ?string $successMessage = null;
 
     #[Computed]
     public function patient(): ?Patient
@@ -45,7 +46,7 @@ class Profile extends Component
 
         $this->photo = null;
         $this->dispatch('photo-updated');
-        session()->flash('success', 'Profile picture updated successfully.');
+        $this->successMessage = 'Profile picture updated successfully.';
     }
 
     public function removePhoto(): void
@@ -59,7 +60,7 @@ class Profile extends Component
         Storage::disk('public')->delete($patient->photo);
         $patient->update(['photo' => null]);
 
-        session()->flash('success', 'Profile picture removed.');
+        $this->successMessage = 'Profile picture removed.';
     }
 
     public function render()

@@ -16,14 +16,15 @@ class ContactMessageMail extends Mailable
         public readonly string $name,
         public readonly string $email,
         public readonly ?string $phone,
-        public readonly string $subject,
+        // Not "$subject": that name is already a (non-readonly) property on Mailable.
+        public readonly string $contactSubject,
         public readonly string $messageBody,
     ) {}
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'New Contact Message: ' . $this->subject,
+            subject: 'New Contact Message: ' . $this->contactSubject,
             replyTo: [$this->email],
         );
     }
@@ -36,7 +37,7 @@ class ContactMessageMail extends Mailable
                 'name'        => $this->name,
                 'email'       => $this->email,
                 'phone'       => $this->phone,
-                'subject'     => $this->subject,
+                'subject'     => $this->contactSubject,
                 'messageBody' => $this->messageBody,
                 'clinic'      => \App\Models\SiteSetting::instance(),
             ],
