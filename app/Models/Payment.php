@@ -48,4 +48,17 @@ class Payment extends Model
     {
         return static::nextDailyNumber('PAY-', 'payment_number');
     }
+
+    /**
+     * Create a payment with a freshly generated payment_number, retrying on a
+     * duplicate-key collision instead of failing the request with a 500.
+     */
+    public static function createUnique(array $attributes): static
+    {
+        return static::retryOnDuplicateNumber(
+            'payment_number',
+            static::generateNumber(...),
+            fn (string $number) => static::create(array_merge($attributes, ['payment_number' => $number])),
+        );
+    }
 }

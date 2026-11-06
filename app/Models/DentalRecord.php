@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
 class DentalRecord extends Model
@@ -230,6 +231,19 @@ class DentalRecord extends Model
             return;
         }
 
+        // Lock the invoice row for the duration of the reconcile so two
+        // overlapping saves (e.g. a double-clicked Save button) run one after
+        // the other: the second then sees the first one's payment and finds
+        // nothing left to record, instead of both inserting the same amount.
+        DB::transaction(function () use ($invoice) {
+            $invoice = Invoice::whereKey($invoice->getKey())->lockForUpdate()->first() ?? $invoice;
+
+            $this->reconcilePartialPayment($invoice);
+        });
+    }
+
+    private function reconcilePartialPayment(Invoice $invoice): void
+    {
         $autoPayments = $invoice->payments()
             ->where('source', Payment::SOURCE_DENTAL_RECORD_SYNC)
             ->orderBy('paid_at')
@@ -245,8 +259,8 @@ class DentalRecord extends Model
         $difference = round($targetAuto - $autoPaid, 2);
 
         if ($difference > 0) {
-            $invoice->payments()->create([
-                'payment_number' => Payment::generateNumber(),
+            Payment::createUnique([
+                'invoice_id'     => $invoice->id,
                 'patient_id'     => $this->patient_id,
                 'amount'         => $difference,
                 'payment_method' => PaymentMethod::Cash,

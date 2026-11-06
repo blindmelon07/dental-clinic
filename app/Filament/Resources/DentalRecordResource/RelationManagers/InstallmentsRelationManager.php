@@ -85,8 +85,7 @@ class InstallmentsRelationManager extends RelationManager
                         $dentalRecord = $this->getOwnerRecord();
                         $invoice = $dentalRecord->getOrCreateInvoice();
 
-                        $payment = Payment::create([
-                            'payment_number'   => Payment::generateNumber(),
+                        $payment = Payment::createUnique([
                             'invoice_id'       => $invoice->id,
                             'patient_id'       => $dentalRecord->patient_id,
                             'amount'           => $data['amount'],

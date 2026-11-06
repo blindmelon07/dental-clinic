@@ -58,8 +58,7 @@ class EditInvoice extends EditRecord
                 ->action(function (array $data) {
                     $invoice = $this->record;
 
-                    Payment::create([
-                        'payment_number'   => Payment::generateNumber(),
+                    Payment::createUnique([
                         'invoice_id'       => $invoice->id,
                         'patient_id'       => $invoice->patient_id,
                         'amount'           => $data['amount'],
